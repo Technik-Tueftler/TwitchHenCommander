@@ -11,6 +11,7 @@ initial_channels = [os.getenv("INIT_CHANNELS")]
 
 hashtags = set()
 lock = asyncio.Lock()
+test_list = []
 
 
 async def check_if_broadcaster(message) -> bool:
@@ -66,7 +67,6 @@ class Bot(commands.Bot):
     async def finish(self, ctx: commands.Context):
         await ctx.send("Bot wird beendet.")
         await self.close()
-        print("Bot wird beendet")
         exit(0)
 
 
