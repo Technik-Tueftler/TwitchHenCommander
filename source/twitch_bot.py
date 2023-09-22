@@ -1,10 +1,8 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-import asyncio
-import os
-from twitchio.ext import commands
 
-lock = asyncio.Lock()
+from twitchio.ext import commands
+from source.hashtag_handler import app_data, register_new_hashtags, separate_hash, end_add_allowance,tweet_hashtags
 
 
 async def check_if_broadcaster(message) -> bool:
@@ -23,25 +21,12 @@ async def check_if_authorized(message) -> bool:
     return False
 
 
-async def separate_hash(message) -> set:
-    sep_hashtags = [element.replace("#", "")
-                    for element in message.content.lower().split(" ")
-                    if element.startswith("#") and 3 <= len(element) <= 10
-                    ]
-    return sep_hashtags
-
-
-async def register_new_hashtags(data: dict, new_hashtags) -> None:
-    async with lock:
-        merged_hashtags = set(data["tweets"]).union(set(new_hashtags))
-        data["tweets"] = list(merged_hashtags)
-
-
 class Bot(commands.Bot):
-    def __init__(self, settings: list, data: dict):
-        super().__init__(token=settings["token"], prefix="!", initial_channels=settings["channels"])
+    def __init__(self, settings: list):
+        super().__init__(
+            token=settings["token"], prefix="!", initial_channels=settings["channels"]
+        )
         self.settings = settings
-        self.data = data
 
     async def event_ready(self):
         print(f"Logged in as | {self.nick}")
@@ -54,16 +39,20 @@ class Bot(commands.Bot):
         print(message.content)
         if await check_if_authorized(message):
             new_hashtags = await separate_hash(message)
-            await register_new_hashtags(self.data, new_hashtags)
+            if len(new_hashtags) > 0:
+                await register_new_hashtags(new_hashtags)
 
         await self.handle_commands(message)
 
     @commands.command()
     async def hello(self, ctx: commands.Context):
         await ctx.send(f"Hello {ctx.author.name}!")
+        print(app_data)
 
     @commands.command()
     async def finish(self, ctx: commands.Context):
+        await end_add_allowance()
+        await tweet_hashtags()
         await ctx.send("Bot wird beendet.")
         await self.close()
         exit(0)
