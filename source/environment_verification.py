@@ -1,13 +1,55 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 import os
+import json
+from pathlib import Path
 
-client_id = os.getenv("CLIENT_ID", None)
-token = os.getenv("TOKEN", None)
-nickname = os.getenv("NICKNAME", None)
-init_channels = os.getenv("INIT_CHANNELS", None)
+from source.constants import (
+    CONFIGURATION_FILE_PATH,
+    LOG_FILE_PATH,
+    HASHTAG_MAX_LENGTH,
+    HASHTAG_MIN_LENGTH,
+    TWEET_MAX_LENGTH,
+    TWEET_START_STRING,
+    TWEET_END_STRING,
+)
 
-app_settings = {"ID": client_id, "token": token, "nickname": nickname, "channels": None}
+client_id = os.getenv("TW_CLIENT_ID", None)
+token = os.getenv("TW_TOKEN", None)
+nickname = os.getenv("TW_NICKNAME", None)
+init_channels = os.getenv("TW_INIT_CHANNELS", None)
+
+tweet_settings = {
+    "hashtag_max_length": HASHTAG_MAX_LENGTH,
+    "hashtag_min_length": HASHTAG_MIN_LENGTH,
+    "tweet_max_length": TWEET_MAX_LENGTH,
+    "tweet_start_string": TWEET_START_STRING,
+    "tweet_end_string": TWEET_END_STRING
+}
+
+app_settings = {
+    "ID": client_id,
+    "token": token,
+    "nickname": nickname,
+    "channels": None,
+}
+
+
+def check_twitter_settings():
+    if not Path(CONFIGURATION_FILE_PATH).exists(): return
+    with open(CONFIGURATION_FILE_PATH, encoding="utf-8") as file:
+        data = json.load(file)
+        if not "twitch" in data: return
+        if "hashtag_max_length" in data["twitter"]:
+            tweet_settings["len_hash_max"] = int(data["twitter"]["hashtag_max_length"])
+        if "hashtag_min_length" in data["twitter"]:
+            tweet_settings["len_hash_min"] = int(data["twitter"]["hashtag_min_length"])
+        if "tweet_max_length" in data["twitter"]:
+            tweet_settings["tweet_max_length"] = int(data["twitter"]["tweet_max_length"])
+        if "tweet_start_string" in data["twitter"]:
+            tweet_settings["tweet_start_string"] = data["twitter"]["tweet_start_string"]
+        if "tweet_end_string" in data["twitter"]:
+            tweet_settings["tweet_end_string"] = data["twitter"]["tweet_end_string"]
 
 
 def check_env_available() -> bool:
@@ -17,20 +59,35 @@ def check_env_available() -> bool:
 
 
 def check_config_available() -> bool:
-    return False
+    if not Path(CONFIGURATION_FILE_PATH).exists():
+        return
+    with open(CONFIGURATION_FILE_PATH, encoding="utf-8") as file:
+        data = json.load(file)
+        if "twitch" not in data:
+            return False
+        return True
 
 
-def setting_verification() -> bool:
+def twitch_setting_verification() -> bool:
     if check_env_available():
         app_settings["channels"] = init_channels.split(",")
         return True
     if check_config_available():
-        return True
+        if Path(CONFIGURATION_FILE_PATH).exists():
+            with open(CONFIGURATION_FILE_PATH, encoding="utf-8") as file:
+                data = json.load(file)
+            app_settings["ID"] = data["twitch"]["client_id"]
+            app_settings["token"] = data["twitch"]["token"]
+            app_settings["nickname"] = data["twitch"]["nickname"]
+            app_settings["channels"] = data["twitch"]["init_channels"].split(",")
+            return True
+    with open(LOG_FILE_PATH, "a") as file:
+        file.write("The login data for twitch is missing or incomplete.")
     return False
 
 
 def main() -> None:
-    setting_verification()
+    twitch_setting_verification()
 
 
 if __name__ == "__main__":

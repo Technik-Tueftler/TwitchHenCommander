@@ -17,11 +17,6 @@ async def tweet_hashtags():
     with open(HASHTAG_FILE_PATH, "a", encoding="utf-8") as file:
         hashtags = " ".join(app_data["tweets"])
         file.write(f"{hashtags}\n")
-    auth = tweepy.OAuthHandler(app_settings["consumer_key"], app_settings["consumer_secret"])
-    auth.set_access_token(app_settings["access_token"], app_settings["access_token_secret"])
-    api = tweepy.API(auth)
-    tweet_text = tweet_settings["tweet_start_string"] + hashtags + tweet_settings["tweet_end_string"]
-    api.update_status(status=tweet_text)
 
 
 async def end_add_allowance():
