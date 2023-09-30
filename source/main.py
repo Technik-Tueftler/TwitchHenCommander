@@ -15,6 +15,8 @@ async def my_second_task():
 def main():
     if not env.twitch_setting_verification():
         return
+    env.check_twitter_settings()
+    env.discord_setting_verification()
     app_started()
     bot = Bot(env.app_settings)
     loop = asyncio.get_event_loop()

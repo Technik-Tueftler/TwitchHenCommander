@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 from twitchio.ext import commands
-from source.hashtag_handler import app_data, register_new_hashtags, separate_hash, end_add_allowance,tweet_hashtags
+import source.hashtag_handler as hashh
 
 
 async def check_if_broadcaster(message) -> bool:
@@ -37,25 +37,29 @@ class Bot(commands.Bot):
         if message.echo:
             return
         print(message.content)
-        if await check_if_authorized(message):
-            new_hashtags = await separate_hash(message)
-            if len(new_hashtags) > 0:
-                await register_new_hashtags(new_hashtags)
+        if hashh.app_data["allowed"]:
+            if await check_if_authorized(message):
+                new_hashtags = await hashh.separate_hash(message)
+                if len(new_hashtags) > 0:
+                    await hashh.register_new_hashtags(new_hashtags)
 
         await self.handle_commands(message)
 
-    @commands.command()
-    async def hello(self, ctx: commands.Context):
-        await ctx.send(f"Hello {ctx.author.name}!")
-        print(app_data)
 
     @commands.command()
-    async def finish(self, ctx: commands.Context):
-        await end_add_allowance()
-        await tweet_hashtags()
-        await ctx.send("Bot wird beendet.")
-        await self.close()
-        exit(0)
+    async def finishHash(self, ctx: commands.Context):
+        if hashh.app_data["allowed"]:
+            await hashh.end_add_allowance()
+            await hashh.tweet_hashtags()
+            await ctx.send("Hashtag-Bot is finished and data is sent.")
+        #await self.close()
+        #exit(0)
+
+    @commands.command()
+    async def startHash(self, ctx: commands.Context):
+        if not hashh.app_data["allowed"]:
+            await hashh.start_add_allowance()
+            await ctx.send("Hashtag-Bot is running.")
 
 
 def main() -> None:

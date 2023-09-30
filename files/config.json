@@ -11,7 +11,12 @@
     "hashtag_max_length": 10,
     "hashtag_min_length": 3,
     "tweet_max_length": 280,
-    "tweet_start_string": "Highlights aus dem Stream: ",
-    "tweet_end_string": ""
+    "tweet_start_string": "Highlights aus dem Stream heute: ",
+    "tweet_end_string": " Danke das ihr dabei wart."
+  },
+  "discord":
+  {
+    "discord_username": "",
+    "webhook_url": ""
   }
 }
