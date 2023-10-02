@@ -4,7 +4,7 @@
 Main function for starting app and bot
 """
 import asyncio
-import environment_verification as env
+import source.environment_verification as env
 from source.twitch_bot import Bot
 from source.hashtag_handler import app_started
 

@@ -8,7 +8,7 @@ from datetime import datetime
 from requests import post
 import twitchio
 
-import environment_verification as env
+import source.environment_verification as env
 from source.constants import (
     HASHTAG_FILE_PATH,
 )
