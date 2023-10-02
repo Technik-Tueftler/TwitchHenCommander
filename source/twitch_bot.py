@@ -25,11 +25,7 @@ async def check_if_hash_authorized(message: twitchio.message.Message) -> bool:
     """
     if message.author.is_broadcaster:
         return True
-    if message.author.is_mod:
-        return True
-    if message.author.is_vip:
-        return True
-    return False
+    return True if message.author.is_mod else bool(message.author.is_vip)
 
 
 class Bot(commands.Bot):
