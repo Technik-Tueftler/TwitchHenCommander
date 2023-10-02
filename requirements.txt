@@ -1,0 +1,3 @@
+twitchio~=2.7.0
+discord~=2.3.2
+requests~=2.31.0
