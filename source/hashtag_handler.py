@@ -18,11 +18,13 @@ async def tweet_hashtags():
         hashtags = " ".join(app_data["tweets"])
         file.write(f"{hashtags}\n")
     if env.app_settings["dc_available"]:
-        content = env.tweet_settings["tweet_start_string"] + hashtags + " " + env.tweet_settings["tweet_end_string"]
-        data = {
-            "content": content,
-            "username": env.app_settings["discord_username"]
-        }
+        content = (
+            env.tweet_settings["tweet_start_string"]
+            + hashtags
+            + " "
+            + env.tweet_settings["tweet_end_string"]
+        )
+        data = {"content": content, "username": env.app_settings["discord_username"]}
         post(env.app_settings["webhook_url"], data=data)
     app_data["tweets"] = []
 

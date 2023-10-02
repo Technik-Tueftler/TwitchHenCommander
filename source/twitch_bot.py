@@ -45,15 +45,14 @@ class Bot(commands.Bot):
 
         await self.handle_commands(message)
 
-
     @commands.command()
     async def finishHash(self, ctx: commands.Context):
         if hashh.app_data["allowed"]:
             await hashh.end_add_allowance()
             await hashh.tweet_hashtags()
             await ctx.send("Hashtag-Bot is finished and data is sent.")
-        #await self.close()
-        #exit(0)
+        # await self.close()
+        # exit(0)
 
     @commands.command()
     async def startHash(self, ctx: commands.Context):

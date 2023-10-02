@@ -27,7 +27,7 @@ tweet_settings = {
     "hashtag_min_length": HASHTAG_MIN_LENGTH,
     "tweet_max_length": TWEET_MAX_LENGTH,
     "tweet_start_string": TWEET_START_STRING,
-    "tweet_end_string": TWEET_END_STRING
+    "tweet_end_string": TWEET_END_STRING,
 }
 
 app_settings = {
@@ -42,16 +42,20 @@ app_settings = {
 
 
 def check_twitter_settings():
-    if not Path(CONFIGURATION_FILE_PATH).exists(): return
+    if not Path(CONFIGURATION_FILE_PATH).exists():
+        return
     with open(CONFIGURATION_FILE_PATH, encoding="utf-8") as file:
         data = json.load(file)
-        if not "twitch" in data: return
+        if not "twitch" in data:
+            return
         if "hashtag_max_length" in data["twitter"]:
             tweet_settings["len_hash_max"] = int(data["twitter"]["hashtag_max_length"])
         if "hashtag_min_length" in data["twitter"]:
             tweet_settings["len_hash_min"] = int(data["twitter"]["hashtag_min_length"])
         if "tweet_max_length" in data["twitter"]:
-            tweet_settings["tweet_max_length"] = int(data["twitter"]["tweet_max_length"])
+            tweet_settings["tweet_max_length"] = int(
+                data["twitter"]["tweet_max_length"]
+            )
         if "tweet_start_string" in data["twitter"]:
             tweet_settings["tweet_start_string"] = data["twitter"]["tweet_start_string"]
         if "tweet_end_string" in data["twitter"]:
