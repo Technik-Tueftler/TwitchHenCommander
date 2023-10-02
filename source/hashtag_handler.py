@@ -1,8 +1,12 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+"""
+All functions to collect the hashtags and send the collected to the configured platforms
+"""
 import asyncio
 from datetime import datetime
 from requests import post
+import twitchio
 
 import environment_verification as env
 from source.constants import (
@@ -13,8 +17,13 @@ app_data = {"allowed": True, "tweets": []}
 lock = asyncio.Lock()
 
 
-async def tweet_hashtags():
+async def tweet_hashtags() -> None:
+    """
+    Send all the hashtags to the configured platforms
+    :return: None
+    """
     with open(HASHTAG_FILE_PATH, "a", encoding="utf-8") as file:
+        file.write(f"Hashtags ({datetime.utcnow()} UTC): ")
         hashtags = " ".join(app_data["tweets"])
         file.write(f"{hashtags}\n")
     if env.app_settings["dc_available"]:
@@ -25,21 +34,31 @@ async def tweet_hashtags():
             + env.tweet_settings["tweet_end_string"]
         )
         data = {"content": content, "username": env.app_settings["discord_username"]}
-        post(env.app_settings["webhook_url"], data=data)
+        post(env.app_settings["webhook_url"], data=data, timeout=10)
     app_data["tweets"] = []
 
 
-async def end_add_allowance():
-    async with lock:
-        app_data["allowed"] = False
+async def allow_collecting(allowance: bool) -> None:
+    """
+    Function to protect the information if app is allowed to collect the hashtags and set the
+    status of allowance
+    :param allowance: Status of collecting is allowed as bool
+    :return: None
+    """
+    if allowance:
+        async with lock:
+            app_data["allowed"] = True
+    else:
+        async with lock:
+            app_data["allowed"] = False
 
 
-async def start_add_allowance():
-    async with lock:
-        app_data["allowed"] = True
-
-
-async def separate_hash(message) -> set:
+async def separate_hash(message: twitchio.message.Message) -> set:
+    """
+    Separate all Hashtags from a twitch message
+    :param message:
+    :return:
+    """
     sep_hashtags = [
         element
         for element in message.content.lower().split(" ")
@@ -52,19 +71,31 @@ async def separate_hash(message) -> set:
     return sep_hashtags
 
 
-async def register_new_hashtags(new_hashtags) -> None:
+async def register_new_hashtags(new_hashtags: list) -> None:
+    """
+    Prevents duplications and add all new hashtags to app_data.
+    :param new_hashtags: List of hashtags from a message
+    :return: None
+    """
     async with lock:
         merged_hashtags = set(app_data["tweets"]).union(set(new_hashtags))
         app_data["tweets"] = list(merged_hashtags)
 
 
 def app_started() -> None:
+    """
+    Function to do stuff if the app started
+    :return:
+    """
     with open(HASHTAG_FILE_PATH, "a", encoding="utf-8") as file:
         file.write(f"Hashtag-Bot startet: {datetime.utcnow()} UTC \n")
 
 
 def main() -> None:
-    pass
+    """
+    Scheduling function for regular call.
+    :return: None
+    """
 
 
 if __name__ == "__main__":

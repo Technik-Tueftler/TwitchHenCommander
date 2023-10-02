@@ -1,21 +1,28 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+"""
+Main function for starting app and bot
+"""
 import asyncio
 import environment_verification as env
 from source.twitch_bot import Bot
 from source.hashtag_handler import app_started
 
 
-async def my_second_task():
-    while True:
-        print("sec Task")
-        await asyncio.sleep(3)
+# async def my_second_task():
+#     while True:
+#         print("sec Task")
+#         await asyncio.sleep(3)
 
 
-def main():
+def main() -> None:
+    """
+    Scheduling function for regular call.
+    :return: None
+    """
     if not env.twitch_setting_verification():
         return
-    env.check_twitter_settings()
+    env.check_tweet_settings()
     env.discord_setting_verification()
     app_started()
     bot = Bot(env.app_settings)
