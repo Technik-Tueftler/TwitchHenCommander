@@ -53,7 +53,7 @@ def check_tweet_settings():
         return
     with open(CONFIGURATION_FILE_PATH, encoding="utf-8") as file:
         data = json.load(file)
-        if not "twitter" in data:
+        if "twitter" not in data:
             return
         if "hashtag_max_length" in data["twitter"]:
             tweet_settings["len_hash_max"] = int(data["twitter"]["hashtag_max_length"])
@@ -74,9 +74,7 @@ def check_twitch_env_available() -> bool:
     Check if environment variables available for twitch settings
     :return: result if settings available as bool
     """
-    if None not in (client_id, token, nickname, init_channels):
-        return True
-    return False
+    return None not in (client_id, token, nickname, init_channels)
 
 
 def check_twitch_config_available() -> bool:
@@ -88,9 +86,7 @@ def check_twitch_config_available() -> bool:
         return False
     with open(CONFIGURATION_FILE_PATH, encoding="utf-8") as file:
         data = json.load(file)
-        if "twitch" not in data:
-            return False
-        return True
+        return "twitch" in data
 
 
 def twitch_setting_verification() -> bool:
@@ -119,9 +115,7 @@ def check_dc_env_available() -> bool:
     Check if environment variables available for discord settings
     :return: result if settings available as bool
     """
-    if None not in (discord_username, webhook_url):
-        return True
-    return False
+    return None not in (discord_username, webhook_url)
 
 
 def check_dc_config_available() -> bool:
@@ -133,9 +127,7 @@ def check_dc_config_available() -> bool:
         return False
     with open(CONFIGURATION_FILE_PATH, encoding="utf-8") as file:
         data = json.load(file)
-        if "discord" not in data:
-            return False
-        return True
+        return "discord" in data
 
 
 def discord_setting_verification() -> None:

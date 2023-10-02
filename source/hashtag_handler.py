@@ -45,12 +45,8 @@ async def allow_collecting(allowance: bool) -> None:
     :param allowance: Status of collecting is allowed as bool
     :return: None
     """
-    if allowance:
-        async with lock:
-            app_data["allowed"] = True
-    else:
-        async with lock:
-            app_data["allowed"] = False
+    async with lock:
+        app_data["allowed"] = allowance
 
 
 async def separate_hash(message: twitchio.message.Message) -> set:
@@ -59,7 +55,7 @@ async def separate_hash(message: twitchio.message.Message) -> set:
     :param message:
     :return:
     """
-    sep_hashtags = [
+    return [
         element
         for element in message.content.lower().split(" ")
         if element.startswith("#")
@@ -68,7 +64,6 @@ async def separate_hash(message: twitchio.message.Message) -> set:
         <= env.tweet_settings["hashtag_max_length"]
         and not element[1].isdigit()
     ]
-    return sep_hashtags
 
 
 async def register_new_hashtags(new_hashtags: list) -> None:
