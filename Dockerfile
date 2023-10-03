@@ -6,6 +6,7 @@ WORKDIR $WORKING_DIR
 COPY requirements.txt ./
 
 RUN pip install twitchio
+RUN pip install requests
 
 COPY files/ ./files/
 COPY source/ ./source/
