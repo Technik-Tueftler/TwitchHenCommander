@@ -89,6 +89,32 @@ class Bot(commands.Bot):
             await hashh.allow_collecting(True)
             await ctx.send("Hashtag-Bot is running.")
 
+    @commands.command()
+    async def statusHash(self, ctx: commands.Context) -> None:  # pylint: disable=invalid-name
+        """
+        Function command to get current status of bot
+        :param ctx: Context for bot to send a message
+        :return: None
+        """
+        if not check_if_command_authorized:
+            return
+        if hashh.app_data["allowed"]:
+            await ctx.send("Hashtag-Bot is running and ready to collect hashtags.")
+        else:
+            await ctx.send("Hashtag-Bot is paused and waiting for start-command.")
+
+    @commands.command()
+    async def helpHash(self, ctx: commands.Context) -> None:  # pylint: disable=invalid-name
+        """
+        Function command to get all hashtag bot commands
+        :param ctx: Context for bot to send a message
+        :return: None
+        """
+        if not check_if_command_authorized:
+            return
+        await ctx.send("!statusHash(get status of bot), !startHash(start hashtag collecting)"
+                       ", !finishHash(stop hashtag collecting and tweet)")
+
 
 def main() -> None:
     """
