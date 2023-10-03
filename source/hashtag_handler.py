@@ -17,6 +17,14 @@ app_data = {"allowed": True, "tweets": []}
 lock = asyncio.Lock()
 
 
+async def delete_hashtags() -> None:
+    """
+    Delete the hashtags
+    :return: None
+    """
+    app_data["tweets"] = []
+
+
 async def tweet_hashtags() -> None:
     """
     Send all the hashtags to the configured platforms

@@ -31,6 +31,7 @@ Derzeit wird nur Discord über WebHook unterstützt. Dazu muss in den Servereins
 | !statusHash | Gibt den Status des Bots aus ob er läuft oder pausiert ist. |
 | !startHash  | Beginnt das sammeln der Hashtags.                           |
 | !finishHash | Beendet das sammeln und sendet die Hashtags.                |
+| !stopHash   | Beendet das sammeln und löscht die Hashtags.                |
 
 ## Docker Compose Beispiel
 ````commandline

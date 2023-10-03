@@ -31,6 +31,7 @@ Currently only Discord is supported via WebHook. To do this, a new WebHook must 
 | !statusHash | Get status of the bot if running or paused. |
 | !startHash  | Start collecting hashtags.                  |
 | !finishHash | Finish collecting hashtags and send them.   |
+| !stopHash   | Stop collecting and delete hashtags.        |
 
 ## Docker Compose Example
 ````commandline

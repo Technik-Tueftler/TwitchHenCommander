@@ -77,6 +77,20 @@ class Bot(commands.Bot):
         # exit(0)
 
     @commands.command()
+    async def stopHash(self, ctx: commands.Context):  # pylint: disable=invalid-name
+        """
+        Function command to stop collecting hashtags and delete them
+        :param ctx: Context for bot to send a message
+        :return: None
+        """
+        if not check_if_command_authorized:
+            return
+        if hashh.app_data["allowed"]:
+            await hashh.allow_collecting(False)
+            await hashh.delete_hashtags()
+            await ctx.send("Hashtag-Bot is stopped and hashtags are deleted.")
+
+    @commands.command()
     async def startHash(self, ctx: commands.Context) -> None:  # pylint: disable=invalid-name
         """
         Function command to start collecting hashtags
@@ -113,7 +127,8 @@ class Bot(commands.Bot):
         if not check_if_command_authorized:
             return
         await ctx.send("!statusHash(get status of bot), !startHash(start hashtag collecting)"
-                       ", !finishHash(stop hashtag collecting and tweet)")
+                       ", !finishHash(finish hashtag collecting and tweet)"
+                       ", !stopHash(stop hashtag collecting and delete hashtags)")
 
 
 def main() -> None:
