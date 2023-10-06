@@ -15,6 +15,7 @@ from source.constants import (
     TWEET_MAX_LENGTH,
     TWEET_START_STRING,
     TWEET_END_STRING,
+    HASHTAG_ALL_LOWER_CASE
 )
 
 client_id = os.getenv("TW_CLIENT_ID", None)
@@ -31,6 +32,7 @@ tweet_settings = {
     "tweet_max_length": TWEET_MAX_LENGTH,
     "tweet_start_string": TWEET_START_STRING,
     "tweet_end_string": TWEET_END_STRING,
+    "hashtag_all_lower_case": HASHTAG_ALL_LOWER_CASE,
 }
 
 app_settings = {
@@ -67,6 +69,8 @@ def check_tweet_settings():
             tweet_settings["tweet_start_string"] = data["twitter"]["tweet_start_string"]
         if "tweet_end_string" in data["twitter"]:
             tweet_settings["tweet_end_string"] = data["twitter"]["tweet_end_string"]
+        if "hashtag_all_lower_case" in data["twitter"]:
+            tweet_settings["hashtag_all_lower_case"] = data["twitter"]["hashtag_all_lower_case"]
 
 
 def check_twitch_env_available() -> bool:

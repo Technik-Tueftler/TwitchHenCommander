@@ -63,14 +63,18 @@ async def separate_hash(message: twitchio.message.Message) -> set:
     :param message:
     :return:
     """
+    converted_message = message.content
+    if env.tweet_settings["hashtag_all_lower_case"]:
+        converted_message = message.content.lower()
     return [
         element
-        for element in message.content.lower().split(" ")
+        for element in converted_message.split(" ")
         if element.startswith("#")
         and env.tweet_settings["hashtag_min_length"]
         <= len(element)
         <= env.tweet_settings["hashtag_max_length"]
         and not element[1].isdigit()
+        and not element.count('#') > 1
     ]
 
 

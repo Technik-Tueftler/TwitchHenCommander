@@ -12,7 +12,8 @@
     "hashtag_min_length": 3,
     "tweet_max_length": 280,
     "tweet_start_string": "Highlights aus dem Stream heute: ",
-    "tweet_end_string": "Danke, dass ihr heute da wart."
+    "tweet_end_string": "Danke, dass ihr heute da wart.",
+    "hashtag_all_lower_case": false
   },
   "discord":
   {
