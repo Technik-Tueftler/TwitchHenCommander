@@ -8,7 +8,7 @@
   },
   "twitter":
   {
-    "hashtag_max_length": 10,
+    "hashtag_max_length": 20,
     "hashtag_min_length": 3,
     "tweet_max_length": 280,
     "tweet_start_string": "Highlights aus dem Stream heute: ",

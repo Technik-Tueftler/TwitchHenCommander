@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-Checks if all environment variables and required input are given and provides helper functions.
+Checks if all environment variables and input are given and provides helper functions.
 """
 import os
 import json
@@ -56,9 +56,9 @@ def check_tweet_settings():
         if "twitter" not in data:
             return
         if "hashtag_max_length" in data["twitter"]:
-            tweet_settings["len_hash_max"] = int(data["twitter"]["hashtag_max_length"])
+            tweet_settings["hashtag_max_length"] = int(data["twitter"]["hashtag_max_length"])
         if "hashtag_min_length" in data["twitter"]:
-            tweet_settings["len_hash_min"] = int(data["twitter"]["hashtag_min_length"])
+            tweet_settings["hashtag_min_length"] = int(data["twitter"]["hashtag_min_length"])
         if "tweet_max_length" in data["twitter"]:
             tweet_settings["tweet_max_length"] = int(
                 data["twitter"]["tweet_max_length"]
