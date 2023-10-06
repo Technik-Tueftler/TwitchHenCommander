@@ -74,7 +74,7 @@ async def separate_hash(message: twitchio.message.Message) -> set:
         <= len(element)
         <= env.tweet_settings["hashtag_max_length"]
         and not element[1].isdigit()
-        and not element.count('#') > 1
+        and element.count('#') <= 1
     ]
 
 
