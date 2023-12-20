@@ -5,7 +5,7 @@ Functions and classes for the twitch bot with all allowed commands
 """
 import twitchio
 from twitchio.ext import commands
-import source.hashtag_handler as hashh
+import hashtag_handler as hashh
 
 
 async def check_if_command_authorized(ctx: commands.Context) -> bool:
@@ -55,6 +55,7 @@ class Bot(commands.Bot):
         if hashh.app_data["allowed"]:
             if await check_if_hash_authorized(message):
                 new_hashtags = await hashh.separate_hash(message)
+                print(new_hashtags)
                 if len(new_hashtags) > 0:
                     await hashh.register_new_hashtags(new_hashtags)
 
