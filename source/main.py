@@ -4,9 +4,9 @@
 Main function for starting app and bot
 """
 import asyncio
-import source.environment_verification as env
-from source.twitch_bot import Bot
-from source.hashtag_handler import app_started
+import environment_verification as env
+from twitch_bot import Bot
+from hashtag_handler import app_started
 
 
 # async def my_second_task():
@@ -28,8 +28,7 @@ def main() -> None:
     bot = Bot(env.app_settings)
     loop = asyncio.get_event_loop()
     bot_task = loop.create_task(bot.start())
-
-    # second_task = loop.create_task(my_second_task())
+    # clip_task = loop.create_task(my_second_task())
 
     try:
         loop.run_until_complete(asyncio.gather(bot_task))

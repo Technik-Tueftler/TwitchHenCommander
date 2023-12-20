@@ -7,7 +7,7 @@ import os
 import json
 from pathlib import Path
 
-from source.constants import (
+from constants import (
     CONFIGURATION_FILE_PATH,
     LOG_FILE_PATH,
     HASHTAG_MAX_LENGTH,
