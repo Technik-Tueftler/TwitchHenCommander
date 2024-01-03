@@ -10,3 +10,6 @@ TWEET_MAX_LENGTH = 280
 TWEET_START_STRING = "Highlights aus dem Stream: "
 TWEET_END_STRING = "Danke, dass ihr heute da wart."
 HASHTAG_ALL_LOWER_CASE = False
+TWITCH_WEBSOCKET_URL = "wss://eventsub.wss.twitch.tv/ws"
+TWITCH_SUBSCRIPTION_URL = "https://api.twitch.tv/helix/eventsub/subscriptions"
+REQUEST_TIMEOUT = 10

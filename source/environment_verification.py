@@ -7,6 +7,8 @@ import os
 import json
 from pathlib import Path
 
+import requests
+
 from constants import (
     CONFIGURATION_FILE_PATH,
     LOG_FILE_PATH,
@@ -15,13 +17,15 @@ from constants import (
     TWEET_MAX_LENGTH,
     TWEET_START_STRING,
     TWEET_END_STRING,
-    HASHTAG_ALL_LOWER_CASE
+    HASHTAG_ALL_LOWER_CASE,
+    REQUEST_TIMEOUT
 )
 
 client_id = os.getenv("TW_CLIENT_ID", None)
 token = os.getenv("TW_TOKEN", None)
 nickname = os.getenv("TW_NICKNAME", None)
 init_channels = os.getenv("TW_INIT_CHANNELS", None)
+broadcaster_id = os.getenv("TW_BROADCASTER_ID", None)
 
 discord_username = os.getenv("DC_USER_NAME", None)
 webhook_url = os.getenv("DC_WEBHOOK_URL", None)
@@ -39,6 +43,7 @@ app_settings = {
     "ID": client_id,
     "token": token,
     "nickname": nickname,
+    "broadcaster_id": broadcaster_id,
     "channels": None,
     "discord_username": discord_username,
     "webhook_url": webhook_url,
@@ -58,9 +63,13 @@ def check_tweet_settings():
         if "twitter" not in data:
             return
         if "hashtag_max_length" in data["twitter"]:
-            tweet_settings["hashtag_max_length"] = int(data["twitter"]["hashtag_max_length"])
+            tweet_settings["hashtag_max_length"] = int(
+                data["twitter"]["hashtag_max_length"]
+            )
         if "hashtag_min_length" in data["twitter"]:
-            tweet_settings["hashtag_min_length"] = int(data["twitter"]["hashtag_min_length"])
+            tweet_settings["hashtag_min_length"] = int(
+                data["twitter"]["hashtag_min_length"]
+            )
         if "tweet_max_length" in data["twitter"]:
             tweet_settings["tweet_max_length"] = int(
                 data["twitter"]["tweet_max_length"]
@@ -70,7 +79,9 @@ def check_tweet_settings():
         if "tweet_end_string" in data["twitter"]:
             tweet_settings["tweet_end_string"] = data["twitter"]["tweet_end_string"]
         if "hashtag_all_lower_case" in data["twitter"]:
-            tweet_settings["hashtag_all_lower_case"] = data["twitter"]["hashtag_all_lower_case"]
+            tweet_settings["hashtag_all_lower_case"] = data["twitter"][
+                "hashtag_all_lower_case"
+            ]
 
 
 def check_twitch_env_available() -> bool:
@@ -100,6 +111,10 @@ def twitch_setting_verification() -> bool:
     """
     if check_twitch_env_available():
         app_settings["channels"] = init_channels.split(",")
+        url = f"https://api.twitch.tv/helix/users?login={app_settings['nickname']}"
+        headers = {"Client-ID": client_id, "Authorization": f"Bearer {token}"}
+        response = requests.get(url, headers=headers, timeout=REQUEST_TIMEOUT).json()
+        app_settings["broadcaster_id"] = response["data"][0]["id"]
         return True
     if check_twitch_config_available():
         with open(CONFIGURATION_FILE_PATH, encoding="utf-8") as file:
@@ -108,6 +123,7 @@ def twitch_setting_verification() -> bool:
         app_settings["token"] = data["twitch"]["token"]
         app_settings["nickname"] = data["twitch"]["nickname"]
         app_settings["channels"] = data["twitch"]["init_channels"].split(",")
+        # ToDo: hier noch den nickname hinzufügen
         return True
     with open(LOG_FILE_PATH, "a", encoding="utf-8") as file:
         file.write("The login data for twitch is missing or incomplete.")
