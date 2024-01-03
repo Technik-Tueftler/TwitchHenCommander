@@ -2,7 +2,7 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "Python: Current File",
+            "name": "Main",
             "type": "python",
             "request": "launch",
             "program": "${workspaceFolder}/source/main.py",
@@ -12,10 +12,10 @@
             "envFile": "D:/Workspace/git/TeTueSecrets/TwitchHashtagBot/.env.development"
         },
         {
-            "name": "Python: Current File 2",
+            "name": "Test",
             "type": "python",
             "request": "launch",
-            "program": "${workspaceFolder}/source/test2.py",
+            "program": "${workspaceFolder}/source/test.py",
             "console": "integratedTerminal",
             "justMyCode": true,
             "cwd": "${workspaceFolder}/source",
