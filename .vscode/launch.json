@@ -10,6 +10,16 @@
             "justMyCode": true,
             "cwd": "${workspaceFolder}/source",
             "envFile": "D:/Workspace/git/TeTueSecrets/TwitchHashtagBot/.env.development"
+        },
+        {
+            "name": "Python: Current File 2",
+            "type": "python",
+            "request": "launch",
+            "program": "${workspaceFolder}/source/test2.py",
+            "console": "integratedTerminal",
+            "justMyCode": true,
+            "cwd": "${workspaceFolder}/source",
+            "envFile": "D:/Workspace/git/TeTueSecrets/TwitchHashtagBot/.env.development"
         }
     ]
 }
