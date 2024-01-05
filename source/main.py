@@ -6,6 +6,7 @@ Main function for starting app and bot
 import asyncio
 import environment_verification as env
 from twitch_bot import Bot
+from twitch_api_websocket import websocket_listener
 from hashtag_handler import app_started
 
 
@@ -28,15 +29,15 @@ def main() -> None:
     bot = Bot(env.app_settings)
     loop = asyncio.get_event_loop()
     bot_task = loop.create_task(bot.start())
-    # clip_task = loop.create_task(my_second_task())
+    twitch_websocket = loop.create_task(websocket_listener(env.app_settings))
 
     try:
-        loop.run_until_complete(asyncio.gather(bot_task))
-        # loop.run_until_complete(asyncio.gather(bot_task, second_task))
+        # loop.run_until_complete(asyncio.gather(bot_task))
+        loop.run_until_complete(asyncio.gather(bot_task, twitch_websocket))
     except KeyboardInterrupt:
         bot_task.cancel()
         # second_task.cancel()
-        loop.run_until_complete(asyncio.gather(bot_task, return_exceptions=True))
+        loop.run_until_complete(asyncio.gather(bot_task, twitch_websocket, return_exceptions=True))
         # loop.run_until_complete(asyncio.gather(bot_task, second_task, return_exceptions=True))
     finally:
         loop.close()

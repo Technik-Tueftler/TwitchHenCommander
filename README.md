@@ -1,5 +1,5 @@
-# TwitchHashtagBot
-TwitchHashtagBot is a bot that listens to configured twitch channels and collects hashtags from broadcaster, mod or vip in the chat. Finally, the broadcaster can post them on various platforms.
+# TwitchHenCommander
+TwitchHenCommander is a bot that listens to configured twitch channels and collects hashtags from broadcaster, mod or vip in the chat. Finally, the broadcaster can post them on various platforms.
 
 [English readme](https://github.com/Technik-Tueftler/TwitchHashtagBot/blob/main/README.md)
  • [deutsche readme](https://github.com/Technik-Tueftler/TwitchHashtagBot/blob/main/README.de.md)

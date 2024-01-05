@@ -1,5 +1,5 @@
-# TwitchHashtagBot
-Der TwitchHashtagBot ist ein Bot, welcher auf konfigurierte Twitchkanäle hört und dort die Hashtags sammelt, welche vom Streamer, Mod oder Vip im Chat geschrieben wurde. Am Ende kann der Streamer diese auf konfigurierte Kanäle posten.
+# TwitchHenCommander
+Der TwitchHenCommander ist ein Bot, welcher auf konfigurierte Twitchkanäle hört und dort die Hashtags sammelt, welche vom Streamer, Mod oder Vip im Chat geschrieben wurde. Am Ende kann der Streamer diese auf konfigurierte Kanäle posten.
 
 [deutsche readme](https://github.com/Technik-Tueftler/TwitchHashtagBot/blob/main/README.de.md)
  • [English readme](https://github.com/Technik-Tueftler/TwitchHashtagBot/blob/main/README.md)

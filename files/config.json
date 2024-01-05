@@ -4,7 +4,8 @@
     "client_id": "",
     "token": "",
     "nickname": "",
-    "init_channels": ""
+    "init_channels": "",
+    "broadcaster_id": ""
   },
   "twitter":
   {
