@@ -123,7 +123,7 @@ def twitch_setting_verification() -> bool:
         app_settings["token"] = data["twitch"]["token"]
         app_settings["nickname"] = data["twitch"]["nickname"]
         app_settings["channels"] = data["twitch"]["init_channels"].split(",")
-        # ToDo: hier noch den nickname hinzufügen
+        app_settings["broadcaster_id"] = data["twitch"]["broadcaster_id"]
         return True
     with open(LOG_FILE_PATH, "a", encoding="utf-8") as file:
         file.write("The login data for twitch is missing or incomplete.")

@@ -7,6 +7,7 @@ COPY requirements.txt ./
 
 RUN pip install twitchio
 RUN pip install requests
+RUN pip install websockets
 
 COPY files/ ./files/
 COPY source/ ./source/
