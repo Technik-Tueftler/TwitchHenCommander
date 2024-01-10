@@ -184,7 +184,7 @@ def discord_setting_verification() -> None:
     app_settings["dc_available"] = False
     return
 
-    
+
 def bot_setting_verification() -> None:
     """
     Check if bot settings are available or app have to use the generic ones
