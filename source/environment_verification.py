@@ -18,7 +18,12 @@ from constants import (
     TWEET_START_STRING,
     TWEET_END_STRING,
     HASHTAG_ALL_LOWER_CASE,
-    REQUEST_TIMEOUT
+    REQUEST_TIMEOUT,
+    BOT_HASHTAG_COMMAND_START,
+    BOT_HASHTAG_COMMAND_FINISH,
+    BOT_HASHTAG_COMMAND_STOP,
+    BOT_HASHTAG_COMMAND_HELP,
+    BOT_HASHTAG_COMMAND_STATUS
 )
 
 client_id = os.getenv("TW_CLIENT_ID", None)
@@ -29,6 +34,14 @@ broadcaster_id = os.getenv("TW_BROADCASTER_ID", None)
 
 discord_username = os.getenv("DC_USER_NAME", None)
 webhook_url = os.getenv("DC_WEBHOOK_URL", None)
+
+bot_hashtag_commands = {
+    "start_hashtag_bot_command": BOT_HASHTAG_COMMAND_START,
+    "finish_hashtag_bot_command": BOT_HASHTAG_COMMAND_FINISH,
+    "stop_hashtag_bot_command": BOT_HASHTAG_COMMAND_STOP,
+    "help_hashtag_bot_command": BOT_HASHTAG_COMMAND_HELP,
+    "status_hashtag_bot_command": BOT_HASHTAG_COMMAND_STATUS
+}
 
 tweet_settings = {
     "hashtag_max_length": HASHTAG_MAX_LENGTH,
@@ -45,6 +58,7 @@ app_settings = {
     "nickname": nickname,
     "broadcaster_id": broadcaster_id,
     "channels": None,
+    "bot_ready": False,
     "discord_username": discord_username,
     "webhook_url": webhook_url,
     "dc_available": False,
@@ -169,6 +183,29 @@ def discord_setting_verification() -> None:
         file.write("The login data for discord is missing or incomplete.")
     app_settings["dc_available"] = False
     return
+
+    
+def bot_setting_verification() -> None:
+    """
+    Check if bot settings are available or app have to use the generic ones
+    :return: None
+    """
+    if not Path(CONFIGURATION_FILE_PATH).exists():
+        return
+    with open(CONFIGURATION_FILE_PATH, encoding="utf-8") as file:
+        data = json.load(file)
+    if not "bot" in data:
+        return
+    if "start_bot_command" in data["bot"]:
+        bot_hashtag_commands["start_hashtag_bot_command"] = data["bot"]["start_bot_command"]
+    if "finish_bot_command" in data["bot"]:
+        bot_hashtag_commands["finish_hashtag_bot_command"] = data["bot"]["finish_bot_command"]
+    if "stop_bot_command" in data["bot"]:
+        bot_hashtag_commands["stop_hashtag_bot_command"] = data["bot"]["stop_bot_command"]
+    if "help_bot_command" in data["bot"]:
+        bot_hashtag_commands["help_hashtag_bot_command"] = data["bot"]["help_bot_command"]
+    if "status_bot_command" in data["bot"]:
+        bot_hashtag_commands["status_hashtag_bot_command"] = data["bot"]["status_bot_command"]
 
 
 def main() -> None:

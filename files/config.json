@@ -7,6 +7,14 @@
     "init_channels": "",
     "broadcaster_id": ""
   },
+  "bot":
+  {
+    "start_bot_command":"starthash",
+    "finish_bot_command":"finishhash",
+    "stop_bot_command":"stophash",
+    "status_bot_command":"statushash",
+    "help_bot_command":"helphash"
+  },
   "twitter":
   {
     "hashtag_max_length": 20,
