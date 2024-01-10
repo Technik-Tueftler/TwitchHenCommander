@@ -13,6 +13,7 @@ HASHTAG_ALL_LOWER_CASE = False
 TWITCH_WEBSOCKET_URL = "wss://eventsub.wss.twitch.tv/ws"
 TWITCH_SUBSCRIPTION_URL = "https://api.twitch.tv/helix/eventsub/subscriptions"
 REQUEST_TIMEOUT = 10
+START_BOT_AT_STREAMSTART = False
 BOT_HASHTAG_COMMAND_START = "starthash"
 BOT_HASHTAG_COMMAND_FINISH = "finishhash"
 BOT_HASHTAG_COMMAND_STOP = "stophash"

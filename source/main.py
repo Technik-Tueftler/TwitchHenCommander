@@ -19,14 +19,18 @@ def main() -> None:
         return
     env.check_tweet_settings()
     env.discord_setting_verification()
+    env.bot_setting_verification()
     app_started()
     bot = Bot(env.app_settings)
     loop = asyncio.get_event_loop()
+    tasks_to_start = []
     bot_task = loop.create_task(bot.start())
-    twitch_websocket = loop.create_task(websocket_listener(env.app_settings))
-
+    tasks_to_start.append(bot_task)
+    if env.app_settings["start_bot_at_streamstart"]:
+        twitch_websocket = loop.create_task(websocket_listener(env.app_settings))
+        tasks_to_start.append(twitch_websocket)
     try:
-        loop.run_until_complete(asyncio.gather(bot_task, twitch_websocket))
+        loop.run_until_complete(asyncio.gather(*tasks_to_start))
     except KeyboardInterrupt:
         loop.run_until_complete(asyncio.gather(bot_task, twitch_websocket, return_exceptions=True))
     finally:

@@ -23,7 +23,8 @@ from constants import (
     BOT_HASHTAG_COMMAND_FINISH,
     BOT_HASHTAG_COMMAND_STOP,
     BOT_HASHTAG_COMMAND_HELP,
-    BOT_HASHTAG_COMMAND_STATUS
+    BOT_HASHTAG_COMMAND_STATUS,
+    START_BOT_AT_STREAMSTART
 )
 
 client_id = os.getenv("TW_CLIENT_ID", None)
@@ -62,6 +63,7 @@ app_settings = {
     "discord_username": discord_username,
     "webhook_url": webhook_url,
     "dc_available": False,
+    "start_bot_at_streamstart": START_BOT_AT_STREAMSTART
 }
 
 
@@ -206,6 +208,8 @@ def bot_setting_verification() -> None:
         bot_hashtag_commands["help_hashtag_bot_command"] = data["bot"]["help_bot_command"]
     if "status_bot_command" in data["bot"]:
         bot_hashtag_commands["status_hashtag_bot_command"] = data["bot"]["status_bot_command"]
+    if "start_bot_at_streamstart" in data["bot"]:
+        app_settings["start_bot_at_streamstart"] = data["bot"]["start_bot_at_streamstart"]
 
 
 def main() -> None:

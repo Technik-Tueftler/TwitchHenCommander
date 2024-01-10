@@ -9,6 +9,7 @@
   },
   "bot":
   {
+    "start_bot_at_streamstart": true,
     "start_bot_command":"starthash",
     "finish_bot_command":"finishhash",
     "stop_bot_command":"stophash",
