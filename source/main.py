@@ -29,12 +29,7 @@ def main() -> None:
     if env.app_settings["start_bot_at_streamstart"]:
         twitch_websocket = loop.create_task(websocket_listener(env.app_settings))
         tasks_to_start.append(twitch_websocket)
-    try:
-        loop.run_until_complete(asyncio.gather(*tasks_to_start))
-    except KeyboardInterrupt:
-        loop.run_until_complete(asyncio.gather(bot_task, twitch_websocket, return_exceptions=True))
-    finally:
-        loop.close()
+    loop.run_until_complete(asyncio.gather(*tasks_to_start))
 
 
 if __name__ == "__main__":
