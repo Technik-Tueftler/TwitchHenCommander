@@ -6,7 +6,6 @@ HASHTAG_FILE_PATH = "../files/hashtags.txt"
 LOG_FILE_PATH = "../files/log.txt"
 HASHTAG_MAX_LENGTH = 10
 HASHTAG_MIN_LENGTH = 3
-TWEET_MAX_LENGTH = 280
 TWEET_START_STRING = "Highlights: "
 TWEET_END_STRING = "Thanks!"
 HASHTAG_ALL_LOWER_CASE = False
