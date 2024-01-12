@@ -47,7 +47,6 @@ bot_hashtag_commands = {
 tweet_settings = {
     "hashtag_max_length": HASHTAG_MAX_LENGTH,
     "hashtag_min_length": HASHTAG_MIN_LENGTH,
-    "tweet_max_length": TWEET_MAX_LENGTH,
     "tweet_start_string": TWEET_START_STRING,
     "tweet_end_string": TWEET_END_STRING,
     "hashtag_all_lower_case": HASHTAG_ALL_LOWER_CASE,
