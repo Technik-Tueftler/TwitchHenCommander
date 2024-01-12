@@ -1,8 +1,8 @@
 # TwitchHenCommander
 Der TwitchHenCommander ist ein Bot, welcher auf den konfigurierten Twitchkanale hört und dort die Hashtags sammelt, welche vom Streamer, Mod oder Vip im Chat geschrieben wurde. Am Ende kann der Streamer diese auf konfigurierte Kanäle posten. Aktuell wird nur Discord unterstützt.  
 
-[deutsche readme](https://github.com/Technik-Tueftler/TwitchHashtagBot/blob/main/README.de.md)
- • [English readme](https://github.com/Technik-Tueftler/TwitchHashtagBot/blob/main/README.md)
+[deutsche readme](https://github.com/Technik-Tueftler/TwitchHenCommander/blob/main/README.de.md)
+ • [English readme](https://github.com/Technik-Tueftler/TwitchHenCommander/blob/main/README.md)
 
 ## Installation / Ausführung
 1. führt das Programm lokal aus, indem es die Hauptdatei ausführt. Dazu wird einfach das Repository kopiert und `main.py` ausgeführt. Derzeit müssen zunächst Umgebungsvariablen in die IDE oder Umgebung geladen werden. Die Logindaten könne auch in der ``/files/config.json`` abgelegt werden. Das Programm wurde unter Python 3.11 getestet und entwickelt.  
