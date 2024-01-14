@@ -10,6 +10,7 @@
   "bot":
   {
     "start_bot_at_streamstart": true,
+    "finish_bot_at_streamend": true,
     "start_bot_command":"starthash",
     "finish_bot_command":"finishhash",
     "stop_bot_command":"stophash",
