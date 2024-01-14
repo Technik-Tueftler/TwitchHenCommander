@@ -19,7 +19,7 @@ async def websocket_listener(settings: dict) -> None:
     async with connect(TWITCH_WEBSOCKET_URL) as websocket:
         welcome_message = json.loads(await websocket.recv())
         websocket_id = welcome_message["payload"]["session"]["id"]
-        subscriptions_message = {
+        subscriptions_message_online = {
             "type": "stream.online",
             "version": "1",
             "condition": {"broadcaster_user_id": settings["broadcaster_id"]},
@@ -31,7 +31,25 @@ async def websocket_listener(settings: dict) -> None:
         }
         response = requests.post(
             TWITCH_SUBSCRIPTION_URL,
-            json=subscriptions_message,
+            json=subscriptions_message_online,
+            headers=headers,
+            timeout=REQUEST_TIMEOUT,
+        )
+        print(response.json())
+
+        subscriptions_message_offline = {
+            "type": "stream.offline",
+            "version": "1",
+            "condition": {"broadcaster_user_id": settings["broadcaster_id"]},
+            "transport": {"method": "websocket", "session_id": websocket_id},
+        }
+        headers = {
+            "Client-ID": settings["ID"],
+            "Authorization": f"Bearer {settings['token']}",
+        }
+        response = requests.post(
+            TWITCH_SUBSCRIPTION_URL,
+            json=subscriptions_message_offline,
             headers=headers,
             timeout=REQUEST_TIMEOUT,
         )
