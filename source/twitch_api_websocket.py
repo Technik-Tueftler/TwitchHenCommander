@@ -62,12 +62,13 @@ async def websocket_listener(settings: dict) -> None:
                         event_data["payload"]["event"]["broadcaster_user_id"]
                         != settings["broadcaster_id"]
                     ):
-                 continue
+                continue
             if event_data["metadata"]["message_type"] == "notification":
                 if event_data["metadata"]["subscription_type"] == "stream.online":
                     await hashh.allow_collecting(True)
                 if event_data["metadata"]["subscription_type"] == "stream.offline":
-                    ...
+                    await hashh.allow_collecting(False)
+                    await hashh.tweet_hashtags()
             print(25 * "-")
             print(json.loads(event))
 
