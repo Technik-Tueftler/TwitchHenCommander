@@ -58,12 +58,16 @@ async def websocket_listener(settings: dict) -> None:
         while True:
             event = await websocket.recv()
             event_data = json.loads(event)
+            if (
+                        event_data["payload"]["event"]["broadcaster_user_id"]
+                        != settings["broadcaster_id"]
+                    ):
+                 continue
             if event_data["metadata"]["message_type"] == "notification":
-                if (
-                    event_data["payload"]["event"]["broadcaster_user_id"]
-                    == settings["broadcaster_id"]
-                ):
+                if event_data["metadata"]["subscription_type"] == "stream.online":
                     await hashh.allow_collecting(True)
+                if event_data["metadata"]["subscription_type"] == "stream.offline":
+                    ...
             print(25 * "-")
             print(json.loads(event))
 
