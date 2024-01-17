@@ -6,7 +6,7 @@ Checks if all environment variables and input are given and provides helper func
 import os
 import json
 from pathlib import Path
-
+from enum import Enum
 import requests
 
 from constants import (
@@ -24,8 +24,16 @@ from constants import (
     BOT_HASHTAG_COMMAND_HELP,
     BOT_HASHTAG_COMMAND_STATUS,
     START_BOT_AT_STREAMSTART,
-    FINISH_BOT_AT_STREAMEND
+    FINISH_BOT_AT_STREAMEND, 
+    HASHTAG_AUTHENTIFICATION_LEVEL
 )
+
+class AuthentificationLevel(Enum):
+    BROADCASTER = 4
+    MOD = 3
+    VIP = 2
+    SUBSCRIBER = 1
+    EVERYONE = 0
 
 client_id = os.getenv("TW_CLIENT_ID", None)
 token = os.getenv("TW_TOKEN", None)
@@ -50,6 +58,7 @@ tweet_settings = {
     "tweet_start_string": TWEET_START_STRING,
     "tweet_end_string": TWEET_END_STRING,
     "hashtag_all_lower_case": HASHTAG_ALL_LOWER_CASE,
+    "hashtag_authentification_level": AuthentificationLevel[HASHTAG_AUTHENTIFICATION_LEVEL]
 }
 
 app_settings = {
@@ -98,6 +107,10 @@ def check_tweet_settings():
             tweet_settings["hashtag_all_lower_case"] = data["twitter"][
                 "hashtag_all_lower_case"
             ]
+        if "hashtag_authentification_level" in data["twitter"]:
+            temp_setting = data["twitter"]["hashtag_authentification_level"].upper()
+            if temp_setting in AuthentificationLevel.__members__:
+                tweet_settings["hashtag_authentification_level"] = AuthentificationLevel[temp_setting]
 
 
 def check_twitch_env_available() -> bool:
