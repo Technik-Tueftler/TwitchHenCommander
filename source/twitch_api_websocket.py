@@ -60,7 +60,10 @@ async def websocket_listener(settings: dict) -> None:
             event_data = json.loads(event)
             if not "event" in event_data["payload"]:
                 continue
-            if (event_data["payload"]["event"]["broadcaster_user_id"] != settings["broadcaster_id"]):
+            if (
+                event_data["payload"]["event"]["broadcaster_user_id"]
+                != settings["broadcaster_id"]
+            ):
                 continue
             if event_data["metadata"]["message_type"] == "notification":
                 if event_data["metadata"]["subscription_type"] == "stream.online":

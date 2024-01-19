@@ -24,16 +24,20 @@ from constants import (
     BOT_HASHTAG_COMMAND_HELP,
     BOT_HASHTAG_COMMAND_STATUS,
     START_BOT_AT_STREAMSTART,
-    FINISH_BOT_AT_STREAMEND, 
-    HASHTAG_AUTHENTIFICATION_LEVEL
+    FINISH_BOT_AT_STREAMEND,
+    HASHTAG_AUTHENTIFICATION_LEVEL,
 )
 
+
 class AuthentificationLevel(Enum):
+    """great for organizing access to the feature for chatters
+    """
     BROADCASTER = 4
     MOD = 3
     VIP = 2
     SUBSCRIBER = 1
     EVERYONE = 0
+
 
 client_id = os.getenv("TW_CLIENT_ID", None)
 token = os.getenv("TW_TOKEN", None)
@@ -49,7 +53,7 @@ bot_hashtag_commands = {
     "finish_hashtag_bot_command": BOT_HASHTAG_COMMAND_FINISH,
     "stop_hashtag_bot_command": BOT_HASHTAG_COMMAND_STOP,
     "help_hashtag_bot_command": BOT_HASHTAG_COMMAND_HELP,
-    "status_hashtag_bot_command": BOT_HASHTAG_COMMAND_STATUS
+    "status_hashtag_bot_command": BOT_HASHTAG_COMMAND_STATUS,
 }
 
 tweet_settings = {
@@ -58,7 +62,9 @@ tweet_settings = {
     "tweet_start_string": TWEET_START_STRING,
     "tweet_end_string": TWEET_END_STRING,
     "hashtag_all_lower_case": HASHTAG_ALL_LOWER_CASE,
-    "hashtag_authentification_level": AuthentificationLevel[HASHTAG_AUTHENTIFICATION_LEVEL]
+    "hashtag_authentification_level": AuthentificationLevel[
+        HASHTAG_AUTHENTIFICATION_LEVEL
+    ],
 }
 
 app_settings = {
@@ -72,7 +78,7 @@ app_settings = {
     "webhook_url": webhook_url,
     "dc_available": False,
     "start_bot_at_streamstart": START_BOT_AT_STREAMSTART,
-    "finish_bot_at_streamend": FINISH_BOT_AT_STREAMEND
+    "finish_bot_at_streamend": FINISH_BOT_AT_STREAMEND,
 }
 
 
@@ -110,7 +116,9 @@ def check_tweet_settings():
         if "hashtag_authentification_level" in data["twitter"]:
             temp_setting = data["twitter"]["hashtag_authentification_level"].upper()
             if temp_setting in AuthentificationLevel.__members__:
-                tweet_settings["hashtag_authentification_level"] = AuthentificationLevel[temp_setting]
+                tweet_settings[
+                    "hashtag_authentification_level"
+                ] = AuthentificationLevel[temp_setting]
 
 
 def check_twitch_env_available() -> bool:
@@ -212,17 +220,29 @@ def bot_setting_verification() -> None:
     if not "bot" in data:
         return
     if "start_bot_command" in data["bot"]:
-        bot_hashtag_commands["start_hashtag_bot_command"] = data["bot"]["start_bot_command"]
+        bot_hashtag_commands["start_hashtag_bot_command"] = data["bot"][
+            "start_bot_command"
+        ]
     if "finish_bot_command" in data["bot"]:
-        bot_hashtag_commands["finish_hashtag_bot_command"] = data["bot"]["finish_bot_command"]
+        bot_hashtag_commands["finish_hashtag_bot_command"] = data["bot"][
+            "finish_bot_command"
+        ]
     if "stop_bot_command" in data["bot"]:
-        bot_hashtag_commands["stop_hashtag_bot_command"] = data["bot"]["stop_bot_command"]
+        bot_hashtag_commands["stop_hashtag_bot_command"] = data["bot"][
+            "stop_bot_command"
+        ]
     if "help_bot_command" in data["bot"]:
-        bot_hashtag_commands["help_hashtag_bot_command"] = data["bot"]["help_bot_command"]
+        bot_hashtag_commands["help_hashtag_bot_command"] = data["bot"][
+            "help_bot_command"
+        ]
     if "status_bot_command" in data["bot"]:
-        bot_hashtag_commands["status_hashtag_bot_command"] = data["bot"]["status_bot_command"]
+        bot_hashtag_commands["status_hashtag_bot_command"] = data["bot"][
+            "status_bot_command"
+        ]
     if "start_bot_at_streamstart" in data["bot"]:
-        app_settings["start_bot_at_streamstart"] = data["bot"]["start_bot_at_streamstart"]
+        app_settings["start_bot_at_streamstart"] = data["bot"][
+            "start_bot_at_streamstart"
+        ]
     if "finish_bot_at_streamend" in data["bot"]:
         app_settings["finish_bot_at_streamend"] = data["bot"]["finish_bot_at_streamend"]
 
