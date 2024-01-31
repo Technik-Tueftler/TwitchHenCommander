@@ -73,7 +73,6 @@ app_settings = {
     "nickname": nickname,
     "broadcaster_id": broadcaster_id,
     "channels": None,
-    "bot_ready": False,
     "discord_username": discord_username,
     "webhook_url": webhook_url,
     "dc_available": False,

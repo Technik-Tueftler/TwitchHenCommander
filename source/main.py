@@ -8,6 +8,14 @@ import environment_verification as env
 from twitch_bot import Bot
 from twitch_api_websocket import websocket_listener
 from hashtag_handler import app_started
+from twitch_api import new_clips_handler
+from constants import UPDATE_INTERVAL_PUBLISH_NEW_CLIPS
+
+
+async def every(__seconds: float, func, *args, **kwargs):
+    while True:
+        func(*args, **kwargs)
+        await asyncio.sleep(__seconds)
 
 
 def main() -> None:
@@ -26,6 +34,7 @@ def main() -> None:
     tasks_to_start = []
     bot_task = loop.create_task(bot.start())
     tasks_to_start.append(bot_task)
+    # subsription für start und ende wird immer beides ausgeführt, wenn nur eines aktiv ist
     if any(
         [
             env.app_settings["start_bot_at_streamstart"],
@@ -34,6 +43,9 @@ def main() -> None:
     ):
         twitch_websocket = loop.create_task(websocket_listener(env.app_settings))
         tasks_to_start.append(twitch_websocket)
+    # if Abfrage ob feature aktiv
+    new_clips = loop.create_task(every(UPDATE_INTERVAL_PUBLISH_NEW_CLIPS, new_clips_handler, **env.app_settings))
+    tasks_to_start.append(new_clips)
     loop.run_until_complete(asyncio.gather(*tasks_to_start))
 
 
