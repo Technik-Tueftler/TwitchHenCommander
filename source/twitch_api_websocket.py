@@ -19,7 +19,7 @@ async def websocket_listener(settings: dict) -> None:
     async with connect(TWITCH_WEBSOCKET_URL) as websocket:
         welcome_message = json.loads(await websocket.recv())
         websocket_id = welcome_message["payload"]["session"]["id"]
-        subscriptions_message = {
+        subscriptions_message_online = {
             "type": "stream.online",
             "version": "1",
             "condition": {"broadcaster_user_id": settings["broadcaster_id"]},
@@ -31,7 +31,25 @@ async def websocket_listener(settings: dict) -> None:
         }
         response = requests.post(
             TWITCH_SUBSCRIPTION_URL,
-            json=subscriptions_message,
+            json=subscriptions_message_online,
+            headers=headers,
+            timeout=REQUEST_TIMEOUT,
+        )
+        print(response.json())
+
+        subscriptions_message_offline = {
+            "type": "stream.offline",
+            "version": "1",
+            "condition": {"broadcaster_user_id": settings["broadcaster_id"]},
+            "transport": {"method": "websocket", "session_id": websocket_id},
+        }
+        headers = {
+            "Client-ID": settings["ID"],
+            "Authorization": f"Bearer {settings['token']}",
+        }
+        response = requests.post(
+            TWITCH_SUBSCRIPTION_URL,
+            json=subscriptions_message_offline,
             headers=headers,
             timeout=REQUEST_TIMEOUT,
         )
@@ -40,14 +58,21 @@ async def websocket_listener(settings: dict) -> None:
         while True:
             event = await websocket.recv()
             event_data = json.loads(event)
+            if not "event" in event_data["payload"]:
+                continue
+            if (
+                event_data["payload"]["event"]["broadcaster_user_id"]
+                != settings["broadcaster_id"]
+            ):
+                continue
             if event_data["metadata"]["message_type"] == "notification":
-                if (
-                    event_data["payload"]["event"]["broadcaster_user_id"]
-                    == settings["broadcaster_id"]
-                ):
+                if event_data["metadata"]["subscription_type"] == "stream.online":
                     await hashh.allow_collecting(True)
-            print(25 * "-")
-            print(json.loads(event))
+                if event_data["metadata"]["subscription_type"] == "stream.offline":
+                    await hashh.allow_collecting(False)
+                    await hashh.tweet_hashtags()
+            # print(25 * "-")
+            # print(json.loads(event))
 
 
 def main() -> None:

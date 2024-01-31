@@ -26,7 +26,12 @@ def main() -> None:
     tasks_to_start = []
     bot_task = loop.create_task(bot.start())
     tasks_to_start.append(bot_task)
-    if env.app_settings["start_bot_at_streamstart"]:
+    if any(
+        [
+            env.app_settings["start_bot_at_streamstart"],
+            env.app_settings["finish_bot_at_streamend"],
+        ]
+    ):
         twitch_websocket = loop.create_task(websocket_listener(env.app_settings))
         tasks_to_start.append(twitch_websocket)
     loop.run_until_complete(asyncio.gather(*tasks_to_start))

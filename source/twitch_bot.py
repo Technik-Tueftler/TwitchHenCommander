@@ -24,13 +24,16 @@ async def check_if_hash_authorized(message: twitchio.message.Message) -> bool:
     :param message: Sent message from user
     :return: Allowance as bool
     """
-    if message.author.is_broadcaster:
-        return True
-    if message.author.is_mod:
-        return True
+    level = env.AuthentificationLevel.EVERYONE
+    if message.author.is_subscriber:
+        level = env.AuthentificationLevel.SUBSCRIBER
     if message.author.is_vip:
-        return True
-    return False
+        level = env.AuthentificationLevel.VIP
+    if message.author.is_mod:
+        level = env.AuthentificationLevel.MOD
+    if message.author.is_broadcaster:
+        level = env.AuthentificationLevel.BROADCASTER
+    return level.value >= env.tweet_settings["hashtag_authentification_level"].value
 
 
 class Bot(commands.Bot):
@@ -53,7 +56,7 @@ class Bot(commands.Bot):
         # Messages with echo set to True are messages sent by the bot
         if message.echo:
             return
-        print(message.content)
+        # print(message.content)
         if hashh.app_data["allowed"]:
             if await check_if_hash_authorized(message):
                 new_hashtags = await hashh.separate_hash(message)

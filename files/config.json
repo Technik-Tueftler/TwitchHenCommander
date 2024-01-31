@@ -10,6 +10,7 @@
   "bot":
   {
     "start_bot_at_streamstart": true,
+    "finish_bot_at_streamend": true,
     "start_bot_command":"starthash",
     "finish_bot_command":"finishhash",
     "stop_bot_command":"stophash",
@@ -23,7 +24,8 @@
     "tweet_max_length": 280,
     "tweet_start_string": "Highlights aus dem Stream heute: ",
     "tweet_end_string": "Danke, dass ihr heute da wart.",
-    "hashtag_all_lower_case": false
+    "hashtag_all_lower_case": false,
+    "hashtag_authentification_level": "SUBSCRIBER"
   },
   "discord":
   {
