@@ -53,7 +53,7 @@ async def websocket_listener(settings: dict) -> None:
             headers=headers,
             timeout=REQUEST_TIMEOUT,
         )
-        print(response.json())
+        # print(response.json())
 
         while True:
             event = await websocket.recv()
@@ -71,8 +71,8 @@ async def websocket_listener(settings: dict) -> None:
                 if event_data["metadata"]["subscription_type"] == "stream.offline":
                     await hashh.allow_collecting(False)
                     await hashh.tweet_hashtags()
-            print(25 * "-")
-            print(json.loads(event))
+            # print(25 * "-")
+            # print(json.loads(event))
 
 
 def main() -> None:
