@@ -30,8 +30,8 @@ from constants import (
 
 
 class AuthentificationLevel(Enum):
-    """great for organizing access to the feature for chatters
-    """
+    """Privileges for chatters to limit the use of features"""
+
     BROADCASTER = 4
     MOD = 3
     VIP = 2
@@ -78,6 +78,7 @@ app_settings = {
     "dc_available": False,
     "start_bot_at_streamstart": START_BOT_AT_STREAMSTART,
     "finish_bot_at_streamend": FINISH_BOT_AT_STREAMEND,
+    "clip_collection": False,
 }
 
 
@@ -115,9 +116,9 @@ def check_tweet_settings():
         if "hashtag_authentification_level" in data["twitter"]:
             temp_setting = data["twitter"]["hashtag_authentification_level"].upper()
             if temp_setting in AuthentificationLevel.__members__:
-                tweet_settings[
-                    "hashtag_authentification_level"
-                ] = AuthentificationLevel[temp_setting]
+                tweet_settings["hashtag_authentification_level"] = (
+                    AuthentificationLevel[temp_setting]
+                )
 
 
 def check_twitch_env_available() -> bool:
@@ -244,6 +245,21 @@ def bot_setting_verification() -> None:
         ]
     if "finish_bot_at_streamend" in data["bot"]:
         app_settings["finish_bot_at_streamend"] = data["bot"]["finish_bot_at_streamend"]
+
+
+def clip_collection_setting_verification() -> None:
+    """
+    Check if settings are available for collecting new clips
+    :return: None
+    """
+    if not Path(CONFIGURATION_FILE_PATH).exists():
+        return
+    with open(CONFIGURATION_FILE_PATH, encoding="utf-8") as file:
+        data = json.load(file)
+    if not "clips" in data:
+        return
+    if "active" in data["clips"]:
+        app_settings["clip_collection"] = data["clips"]["active"]
 
 
 def main() -> None:

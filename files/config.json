@@ -31,5 +31,9 @@
   {
     "discord_username": "",
     "webhook_url": ""
+  },
+  "clips":
+  {
+    "active": true
   }
 }

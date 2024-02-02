@@ -60,7 +60,6 @@ class Bot(commands.Bot):
         if hashh.app_data["allowed"]:
             if await check_if_hash_authorized(message):
                 new_hashtags = await hashh.separate_hash(message)
-                print(new_hashtags)
                 if len(new_hashtags) > 0:
                     await hashh.register_new_hashtags(new_hashtags)
 

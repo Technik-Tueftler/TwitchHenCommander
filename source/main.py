@@ -28,6 +28,7 @@ def main() -> None:
     env.check_tweet_settings()
     env.discord_setting_verification()
     env.bot_setting_verification()
+    env.clip_collection_setting_verification()
     app_started()
     bot = Bot(env.app_settings)
     loop = asyncio.get_event_loop()
@@ -42,9 +43,11 @@ def main() -> None:
     ):
         twitch_websocket = loop.create_task(websocket_listener(env.app_settings))
         tasks_to_start.append(twitch_websocket)
-    # if Abfrage ob feature aktiv
-    new_clips = loop.create_task(every(UPDATE_INTERVAL_PUBLISH_NEW_CLIPS, new_clips_handler, **env.app_settings))
-    tasks_to_start.append(new_clips)
+    if env.app_settings["clip_collection"]:
+        new_clips = loop.create_task(
+            every(UPDATE_INTERVAL_PUBLISH_NEW_CLIPS, new_clips_handler, **env.app_settings)
+        )
+        tasks_to_start.append(new_clips)
     loop.run_until_complete(asyncio.gather(*tasks_to_start))
 
 
