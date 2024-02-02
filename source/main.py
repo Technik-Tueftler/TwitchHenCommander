@@ -34,7 +34,6 @@ def main() -> None:
     tasks_to_start = []
     bot_task = loop.create_task(bot.start())
     tasks_to_start.append(bot_task)
-    # subsription für start und ende wird immer beides ausgeführt, wenn nur eines aktiv ist
     if any(
         [
             env.app_settings["start_bot_at_streamstart"],
