@@ -14,7 +14,7 @@ from constants import UPDATE_INTERVAL_PUBLISH_NEW_CLIPS
 
 async def every(__seconds: float, func, *args, **kwargs):
     while True:
-        func(*args, **kwargs)
+        await func(*args, **kwargs)
         await asyncio.sleep(__seconds)
 
 
