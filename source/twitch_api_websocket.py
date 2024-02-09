@@ -72,8 +72,7 @@ async def websocket_listener(settings: dict) -> None:
                 if event_data["metadata"]["subscription_type"] == "stream.offline":
                     await hashh.allow_collecting(False)
                     await hashh.tweet_hashtags()
-            # print(25 * "-")
-            # print(json.loads(event))
+            await websocket.ping()
 
 
 def main() -> None:
