@@ -13,6 +13,12 @@ from constants import UPDATE_INTERVAL_PUBLISH_NEW_CLIPS
 
 
 async def every(__seconds: float, func, *args, **kwargs):
+    """Function to call cyclic another function
+
+    Args:
+        __seconds (float): Time at which the function is to be called
+        func (_type_): Function to be called
+    """
     while True:
         await func(*args, **kwargs)
         await asyncio.sleep(__seconds)

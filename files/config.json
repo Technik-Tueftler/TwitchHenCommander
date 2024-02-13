@@ -34,6 +34,10 @@
   },
   "clips":
   {
-    "active": true
+    "active": true,
+    "discord_username_clip": "",
+    "webhook_url_clip": "",
+    "clip_last_timestamp": "2024-02-03T21:16:52Z",
+    "thank_you_text": "Clip aus dem aktuellen Stream, danke an"
   }
 }
