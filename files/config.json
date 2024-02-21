@@ -1,12 +1,4 @@
 {
-  "twitch":
-  {
-    "client_id": "",
-    "token": "",
-    "nickname": "",
-    "init_channels": "",
-    "broadcaster_id": ""
-  },
   "bot":
   {
     "start_bot_at_streamstart": true,
@@ -17,8 +9,11 @@
     "status_bot_command":"statushash",
     "help_bot_command":"helphash"
   },
-  "twitter":
+  "hashtag":
   {
+    "active": true,
+    "discord_username_hashtag":"",
+    "discord_url_hashtag":"",
     "hashtag_max_length": 20,
     "hashtag_min_length": 3,
     "tweet_max_length": 280,
@@ -26,11 +21,6 @@
     "tweet_end_string": "Danke, dass ihr heute da wart.",
     "hashtag_all_lower_case": false,
     "hashtag_authentification_level": "SUBSCRIBER"
-  },
-  "discord":
-  {
-    "discord_username": "",
-    "webhook_url": ""
   },
   "clips":
   {
