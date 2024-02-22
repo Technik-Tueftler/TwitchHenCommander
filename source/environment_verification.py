@@ -72,11 +72,14 @@ tweet_end_string = config.get("TWEET_END_STRING", TWEET_END_STRING)
 hashtag_all_lower_case = config.get("HASHTAG_ALL_LOWER_CASE", None)
 hashtag_authentication_level = config.get("HASHTAG_AUTHENTICATION_LEVEL", None)
 
-start_hashtag_bot_command = config.get("BOT_HASHTAG_COMMAND_START", BOT_HASHTAG_COMMAND_START)
-finish_hashtag_bot_command = config.get("BOT_HASHTAG_COMMAND_FINISH", BOT_HASHTAG_COMMAND_FINISH)
-stop_hashtag_bot_command = config.get("BOT_HASHTAG_COMMAND_STOP", BOT_HASHTAG_COMMAND_STOP)
-help_hashtag_bot_command = config.get("BOT_HASHTAG_COMMAND_HELP", BOT_HASHTAG_COMMAND_HELP)
-status_hashtag_bot_command = config.get("BOT_HASHTAG_COMMAND_STATUS", BOT_HASHTAG_COMMAND_STATUS)
+
+start_bot_at_streamstart = config.get("START_BOT_AT_STREAMSTART", None)
+finish_bot_at_streamend = config.get("FINISH_BOT_AT_STREAMEND", None)
+start_hashtag_bot_command = config.get("BOT_HASHTAG_COMMAND_START", None)
+finish_hashtag_bot_command = config.get("BOT_HASHTAG_COMMAND_FINISH", None)
+stop_hashtag_bot_command = config.get("BOT_HASHTAG_COMMAND_STOP", None)
+help_hashtag_bot_command = config.get("BOT_HASHTAG_COMMAND_HELP", None)
+status_hashtag_bot_command = config.get("BOT_HASHTAG_COMMAND_STATUS", None)
 
 bot_command_pattern = re.compile(BOT_COMMAND_PATTERN)
 
@@ -89,11 +92,10 @@ app_settings = {
     "dc_available": DC_FEATURE_HASHTAG | DC_FEATURE_CLIPS,
     "dc_feature_hashtag": False,
     "dc_feature_clips": False,
-    "start_bot_at_streamstart": START_BOT_AT_STREAMSTART,
-    "finish_bot_at_streamend": FINISH_BOT_AT_STREAMEND,
+    "start_bot_at_streamstart": start_bot_at_streamstart,
+    "finish_bot_at_streamend": finish_bot_at_streamend,
 }
 
-# TODO: mit regex prüfen auf Buchstaben
 bot_hashtag_commands = {
     "start_hashtag_bot_command": start_hashtag_bot_command,
     "finish_hashtag_bot_command": finish_hashtag_bot_command,
@@ -118,46 +120,48 @@ discord_settings = {
     "webhook_url_clip": webhook_url_clip,
 }
 
+
 def bot_setting_verification() -> None:
     """
     Check if bot settings are available or app have to use the generic ones
     :return: None
     """
-    if re.match(bot_command_pattern, )
+    bot_hashtag_commands["start_hashtag_bot_command"] = (
+        start_hashtag_bot_command
+        if re.match(bot_command_pattern, start_hashtag_bot_command)
+        else BOT_HASHTAG_COMMAND_START
+    )
+    bot_hashtag_commands["finish_hashtag_bot_command"] = (
+        finish_hashtag_bot_command
+        if re.match(bot_command_pattern, finish_hashtag_bot_command)
+        else BOT_HASHTAG_COMMAND_FINISH
+    )
+    bot_hashtag_commands["stop_hashtag_bot_command"] = (
+        stop_hashtag_bot_command
+        if re.match(bot_command_pattern, stop_hashtag_bot_command)
+        else BOT_HASHTAG_COMMAND_STOP
+    )
+    bot_hashtag_commands["help_hashtag_bot_command"] = (
+        help_hashtag_bot_command
+        if re.match(bot_command_pattern, help_hashtag_bot_command)
+        else BOT_HASHTAG_COMMAND_HELP
+    )
+    bot_hashtag_commands["status_hashtag_bot_command"] = (
+        status_hashtag_bot_command
+        if re.match(bot_command_pattern, help_hashtag_bot_command)
+        else BOT_HASHTAG_COMMAND_STATUS
+    )
+    app_settings["start_bot_at_streamstart"] = (
+        True
+        if start_bot_at_streamstart.lower() in (OPTIONS_POSITIVE_ARG)
+        else START_BOT_AT_STREAMSTART
+    )
+    app_settings["finish_bot_at_streamend"] = (
+        True
+        if finish_bot_at_streamend.lower() in (OPTIONS_POSITIVE_ARG)
+        else FINISH_BOT_AT_STREAMEND
+    )
 
-
-    if not Path(CONFIGURATION_FILE_PATH).exists():
-        returnd
-    with open(CONFIGURATION_FILE_PATH, encoding="utf-8") as file:
-        data = json.load(file)
-    if not "bot" in data:
-        return
-    if "start_bot_command" in data["bot"]:
-        bot_hashtag_commands["start_hashtag_bot_command"] = data["bot"][
-            "start_bot_command"
-        ]
-    if "finish_bot_command" in data["bot"]:
-        bot_hashtag_commands["finish_hashtag_bot_command"] = data["bot"][
-            "finish_bot_command"
-        ]
-    if "stop_bot_command" in data["bot"]:
-        bot_hashtag_commands["stop_hashtag_bot_command"] = data["bot"][
-            "stop_bot_command"
-        ]
-    if "help_bot_command" in data["bot"]:
-        bot_hashtag_commands["help_hashtag_bot_command"] = data["bot"][
-            "help_bot_command"
-        ]
-    if "status_bot_command" in data["bot"]:
-        bot_hashtag_commands["status_hashtag_bot_command"] = data["bot"][
-            "status_bot_command"
-        ]
-    if "start_bot_at_streamstart" in data["bot"]:
-        app_settings["start_bot_at_streamstart"] = data["bot"][
-            "start_bot_at_streamstart"
-        ]
-    if "finish_bot_at_streamend" in data["bot"]:
-        app_settings["finish_bot_at_streamend"] = data["bot"]["finish_bot_at_streamend"]
 
 def check_tweet_settings():
     """
@@ -250,8 +254,8 @@ def clip_collection_setting_verification() -> None:
     Check if settings are available for collecting new clips
     :return: None
     """
-    app_settings["dc_feature_clips"] = (
-        dc_feature_clips.lower() in (OPTIONS_POSITIVE_ARG)
+    app_settings["dc_feature_clips"] = dc_feature_clips.lower() in (
+        OPTIONS_POSITIVE_ARG
     )
 
 
