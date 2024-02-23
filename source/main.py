@@ -49,7 +49,7 @@ def main() -> None:
     ):
         twitch_websocket = loop.create_task(websocket_listener(env.app_settings))
         tasks_to_start.append(twitch_websocket)
-    if env.app_settings["clip_collection"]:
+    if env.app_settings["dc_feature_clips"]:
         new_clips = loop.create_task(
             every(UPDATE_INTERVAL_PUBLISH_NEW_CLIPS, new_clips_handler, **env.app_settings)
         )

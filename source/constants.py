@@ -2,6 +2,7 @@
 File contains all constants for easy central import and usage.
 """
 CONFIGURATION_FILE_PATH = "../files/config.json"
+CACHE_FILE_PATH = "../files/cache.json"
 HASHTAG_FILE_PATH = "../files/hashtags.txt"
 LOG_FILE_PATH = "../files/log.txt"
 HASHTAG_MAX_LENGTH = 10
@@ -29,3 +30,5 @@ START_BOT_AT_STREAMSTART = "off"
 FINISH_BOT_AT_STREAMEND = "off"
 HASHTAG_AUTHENTICATION_LEVEL = "BROADCASTER"
 OPTIONS_POSITIVE_ARG = ("true", "on", "1", "t", "active")
+TIMESTAMP_PATTERN = "%Y-%m-%dT%H:%M:%SZ"
+DEFAULT_CACHE_DATA = {"Version": "v1.3.0", "clip_last_timestamp": "2024-02-02T12:00:00Z"}
