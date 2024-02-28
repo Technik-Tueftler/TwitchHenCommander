@@ -16,13 +16,15 @@ async def load_cache_data() -> dict:
         dict: Cache data 
     """
     if not Path(CACHE_FILE_PATH).exists():
-        default_data = DEFAULT_CACHE_DATA
         async with aiofiles.open(CACHE_FILE_PATH, "w") as file:
-            await file.write(json.dumps(default_data))
-        return default_data
-    async with aiofiles.open(CACHE_FILE_PATH, "r") as file:
-        content = json.loads(await file.read())
-    return content
+            await file.write(json.dumps(DEFAULT_CACHE_DATA))
+        return DEFAULT_CACHE_DATA
+    try:
+        async with aiofiles.open(CACHE_FILE_PATH, "r") as file:
+            content = json.loads(await file.read())
+        return content
+    except json.JSONDecodeError as _:
+        return DEFAULT_CACHE_DATA
 
 async def load_last_clip_timestamp() -> datetime:
     """Read the last fetched timestamp from file for the clip feature
@@ -33,7 +35,7 @@ async def load_last_clip_timestamp() -> datetime:
     data = await load_cache_data()
     if "clip_last_timestamp" in data:
         return datetime.strptime(data["clip_last_timestamp"], TIMESTAMP_PATTERN)
-    return DEFAULT_CACHE_DATA
+    return datetime.strptime(DEFAULT_CACHE_DATA["clip_last_timestamp"], TIMESTAMP_PATTERN)
 
 
 async def save_cache_data(data_to_save: dict) -> None:
@@ -42,7 +44,8 @@ async def save_cache_data(data_to_save: dict) -> None:
     Args:
         data_to_save (dict): Data to be stored
     """
-    data = await load_cache_data()
+    data = DEFAULT_CACHE_DATA.copy()
+    data.update(await load_cache_data())
     data.update(data_to_save)
     async with aiofiles.open(CACHE_FILE_PATH, "w") as file:
         await file.write(json.dumps(data))

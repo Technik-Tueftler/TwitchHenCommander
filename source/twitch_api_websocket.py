@@ -36,7 +36,7 @@ async def websocket_listener(settings: dict) -> None:
                 headers=headers,
                 timeout=REQUEST_TIMEOUT,
             )
-            print(response.json())
+            # print(response.json())
         if settings["finish_bot_at_streamend"]:
             subscriptions_message_offline = {
                 "type": "stream.offline",
@@ -54,7 +54,7 @@ async def websocket_listener(settings: dict) -> None:
                 headers=headers,
                 timeout=REQUEST_TIMEOUT,
             )
-            print(response.json())
+            # print(response.json())
 
         while True:
             event = await websocket.recv()

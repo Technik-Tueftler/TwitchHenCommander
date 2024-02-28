@@ -51,7 +51,12 @@ def main() -> None:
         tasks_to_start.append(twitch_websocket)
     if env.app_settings["dc_feature_clips"]:
         new_clips = loop.create_task(
-            every(UPDATE_INTERVAL_PUBLISH_NEW_CLIPS, new_clips_handler, **env.app_settings)
+            every(
+                UPDATE_INTERVAL_PUBLISH_NEW_CLIPS,
+                new_clips_handler,
+                **env.app_settings,
+                **env.discord_settings
+            )
         )
         tasks_to_start.append(new_clips)
     loop.run_until_complete(asyncio.gather(*tasks_to_start))

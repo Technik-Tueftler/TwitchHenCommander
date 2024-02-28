@@ -11,6 +11,7 @@ import twitchio
 import environment_verification as env
 from constants import (
     HASHTAG_FILE_PATH,
+    REQUEST_TIMEOUT,
 )
 
 app_data = {"allowed": True, "tweets": []}
@@ -42,7 +43,7 @@ async def tweet_hashtags() -> None:
             + env.tweet_settings["tweet_end_string"]
         )
         data = {"content": content, "username": env.app_settings["discord_username"]}
-        post(env.app_settings["webhook_url"], data=data, timeout=10)
+        post(env.app_settings["webhook_url"], data=data, timeout=REQUEST_TIMEOUT)
     app_data["tweets"] = []
 
 

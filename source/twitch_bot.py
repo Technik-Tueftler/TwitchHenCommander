@@ -33,7 +33,7 @@ async def check_if_hash_authorized(message: twitchio.message.Message) -> bool:
         level = env.AuthenticationLevel.MOD
     if message.author.is_broadcaster:
         level = env.AuthenticationLevel.BROADCASTER
-    return level.value >= env.tweet_settings["hashtag_authentification_level"].value
+    return level.value >= env.tweet_settings["hashtag_authentication_level"].value
 
 
 class Bot(commands.Bot):
