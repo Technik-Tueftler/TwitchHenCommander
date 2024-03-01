@@ -34,6 +34,7 @@ from constants import (
     OPTIONS_POSITIVE_ARG,
     BOT_COMMAND_PATTERN,
     DEFAULT_CLIP_THANK_YOU_TEXT,
+    UPDATE_INTERVAL_PUBLISH_NEW_CLIPS,
 )
 
 config = {
@@ -65,6 +66,7 @@ webhook_url_clip = config.get("DC_WEBHOOK_URL_CLIP", None)
 dc_feature_hashtag = config.get("DC_FEATURE_HASHTAG", DC_FEATURE_HASHTAG)
 dc_feature_clips = config.get("DC_FEATURE_CLIPS", DC_FEATURE_CLIPS)
 clip_thank_you_text = config.get("CLIP_THANK_YOU_TEXT", DEFAULT_CLIP_THANK_YOU_TEXT)
+clips_fetch_time = config.get("CLIPS_FETCH_TIME", UPDATE_INTERVAL_PUBLISH_NEW_CLIPS)
 
 hashtag_max_length = config.get("HASHTAG_MAX_LENGTH", None)
 hashtag_min_length = config.get("HASHTAG_MIN_LENGTH", None)
@@ -94,6 +96,7 @@ app_settings = {
     "dc_available": False,
     "dc_feature_hashtag": False,
     "dc_feature_clips": False,
+    "clips_fetch_time": clips_fetch_time,
     "start_bot_at_streamstart": start_bot_at_streamstart,
     "finish_bot_at_streamend": finish_bot_at_streamend,
 }
@@ -252,7 +255,11 @@ def discord_setting_verification() -> None:
             app_settings["dc_feature_clips"] = True
     if app_settings["dc_feature_clips"] or app_settings["dc_feature_hashtag"]:
         app_settings["dc_available"] = True
-
+    app_settings["clips_fetch_time"] = (
+        int(clips_fetch_time)
+        if clips_fetch_time.isdecimal()
+        else UPDATE_INTERVAL_PUBLISH_NEW_CLIPS
+    )
 
 def clip_collection_setting_verification() -> None:
     """
