@@ -10,7 +10,6 @@ from constants import (
     REQUEST_TIMEOUT,
     UPDATE_INTERVAL_PUBLISH_NEW_CLIPS,
     CLIP_WAIT_TIME,
-    DEFAULT_CACHE_DATA,
     TIMESTAMP_PATTERN,
 )
 from file_handler import load_last_clip_timestamp, save_cache_data
@@ -101,8 +100,12 @@ async def new_clips_handler(**settings) -> None:
 
 
 async def post_clips(settings: dict, content: str) -> None:
-    # Clip aus dem aktuellen Stream <Link>. Vielen dank an <Twitch Name>.
-    # ToDo: Wollen wir die clip links auch in einem extra File speichern?
+    """Post clip in discord with all information
+
+    Args:
+        settings (dict): Settings to get access to descord webhook
+        content (str): Clip link with user information
+    """
     if not settings["dc_feature_clips"]:
         return
     data = {"content": content, "username": settings["discord_username_clip"]}

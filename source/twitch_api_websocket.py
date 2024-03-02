@@ -30,13 +30,12 @@ async def websocket_listener(settings: dict) -> None:
                 "Client-ID": settings["ID"],
                 "Authorization": f"Bearer {settings['token']}",
             }
-            response = requests.post(
+            _ = requests.post(
                 TWITCH_SUBSCRIPTION_URL,
                 json=subscriptions_message_online,
                 headers=headers,
                 timeout=REQUEST_TIMEOUT,
             )
-            # print(response.json())
         if settings["finish_bot_at_streamend"]:
             subscriptions_message_offline = {
                 "type": "stream.offline",
@@ -48,13 +47,12 @@ async def websocket_listener(settings: dict) -> None:
                 "Client-ID": settings["ID"],
                 "Authorization": f"Bearer {settings['token']}",
             }
-            response = requests.post(
+            _ = requests.post(
                 TWITCH_SUBSCRIPTION_URL,
                 json=subscriptions_message_offline,
                 headers=headers,
                 timeout=REQUEST_TIMEOUT,
             )
-            # print(response.json())
 
         while True:
             event = await websocket.recv()
