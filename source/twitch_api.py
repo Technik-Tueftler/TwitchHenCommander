@@ -6,6 +6,7 @@ from string import Template
 
 import asyncio
 import requests
+import db
 from constants import (
     REQUEST_TIMEOUT,
     UPDATE_INTERVAL_PUBLISH_NEW_CLIPS,
@@ -32,8 +33,8 @@ async def fetch_new_clips(settings) -> list:
     client_id = settings["ID"]
     token = settings["token"]
     timestamp = datetime.utcnow()
-    seconds = UPDATE_INTERVAL_PUBLISH_NEW_CLIPS
-    start_timestamp = (timestamp - timedelta(seconds=40)).strftime("%Y-%m-%dT%H:%M:%SZ")
+    seconds = 40 # UPDATE_INTERVAL_PUBLISH_NEW_CLIPS
+    start_timestamp = (timestamp - timedelta(seconds=seconds)).strftime("%Y-%m-%dT%H:%M:%SZ")
     end_timestamp = timestamp.strftime("%Y-%m-%dT%H:%M:%SZ")
     fetch_url = (
         f"https://api.twitch.tv/helix/clips?"
@@ -50,8 +51,8 @@ async def fetch_new_clips(settings) -> list:
 async def new_clips_handler(**settings) -> None:
     """Handling function to find new clips and then post them"""
     clips = await fetch_new_clips(settings)
-    last_clip_timestamp = await load_last_clip_timestamp()
-    print(last_clip_timestamp)
+    last_clip_ids = await db.fetch_last_clip_ids() # ["clip_id_1, clip_id_2, clip_id_3"]
+    # print(last_clip_timestamp)
     # {'data': [], 'pagination': {}}
 
     # {'data': [
@@ -70,33 +71,28 @@ async def new_clips_handler(**settings) -> None:
     #    'created_at': '2024-02-03T21:16:52Z',
     #    'thumbnail_url': 'https://clips-media-assets2.twitch.tv/MmRp06yZj5_iEypAz0B-cA/AT-cm%7CMmRp06yZj5_iEypAz0B-cA-preview-480x272.jpg',
     #    'duration': 16, 'vod_offset': 4930, 'is_featured': False}], 'pagination': {}}
+    
     new_clips = [
         clip
         for clip in clips
-        if datetime.strptime(clip["created_at"], "%Y-%m-%dT%H:%M:%SZ")
-        > last_clip_timestamp
+        if clip["id"] in last_clip_ids
     ]
     print(new_clips)
     if not new_clips:
         return
     for clip in new_clips:
-        print(clip)
-        print(clip["url"])
-        print(clip["creator_name"])
-        print(settings["clip_thank_you_text"])
-        # content_1 = settings["clip_thank_you_text"].format(link=clip["url"], user=clip["creator_name"])
+        # Step 1
+            # Prüfe ob creator_id des clip schon existiert
+                # Ja -> fetch User mit twitch_user_id, commit new Clip mit user.id
+                # Nein -> create User und commit Clip
+        # Step 2
+            # Post clip
+
         content = MyTemplate(settings["clip_thank_you_text"]).substitute(
             link=clip["url"], user=clip["creator_name"]
         )
         await post_clips(settings, content)
         await asyncio.sleep(CLIP_WAIT_TIME)
-    latest_timestamp = max(
-        datetime.strptime(clip["created_at"], TIMESTAMP_PATTERN) for clip in clips
-    )
-
-    await save_cache_data(
-        {"clip_last_timestamp": latest_timestamp.strftime(TIMESTAMP_PATTERN)}
-    )
 
 
 async def post_clips(settings: dict, content: str) -> None:
