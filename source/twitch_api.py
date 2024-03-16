@@ -1,7 +1,7 @@
 """All functions and features that work with the help of the twitch api
 """
 
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, UTC
 from string import Template
 
 import asyncio
@@ -33,8 +33,10 @@ async def fetch_new_clips(settings) -> list:
     client_id = settings["ID"]
     token = settings["token"]
     timestamp = datetime.utcnow()
-    seconds = 40 # UPDATE_INTERVAL_PUBLISH_NEW_CLIPS
-    start_timestamp = (timestamp - timedelta(seconds=seconds)).strftime("%Y-%m-%dT%H:%M:%SZ")
+    seconds = 8000  # UPDATE_INTERVAL_PUBLISH_NEW_CLIPS
+    start_timestamp = (timestamp - timedelta(seconds=seconds)).strftime(
+        "%Y-%m-%dT%H:%M:%SZ"
+    )
     end_timestamp = timestamp.strftime("%Y-%m-%dT%H:%M:%SZ")
     fetch_url = (
         f"https://api.twitch.tv/helix/clips?"
@@ -51,7 +53,9 @@ async def fetch_new_clips(settings) -> list:
 async def new_clips_handler(**settings) -> None:
     """Handling function to find new clips and then post them"""
     clips = await fetch_new_clips(settings)
-    last_clip_ids = await db.fetch_last_clip_ids() # ["clip_id_1, clip_id_2, clip_id_3"]
+    last_clip_ids = (
+        await db.fetch_last_clip_ids()
+    )  # ["clip_id_1, clip_id_2, clip_id_3"]
     # print(last_clip_timestamp)
     # {'data': [], 'pagination': {}}
 
@@ -71,22 +75,23 @@ async def new_clips_handler(**settings) -> None:
     #    'created_at': '2024-02-03T21:16:52Z',
     #    'thumbnail_url': 'https://clips-media-assets2.twitch.tv/MmRp06yZj5_iEypAz0B-cA/AT-cm%7CMmRp06yZj5_iEypAz0B-cA-preview-480x272.jpg',
     #    'duration': 16, 'vod_offset': 4930, 'is_featured': False}], 'pagination': {}}
-    
-    new_clips = [
-        clip
-        for clip in clips
-        if clip["id"] in last_clip_ids
-    ]
+
+    new_clips = [clip for clip in clips if clip["id"] in last_clip_ids]
     print(new_clips)
+    #  ToDo: hier kommen keine neuen clips zurük, obwohl in clips welcher sind.
     if not new_clips:
         return
     for clip in new_clips:
-        # Step 1
-            # Prüfe ob creator_id des clip schon existiert
-                # Ja -> fetch User mit twitch_user_id, commit new Clip mit user.id
-                # Nein -> create User und commit Clip
-        # Step 2
-            # Post clip
+        user = await db.get_twitch_user(clip["creator_id"])
+        if user is None:
+            user = db.add_new_user(clip["creator_id"], clip["creator_name"])
+        db_clip = db.Clip(
+            user_id=user.id,
+            clip_id=clip["id"],
+            timestamp=datetime.strptime(clip["created_at"], "%Y-%m-%dT%H:%M:%SZ"),
+            title=clip["title"],
+        )
+        await db.add_user_clip(db_clip)
 
         content = MyTemplate(settings["clip_thank_you_text"]).substitute(
             link=clip["url"], user=clip["creator_name"]
