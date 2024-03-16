@@ -12,7 +12,7 @@ from constants import UPDATE_INTERVAL_PUBLISH_NEW_CLIPS
 engine = create_async_engine("sqlite+aiosqlite:///sample.db", echo=False)
 
 
-class Base(DeclarativeBase):
+class Base(DeclarativeBase): # pylint: disable=too-few-public-methods
     """Declarative base class
 
     Args:
@@ -20,7 +20,7 @@ class Base(DeclarativeBase):
     """
 
 
-class User(Base):
+class User(Base): # pylint: disable=too-few-public-methods
     """Class to be able to map the twitch user via an ORM
 
     Args:
@@ -36,7 +36,7 @@ class User(Base):
         return f"User: {self.twitch_user_name}"
 
 
-class Clip(Base):
+class Clip(Base): # pylint: disable=too-few-public-methods
     """Class to be able to map the twitch user clips via an ORM
 
     Args:
