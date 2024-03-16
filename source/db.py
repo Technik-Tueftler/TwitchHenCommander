@@ -7,15 +7,25 @@ from typing import List
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship
 from sqlalchemy import ForeignKey, select
 from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker
+from constants import UPDATE_INTERVAL_PUBLISH_NEW_CLIPS
 
 engine = create_async_engine("sqlite+aiosqlite:///sample.db", echo=False)
 
 
 class Base(DeclarativeBase):
-    pass
+    """Declarative base class
+
+    Args:
+        DeclarativeBase (_type_): Basic class that is inherited
+    """
 
 
 class User(Base):
+    """Class to be able to map the twitch user via an ORM
+
+    Args:
+        Base (_type_): Basic class that is inherited
+    """
     __tablename__ = "users"
     id: Mapped[int] = mapped_column(primary_key=True)
     twitch_user_id: Mapped[str] = mapped_column(nullable=False)
@@ -27,6 +37,11 @@ class User(Base):
 
 
 class Clip(Base):
+    """Class to be able to map the twitch user clips via an ORM
+
+    Args:
+        Base (_type_): Basic class that is inherited
+    """
     __tablename__ = "clips"
     id: Mapped[int] = mapped_column(primary_key=True)
     clip_id: Mapped[str] = mapped_column(nullable=False)
@@ -43,11 +58,21 @@ session = async_sessionmaker(bind=engine, expire_on_commit=False)
 
 
 async def sync_db():
+    """Function to run the sync command and create all DB dependencies and tables
+    """
     async with engine.begin() as conn:
         await conn.run_sync(Base.metadata.create_all)
 
 
 async def get_twitch_user(user_id: str) -> User:
+    """Function searches in DB for twitch user ID and returns the mapped user
+
+    Args:
+        user_id (str): Twitch ID of user
+
+    Returns:
+        User: User mapped object
+    """
     async with session() as sess:
         statement = select(User).where(User.twitch_user_id == user_id)
         result = await sess.execute(statement)
@@ -55,6 +80,15 @@ async def get_twitch_user(user_id: str) -> User:
 
 
 async def add_new_user(twitch_user_id: str, twitch_user_name: str) -> User:
+    """Create a new entry in DB for user
+
+    Args:
+        twitch_user_id (str): Twitch user ID
+        twitch_user_name (str): Twitch user name
+
+    Returns:
+        User: User mapped object
+    """
     async with session() as sess:
         user = User(twitch_user_id=twitch_user_id, twitch_user_name=twitch_user_name)
         sess.add(user)
@@ -62,54 +96,38 @@ async def add_new_user(twitch_user_id: str, twitch_user_name: str) -> User:
     return user
 
 
-async def add_user():
-    async with engine.begin():
-        async with session() as sess:
-            sess.add(
-                User(
-                    twitch_user_id="5678",
-                    twitch_user_name="Kinger",
-                    clips=[
-                        Clip(
-                            clip_id="ujkhegfdeue3e",
-                            timestamp=datetime.utcnow(),
-                            title="Super cooles Huhn",
-                        ),
-                        Clip(
-                            clip_id="ujkhegfddepdkeeue3e",
-                            timestamp=datetime.utcnow(),
-                            title="Super super cooles Huhn",
-                        ),
-                        Clip(
-                            clip_id="peuoifdteiugfe444",
-                            timestamp=datetime.utcnow(),
-                            title="Geniales cooles Huhn",
-                        ),
-                    ],
-                )
-            )
-            await sess.commit()
+async def fetch_last_clip_ids() -> List[int]:
+    """Function gets all the clips in the last time period 
 
-
-async def fetch_last_clip_ids():
+    Returns:
+        List[int]: List of clip IDs
+    """
     timestamp = datetime.now(UTC)
-    seconds = 600  # UPDATE_INTERVAL_PUBLISH_NEW_CLIPS
+    seconds = UPDATE_INTERVAL_PUBLISH_NEW_CLIPS
     start_timestamp = (timestamp - timedelta(seconds=seconds)).strftime(
         "%Y-%m-%dT%H:%M:%SZ"
     )
     async with session() as sess:
         statement = select(Clip).where(Clip.timestamp < start_timestamp)
         result = await sess.execute(statement)
-    return result.scalars().all()
+        all_clips = result.scalars().all()
+    return [clip.clip_id for clip in all_clips]
 
 
 async def add_user_clip(clip: Clip) -> None:
+    """Add user clip to DB
+
+    Args:
+        clip (Clip): Clip mapped object with necessary 
+    """
     async with session() as sess:
         sess.add(clip)
         await sess.commit()
 
 
 async def async_main():
+    """Scheduling function for regular call.
+    """
     await sync_db()
     # await fetch_last_clip_ids()
     # await get_twitch_user("1234")
