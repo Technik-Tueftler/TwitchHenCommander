@@ -54,6 +54,9 @@ async def fetch_new_clips(settings) -> list:
 
 async def new_clips_handler(**settings) -> None:
     """Handling function to find new clips and then post them"""
+    if not settings["database_synchronized"]:
+        await db.sync_db()
+        settings["database_synchronized"] = True
     clips = await fetch_new_clips(settings)
     last_clip_ids = (
         await db.fetch_last_clip_ids()

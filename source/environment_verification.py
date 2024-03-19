@@ -97,6 +97,7 @@ app_settings = {
     "dc_feature_hashtag": False,
     "dc_feature_clips": False,
     "clips_fetch_time": clips_fetch_time,
+    "database_synchronized": False,
     "start_bot_at_streamstart": start_bot_at_streamstart,
     "finish_bot_at_streamend": finish_bot_at_streamend,
 }

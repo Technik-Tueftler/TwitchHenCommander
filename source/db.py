@@ -9,7 +9,7 @@ from sqlalchemy import ForeignKey, select
 from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker
 from constants import UPDATE_INTERVAL_PUBLISH_NEW_CLIPS
 
-engine = create_async_engine("sqlite+aiosqlite:///sample.db", echo=False)
+engine = create_async_engine("sqlite+aiosqlite:///../files/sample.db", echo=False)
 
 
 class Base(DeclarativeBase): # pylint: disable=too-few-public-methods
