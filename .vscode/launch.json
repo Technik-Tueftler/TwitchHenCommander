@@ -12,10 +12,10 @@
             "envFile": "D:/Workspace/git/TeTueSecrets/TwitchHashtagBot/.env.development"
         },
         {
-            "name": "Test",
+            "name": "test",
             "type": "python",
             "request": "launch",
-            "program": "${workspaceFolder}/source/test.py",
+            "program": "${file}",
             "console": "integratedTerminal",
             "justMyCode": true,
             "cwd": "${workspaceFolder}/source",

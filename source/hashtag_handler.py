@@ -11,6 +11,7 @@ import twitchio
 import environment_verification as env
 from constants import (
     HASHTAG_FILE_PATH,
+    REQUEST_TIMEOUT,
 )
 
 app_data = {"allowed": True, "tweets": []}
@@ -41,8 +42,8 @@ async def tweet_hashtags() -> None:
             + " "
             + env.tweet_settings["tweet_end_string"]
         )
-        data = {"content": content, "username": env.app_settings["discord_username"]}
-        post(env.app_settings["webhook_url"], data=data, timeout=10)
+        data = {"content": content, "username": env.discord_settings["discord_username_hashtag"]}
+        post(env.discord_settings["webhook_url_hashtag"], data=data, timeout=REQUEST_TIMEOUT)
     app_data["tweets"] = []
 
 
@@ -73,7 +74,7 @@ async def separate_hash(message: twitchio.message.Message) -> set:
         and env.tweet_settings["hashtag_min_length"]
         <= len(element)
         <= env.tweet_settings["hashtag_max_length"]
-        and not element[1].isdigit()
+        and element[1].isalpha()
         and not element.count('#') > 1
     ]
 

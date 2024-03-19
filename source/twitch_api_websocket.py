@@ -19,41 +19,40 @@ async def websocket_listener(settings: dict) -> None:
     async with connect(TWITCH_WEBSOCKET_URL) as websocket:
         welcome_message = json.loads(await websocket.recv())
         websocket_id = welcome_message["payload"]["session"]["id"]
-        subscriptions_message_online = {
-            "type": "stream.online",
-            "version": "1",
-            "condition": {"broadcaster_user_id": settings["broadcaster_id"]},
-            "transport": {"method": "websocket", "session_id": websocket_id},
-        }
-        headers = {
-            "Client-ID": settings["ID"],
-            "Authorization": f"Bearer {settings['token']}",
-        }
-        response = requests.post(
-            TWITCH_SUBSCRIPTION_URL,
-            json=subscriptions_message_online,
-            headers=headers,
-            timeout=REQUEST_TIMEOUT,
-        )
-        print(response.json())
-
-        subscriptions_message_offline = {
-            "type": "stream.offline",
-            "version": "1",
-            "condition": {"broadcaster_user_id": settings["broadcaster_id"]},
-            "transport": {"method": "websocket", "session_id": websocket_id},
-        }
-        headers = {
-            "Client-ID": settings["ID"],
-            "Authorization": f"Bearer {settings['token']}",
-        }
-        response = requests.post(
-            TWITCH_SUBSCRIPTION_URL,
-            json=subscriptions_message_offline,
-            headers=headers,
-            timeout=REQUEST_TIMEOUT,
-        )
-        print(response.json())
+        if settings["start_bot_at_streamstart"]:
+            subscriptions_message_online = {
+                "type": "stream.online",
+                "version": "1",
+                "condition": {"broadcaster_user_id": settings["broadcaster_id"]},
+                "transport": {"method": "websocket", "session_id": websocket_id},
+            }
+            headers = {
+                "Client-ID": settings["ID"],
+                "Authorization": f"Bearer {settings['token']}",
+            }
+            _ = requests.post(
+                TWITCH_SUBSCRIPTION_URL,
+                json=subscriptions_message_online,
+                headers=headers,
+                timeout=REQUEST_TIMEOUT,
+            )
+        if settings["finish_bot_at_streamend"]:
+            subscriptions_message_offline = {
+                "type": "stream.offline",
+                "version": "1",
+                "condition": {"broadcaster_user_id": settings["broadcaster_id"]},
+                "transport": {"method": "websocket", "session_id": websocket_id},
+            }
+            headers = {
+                "Client-ID": settings["ID"],
+                "Authorization": f"Bearer {settings['token']}",
+            }
+            _ = requests.post(
+                TWITCH_SUBSCRIPTION_URL,
+                json=subscriptions_message_offline,
+                headers=headers,
+                timeout=REQUEST_TIMEOUT,
+            )
 
         while True:
             event = await websocket.recv()
@@ -71,8 +70,7 @@ async def websocket_listener(settings: dict) -> None:
                 if event_data["metadata"]["subscription_type"] == "stream.offline":
                     await hashh.allow_collecting(False)
                     await hashh.tweet_hashtags()
-            # print(25 * "-")
-            # print(json.loads(event))
+            await websocket.ping()
 
 
 def main() -> None:

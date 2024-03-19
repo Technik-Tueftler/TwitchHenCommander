@@ -8,6 +8,19 @@ import environment_verification as env
 from twitch_bot import Bot
 from twitch_api_websocket import websocket_listener
 from hashtag_handler import app_started
+from twitch_api import new_clips_handler
+
+
+async def every(__seconds: float, func, *args, **kwargs):
+    """Function to call cyclic another function
+
+    Args:
+        __seconds (float): Time at which the function is to be called
+        func (_type_): Function to be called
+    """
+    while True:
+        await func(*args, **kwargs)
+        await asyncio.sleep(__seconds)
 
 
 def main() -> None:
@@ -20,6 +33,7 @@ def main() -> None:
     env.check_tweet_settings()
     env.discord_setting_verification()
     env.bot_setting_verification()
+    env.clip_collection_setting_verification()
     app_started()
     bot = Bot(env.app_settings)
     loop = asyncio.get_event_loop()
@@ -34,6 +48,16 @@ def main() -> None:
     ):
         twitch_websocket = loop.create_task(websocket_listener(env.app_settings))
         tasks_to_start.append(twitch_websocket)
+    if env.app_settings["dc_feature_clips"]:
+        new_clips = loop.create_task(
+            every(
+                env.app_settings["clips_fetch_time"],
+                new_clips_handler,
+                **env.app_settings,
+                **env.discord_settings
+            )
+        )
+        tasks_to_start.append(new_clips)
     loop.run_until_complete(asyncio.gather(*tasks_to_start))
 
 

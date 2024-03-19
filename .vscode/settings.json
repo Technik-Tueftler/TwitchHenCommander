@@ -1,5 +1,5 @@
 {
-    "code-runner.cwd": "D:\\Workspace\\git\\TwitchHashtagBot\\source",
-    "terminal.integrated.cwd": "D:\\Workspace\\git\\TwitchHashtagBot\\source",
+    "code-runner.cwd": "${workspaceFolder}/source",
+    "terminal.integrated.cwd": "${workspaceFolder}/source",
     "code-runner.fileDirectoryAsCwd": true
 }

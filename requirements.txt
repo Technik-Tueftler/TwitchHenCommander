@@ -1,4 +1,8 @@
-twitchio~=2.7.0
-discord~=2.3.2
-requests~=2.31.0
+aiofiles==23.2.1
 websockets==12.0
+python-dotenv==1.0.1
+requests~=2.31.0
+aiosqlite==0.20.0
+greenlet==3.0.3
+SQLAlchemy==2.0.28
+typing-extensions==4.10.0
