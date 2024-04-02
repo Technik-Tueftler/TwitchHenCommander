@@ -59,6 +59,22 @@ async def websocket_listener(settings: dict) -> None:
                             headers=headers,
                             timeout=REQUEST_TIMEOUT,
                         )
+                        subscriptions_message_offline_via_raid = {
+                            "type": "stream.raid",
+                            "version": "1",
+                            "condition": {"broadcaster_user_id": settings["broadcaster_id"]},
+                            "transport": {"method": "websocket", "session_id": websocket_id},
+                        }
+                        headers = {
+                            "Client-ID": settings["ID"],
+                            "Authorization": f"Bearer {settings['token']}",
+                        }
+                        _ = requests.post(
+                            TWITCH_SUBSCRIPTION_URL,
+                            json=subscriptions_message_offline_via_raid,
+                            headers=headers,
+                            timeout=REQUEST_TIMEOUT,
+                        )
         elif message["metadata"]["message_type"] == "reconnecting":
             reconnect_url = message["payload"]["session"]["reconnect_url"]
             old_connection = connection
