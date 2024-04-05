@@ -11,6 +11,7 @@ GitPython==3.1.41
 greenlet==3.0.3
 idna==3.6
 iso8601==2.1.0
+loguru==0.7.2
 multidict==6.0.5
 python-dotenv==1.0.1
 requests==2.31.0
