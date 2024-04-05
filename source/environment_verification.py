@@ -10,6 +10,7 @@ from pathlib import Path
 from enum import Enum
 import requests
 from dotenv import dotenv_values
+from loguru import logger
 
 from constants import (
     CONFIGURATION_FILE_PATH,
@@ -35,6 +36,7 @@ from constants import (
     BOT_COMMAND_PATTERN,
     DEFAULT_CLIP_THANK_YOU_TEXT,
     UPDATE_INTERVAL_PUBLISH_NEW_CLIPS,
+    LOG_LEVEL
 )
 
 config = {
@@ -84,8 +86,12 @@ finish_hashtag_bot_command = config.get("BOT_HASHTAG_COMMAND_FINISH", None)
 stop_hashtag_bot_command = config.get("BOT_HASHTAG_COMMAND_STOP", None)
 help_hashtag_bot_command = config.get("BOT_HASHTAG_COMMAND_HELP", None)
 status_hashtag_bot_command = config.get("BOT_HASHTAG_COMMAND_STATUS", None)
+log_level = config.get("LOG_LEVEL", LOG_LEVEL)
 
 bot_command_pattern = re.compile(BOT_COMMAND_PATTERN)
+
+logger.add("henCommander.log", rotation="500 MB", level=log_level)
+logger.info(f"Ja das Programm läuft {hashtag_max_length}")
 
 app_settings = {
     "ID": client_id,
@@ -169,7 +175,7 @@ def bot_setting_verification() -> None:
         else FINISH_BOT_AT_STREAMEND
     )
 
-
+@logger.catch
 def check_tweet_settings():
     """
     Check if config file available and the tweet settings and write the result in the tweet settings
@@ -219,7 +225,7 @@ def twitch_setting_verification() -> bool:
         app_settings["broadcaster_id"] = response["data"][0]["id"]
         return True
     with open(LOG_FILE_PATH, "a", encoding="utf-8") as file:
-        file.write("The login data for twitch is missing or incomplete.")
+        file.write("The login data for twitch is missing or incomplete.\n")
     return False
 
 
