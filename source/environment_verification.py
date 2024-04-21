@@ -35,6 +35,7 @@ from constants import (
     BOT_COMMAND_PATTERN,
     DEFAULT_CLIP_THANK_YOU_TEXT,
     UPDATE_INTERVAL_PUBLISH_NEW_CLIPS,
+    CHECK_STREAM_INTERVAL,
 )
 
 config = {
@@ -68,9 +69,9 @@ dc_feature_clips = config.get("DC_FEATURE_CLIPS", DC_FEATURE_CLIPS)
 clip_thank_you_text = config.get("CLIP_THANK_YOU_TEXT", DEFAULT_CLIP_THANK_YOU_TEXT)
 clips_fetch_time = config.get("CLIPS_FETCH_TIME", UPDATE_INTERVAL_PUBLISH_NEW_CLIPS)
 
-hashtag_max_length = config.get("HASHTAG_MAX_LENGTH", None)
-hashtag_min_length = config.get("HASHTAG_MIN_LENGTH", None)
-tweet_max_length = config.get("TWEET_MAX_LENGTH", None)
+hashtag_max_length = config.get("HASHTAG_MAX_LENGTH", HASHTAG_MAX_LENGTH)
+hashtag_min_length = config.get("HASHTAG_MIN_LENGTH", HASHTAG_MIN_LENGTH)
+tweet_max_length = config.get("TWEET_MAX_LENGTH", TWEET_MAX_LENGTH)
 tweet_start_string = config.get("TWEET_START_STRING", TWEET_START_STRING)
 tweet_end_string = config.get("TWEET_END_STRING", TWEET_END_STRING)
 hashtag_all_lower_case = config.get("HASHTAG_ALL_LOWER_CASE", None)
@@ -96,6 +97,7 @@ app_settings = {
     "dc_available": False,
     "dc_feature_hashtag": False,
     "dc_feature_clips": False,
+    "check_stream_interval": CHECK_STREAM_INTERVAL,
     "clips_fetch_time": clips_fetch_time,
     "database_synchronized": False,
     "start_bot_at_streamstart": start_bot_at_streamstart,
@@ -124,7 +126,7 @@ discord_settings = {
     "webhook_url_hashtag": webhook_url_hashtag,
     "discord_username_clip": discord_username_clip,
     "webhook_url_clip": webhook_url_clip,
-    "clip_thank_you_text": clip_thank_you_text, 
+    "clip_thank_you_text": clip_thank_you_text,
 }
 
 
@@ -261,6 +263,7 @@ def discord_setting_verification() -> None:
         if clips_fetch_time.isdecimal()
         else UPDATE_INTERVAL_PUBLISH_NEW_CLIPS
     )
+
 
 def clip_collection_setting_verification() -> None:
     """
