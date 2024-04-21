@@ -7,9 +7,9 @@ import asyncio
 import environment_verification as env
 from twitch_bot import Bot
 # from twitch_api_websocket import websocket_listener
-from twitch_websocket_2 import websocket_listener_2
+# from twitch_websocket_2 import websocket_listener_2
 from hashtag_handler import app_started
-from twitch_api import new_clips_handler
+from twitch_api import new_clips_handler, streaming_handler
 
 
 async def every(__seconds: float, func, *args, **kwargs):
@@ -48,8 +48,16 @@ def main() -> None:
             env.app_settings["finish_bot_at_streamend"],
         ]
     ):
-        twitch_websocket = loop.create_task(websocket_listener_2(env.app_settings))
-        tasks_to_start.append(twitch_websocket)
+        # twitch_websocket = loop.create_task(websocket_listener_2(env.app_settings))
+        # tasks_to_start.append(twitch_websocket)
+        stream_handler = loop.create_task(
+            every(
+                env.app_settings["check_stream_interval"],
+                streaming_handler,
+                **env.app_settings
+            )
+        )
+        tasks_to_start.append(stream_handler)
     if env.app_settings["dc_feature_clips"]:
         new_clips = loop.create_task(
             every(

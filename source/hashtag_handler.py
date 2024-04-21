@@ -7,6 +7,7 @@ import asyncio
 from datetime import datetime
 from requests import post
 import twitchio
+import re
 
 import environment_verification as env
 from constants import (
@@ -14,9 +15,13 @@ from constants import (
     REQUEST_TIMEOUT,
 )
 
-app_data = {"allowed": True, "tweets": []}
+app_data = {"online": False, "allowed": True, "tweets": []}
 lock = asyncio.Lock()
 
+_ = r'\B#(?![0-9_]+)\w{3,19}\b'
+max = 20
+min = 3
+pattern = re.compile(r'\B#(?![0-9_]+)\w{' + min + r',' + max + r'}\b')
 
 async def delete_hashtags() -> None:
     """
@@ -56,6 +61,16 @@ async def allow_collecting(allowance: bool) -> None:
     """
     async with lock:
         app_data["allowed"] = allowance
+
+
+async def set_stream_status(status: bool) -> None:
+    """
+    Function to protect the information if stream is online or offline and set status
+    :param status: Status of stream
+    :return: None
+    """
+    async with lock:
+        app_data["online"] = status
 
 
 async def separate_hash(message: twitchio.message.Message) -> set:
