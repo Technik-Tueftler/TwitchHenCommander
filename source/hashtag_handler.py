@@ -21,7 +21,8 @@ lock = asyncio.Lock()
 _ = r'\B#(?![0-9_]+)\w{3,19}\b'
 max = 20
 min = 3
-pattern = re.compile(r'\B#(?![0-9_]+)\w{' + min + r',' + max + r'}\b')
+pattern = re.compile(r'\B#(?![0-9_]+)\w{' + str(min) + r',' + str(max) + r'}\b')
+print("twieet fertig")
 
 async def delete_hashtags() -> None:
     """
