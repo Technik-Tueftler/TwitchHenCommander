@@ -7,8 +7,6 @@ import asyncio
 from datetime import datetime
 from requests import post
 import twitchio
-import re
-
 import environment_verification as env
 from constants import (
     HASHTAG_FILE_PATH,
@@ -17,12 +15,6 @@ from constants import (
 
 app_data = {"online": False, "allowed": True, "tweets": []}
 lock = asyncio.Lock()
-
-_ = r'\B#(?![0-9_]+)\w{3,19}\b'
-max = 20
-min = 3
-pattern = re.compile(r'\B#(?![0-9_]+)\w{' + str(min) + r',' + str(max) + r'}\b')
-print("twieet fertig")
 
 async def delete_hashtags() -> None:
     """
@@ -83,17 +75,7 @@ async def separate_hash(message: twitchio.message.Message) -> set:
     converted_message = message.content
     if env.tweet_settings["hashtag_all_lower_case"]:
         converted_message = message.content.lower()
-    return [
-        element
-        for element in converted_message.split(" ")
-        if element.startswith("#")
-        and env.tweet_settings["hashtag_min_length"]
-        <= len(element)
-        <= env.tweet_settings["hashtag_max_length"]
-        and element[1].isalpha()
-        and not element.count('#') > 1
-    ]
-
+    return env.tweet_settings["hashtag_pattern"].findall(converted_message)
 
 async def register_new_hashtags(new_hashtags: list) -> None:
     """

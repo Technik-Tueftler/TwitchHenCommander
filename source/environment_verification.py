@@ -69,8 +69,8 @@ dc_feature_clips = config.get("DC_FEATURE_CLIPS", DC_FEATURE_CLIPS)
 clip_thank_you_text = config.get("CLIP_THANK_YOU_TEXT", DEFAULT_CLIP_THANK_YOU_TEXT)
 clips_fetch_time = config.get("CLIPS_FETCH_TIME", UPDATE_INTERVAL_PUBLISH_NEW_CLIPS)
 
-hashtag_max_length = config.get("HASHTAG_MAX_LENGTH", HASHTAG_MAX_LENGTH)
-hashtag_min_length = config.get("HASHTAG_MIN_LENGTH", HASHTAG_MIN_LENGTH)
+hashtag_max_length = config.get("HASHTAG_MAX_LENGTH", 0)
+hashtag_min_length = config.get("HASHTAG_MIN_LENGTH", 0)
 tweet_max_length = config.get("TWEET_MAX_LENGTH", TWEET_MAX_LENGTH)
 tweet_start_string = config.get("TWEET_START_STRING", TWEET_START_STRING)
 tweet_end_string = config.get("TWEET_END_STRING", TWEET_END_STRING)
@@ -119,6 +119,7 @@ tweet_settings = {
     "tweet_end_string": tweet_end_string,
     "hashtag_all_lower_case": HASHTAG_ALL_LOWER_CASE,
     "hashtag_authentication_level": AuthenticationLevel[HASHTAG_AUTHENTICATION_LEVEL],
+    "hashtag_pattern": None,
 }
 
 discord_settings = {
@@ -197,6 +198,13 @@ def check_tweet_settings():
         AuthenticationLevel[hashtag_authentication_level]
         if hashtag_authentication_level.upper() in AuthenticationLevel.__members__
         else AuthenticationLevel[HASHTAG_AUTHENTICATION_LEVEL]
+    )
+    tweet_settings["hashtag_pattern"] = re.compile(
+        r"\B#(?![0-9_]+)\w{"
+        + str(tweet_settings["hashtag_min_length"])
+        + r","
+        + str(tweet_settings["hashtag_max_length"])
+        + r"}\b"
     )
 
 
