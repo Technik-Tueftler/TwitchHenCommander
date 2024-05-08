@@ -9,7 +9,7 @@ from sqlalchemy import ForeignKey, select
 from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker
 from constants import UPDATE_INTERVAL_PUBLISH_NEW_CLIPS
 
-engine = create_async_engine("sqlite+aiosqlite:///../files/sample.db", echo=False)
+engine = create_async_engine("sqlite+aiosqlite:///../files/HenCommander.db", echo=False)
 
 
 class Base(DeclarativeBase): # pylint: disable=too-few-public-methods
@@ -52,6 +52,18 @@ class Clip(Base): # pylint: disable=too-few-public-methods
 
     def __repr__(self) -> str:
         return f"Clip: {self.clip_id}"
+
+
+class Stream(Base): # pylint: disable=too-few-public-methods
+    """Class to collect all stream related information
+
+    Args:
+        Base (_type_): Basic class that is inherited
+    """
+    __tablename__ = "streams"
+    id: Mapped[int] = mapped_column(primary_key=True)
+    timestamp: Mapped[datetime] = mapped_column(nullable=False)
+    hashtags: Mapped[str] = mapped_column(nullable=True)
 
 
 session = async_sessionmaker(bind=engine, expire_on_commit=False)
@@ -114,14 +126,14 @@ async def fetch_last_clip_ids() -> List[int]:
     return [clip.clip_id for clip in all_clips]
 
 
-async def add_user_clip(clip: Clip) -> None:
-    """Add user clip to DB
+async def add_data(data: Stream | Clip) -> None:
+    """Add data object to db
 
     Args:
-        clip (Clip): Clip mapped object with necessary 
+        stream (Stream): Stream mapped object with necessary 
     """
     async with session() as sess:
-        sess.add(clip)
+        sess.add(data)
         await sess.commit()
 
 

@@ -35,6 +35,7 @@ from constants import (
     BOT_COMMAND_PATTERN,
     DEFAULT_CLIP_THANK_YOU_TEXT,
     UPDATE_INTERVAL_PUBLISH_NEW_CLIPS,
+    CHECK_STREAM_INTERVAL,
 )
 
 config = {
@@ -58,6 +59,7 @@ token = config.get("TW_TOKEN", None)
 nickname = config.get("TW_NICKNAME", None)
 init_channels = config.get("TW_INIT_CHANNELS", None)
 broadcaster_id = config.get("TW_BROADCASTER_ID", None)
+check_stream_interval = config.get("CHECK_STREAM_INTERVAL", CHECK_STREAM_INTERVAL)
 
 discord_username_hashtag = config.get("DC_USER_NAME_HASHTAG", None)
 webhook_url_hashtag = config.get("DC_WEBHOOK_URL_HASHTAG", None)
@@ -68,9 +70,9 @@ dc_feature_clips = config.get("DC_FEATURE_CLIPS", DC_FEATURE_CLIPS)
 clip_thank_you_text = config.get("CLIP_THANK_YOU_TEXT", DEFAULT_CLIP_THANK_YOU_TEXT)
 clips_fetch_time = config.get("CLIPS_FETCH_TIME", UPDATE_INTERVAL_PUBLISH_NEW_CLIPS)
 
-hashtag_max_length = config.get("HASHTAG_MAX_LENGTH", None)
-hashtag_min_length = config.get("HASHTAG_MIN_LENGTH", None)
-tweet_max_length = config.get("TWEET_MAX_LENGTH", None)
+hashtag_max_length = config.get("HASHTAG_MAX_LENGTH", HASHTAG_MAX_LENGTH)
+hashtag_min_length = config.get("HASHTAG_MIN_LENGTH", HASHTAG_MIN_LENGTH)
+tweet_max_length = config.get("TWEET_MAX_LENGTH", TWEET_MAX_LENGTH)
 tweet_start_string = config.get("TWEET_START_STRING", TWEET_START_STRING)
 tweet_end_string = config.get("TWEET_END_STRING", TWEET_END_STRING)
 hashtag_all_lower_case = config.get("HASHTAG_ALL_LOWER_CASE", None)
@@ -96,6 +98,7 @@ app_settings = {
     "dc_available": False,
     "dc_feature_hashtag": False,
     "dc_feature_clips": False,
+    "check_stream_interval": CHECK_STREAM_INTERVAL,
     "clips_fetch_time": clips_fetch_time,
     "database_synchronized": False,
     "start_bot_at_streamstart": start_bot_at_streamstart,
@@ -117,6 +120,7 @@ tweet_settings = {
     "tweet_end_string": tweet_end_string,
     "hashtag_all_lower_case": HASHTAG_ALL_LOWER_CASE,
     "hashtag_authentication_level": AuthenticationLevel[HASHTAG_AUTHENTICATION_LEVEL],
+    "hashtag_pattern": None,
 }
 
 discord_settings = {
@@ -124,7 +128,7 @@ discord_settings = {
     "webhook_url_hashtag": webhook_url_hashtag,
     "discord_username_clip": discord_username_clip,
     "webhook_url_clip": webhook_url_clip,
-    "clip_thank_you_text": clip_thank_you_text, 
+    "clip_thank_you_text": clip_thank_you_text,
 }
 
 
@@ -196,6 +200,13 @@ def check_tweet_settings():
         if hashtag_authentication_level.upper() in AuthenticationLevel.__members__
         else AuthenticationLevel[HASHTAG_AUTHENTICATION_LEVEL]
     )
+    tweet_settings["hashtag_pattern"] = re.compile(
+        r"\B#(?![0-9_]+)\w{"
+        + str(tweet_settings["hashtag_min_length"])
+        + r","
+        + str(tweet_settings["hashtag_max_length"])
+        + r"}\b"
+    )
 
 
 def check_twitch_env_available() -> bool:
@@ -203,6 +214,11 @@ def check_twitch_env_available() -> bool:
     Check if environment variables available for twitch settings
     :return: result if settings available as bool
     """
+    app_settings["check_stream_interval"] = (
+        int(check_stream_interval)
+        if check_stream_interval.isdecimal()
+        else CHECK_STREAM_INTERVAL
+    )
     return None not in (client_id, token, nickname, init_channels)
 
 
@@ -261,6 +277,7 @@ def discord_setting_verification() -> None:
         if clips_fetch_time.isdecimal()
         else UPDATE_INTERVAL_PUBLISH_NEW_CLIPS
     )
+
 
 def clip_collection_setting_verification() -> None:
     """

@@ -65,6 +65,11 @@ class Bot(commands.Bot):
 
         await self.handle_commands(message)
 
+    async def event_command_error(self, context: commands.Context, error: Exception):
+        if isinstance(error, commands.CommandNotFound):
+            return
+
+
     @commands.command(name=env.bot_hashtag_commands["finish_hashtag_bot_command"])
     async def finish_hash(self, ctx: commands.Context):
         """

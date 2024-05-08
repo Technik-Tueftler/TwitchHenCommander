@@ -7,6 +7,7 @@ from string import Template
 import asyncio
 import requests
 import db
+import hashtag_handler as hashh
 from constants import (
     REQUEST_TIMEOUT,
     UPDATE_INTERVAL_PUBLISH_NEW_CLIPS,
@@ -51,6 +52,45 @@ async def fetch_new_clips(settings) -> list:
     response = requests.get(fetch_url, headers=headers, timeout=REQUEST_TIMEOUT).json()
     return response["data"]
 
+async def streaming_handler(**settings) -> None:
+    """Function check if stream is running or not and set configured interfaces 
+
+    Args:
+        settings (_type_): App settings
+    """
+    broadcaster = settings["nickname"]
+    client_id = settings["ID"]
+    token = settings["token"]
+    is_live_url = (
+        f"https://api.twitch.tv/helix/search/channels?query="
+        f"{broadcaster}&live_only=true"
+    )
+    headers = {"Client-ID": client_id, "Authorization": f"Bearer {token}"}
+    # {"data": [], "pagination": {}}
+
+    # {data": [ {"display_name": "Technik_Tueftler", "game_id": "509658",
+    # "game_name": "Just Chatting", "is_live": true,
+    # "tags": ["KeinBackseatGaming","Deutsch"], "title": "Reaction",
+    # "started_at": "2024-04-02T12:45:22Z"} ],"pagination": {}
+
+    # {'data': [{'display_name': 'Technik_Tueftler', 'game_id': '766571430',
+    # 'game_name': 'HELLDIVERS 2', 'id': '206130928', 'is_live': False,
+    # 'tags': ['visuellesASMR', 'Deutsch', 'KeineBackseatgaming'],
+    # 'title': '🐔 Noch 2 Achievements #34 🐔',
+    # 'started_at': ''}], 'pagination': {}}
+    response = requests.get(is_live_url, headers=headers, timeout=REQUEST_TIMEOUT).json()
+    print(response)
+    if settings["start_bot_at_streamstart"]:
+        if response["data"] and not hashh.app_data["online"] and response["data"][0]["is_live"]:
+            await hashh.allow_collecting(True)
+    if settings["finish_bot_at_streamend"]:
+        if not response["data"] and hashh.app_data["online"]:
+            await hashh.allow_collecting(False)
+            await hashh.tweet_hashtags()
+        elif response["data"] and hashh.app_data["online"] and not response["data"][0]["is_live"]:
+            await hashh.allow_collecting(False)
+            await hashh.tweet_hashtags()
+
 
 async def new_clips_handler(**settings) -> None:
     """Handling function to find new clips and then post them"""
@@ -74,7 +114,7 @@ async def new_clips_handler(**settings) -> None:
             timestamp=datetime.strptime(clip["created_at"], TIMESTAMP_PATTERN),
             title=clip["title"],
         )
-        await db.add_user_clip(db_clip)
+        await db.add_data(db_clip)
 
         content = MyTemplate(settings["clip_thank_you_text"]).substitute(
             link=clip["url"], user=clip["creator_name"]
