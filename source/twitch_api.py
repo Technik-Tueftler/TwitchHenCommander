@@ -114,7 +114,7 @@ async def new_clips_handler(**settings) -> None:
             timestamp=datetime.strptime(clip["created_at"], TIMESTAMP_PATTERN),
             title=clip["title"],
         )
-        await db.add_user_clip(db_clip)
+        await db.add_data(db_clip)
 
         content = MyTemplate(settings["clip_thank_you_text"]).substitute(
             link=clip["url"], user=clip["creator_name"]

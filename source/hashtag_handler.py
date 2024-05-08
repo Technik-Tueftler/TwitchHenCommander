@@ -8,6 +8,7 @@ from datetime import datetime, UTC
 from requests import post
 import twitchio
 import environment_verification as env
+import db
 from constants import (
     HASHTAG_FILE_PATH,
     REQUEST_TIMEOUT,
@@ -29,6 +30,11 @@ async def tweet_hashtags() -> None:
     Send all the hashtags to the configured platforms
     :return: None
     """
+    stream = db.Stream(
+        timestamp=datetime.now(UTC),
+        hashtags=" ".join(app_data["tweets"])
+    )
+    await db.add_data(stream)
     with open(HASHTAG_FILE_PATH, "a", encoding="utf-8") as file:
         file.write(f"Hashtags ({datetime.now(UTC)} UTC): ")
         hashtags = " ".join(app_data["tweets"])
