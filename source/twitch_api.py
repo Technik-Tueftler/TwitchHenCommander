@@ -10,7 +10,6 @@ import db
 import hashtag_handler as hashh
 from constants import (
     REQUEST_TIMEOUT,
-    UPDATE_INTERVAL_PUBLISH_NEW_CLIPS,
     CLIP_WAIT_TIME,
     TIMESTAMP_PATTERN,
 )
@@ -79,7 +78,7 @@ async def streaming_handler(**settings) -> None:
     # 'title': '🐔 Noch 2 Achievements #34 🐔',
     # 'started_at': ''}], 'pagination': {}}
     response = requests.get(is_live_url, headers=headers, timeout=REQUEST_TIMEOUT).json()
-    print(response)
+    # print(response)
     if settings["start_bot_at_streamstart"]:
         if response["data"] and not hashh.app_data["online"] and response["data"][0]["is_live"]:
             await hashh.allow_collecting(True)
