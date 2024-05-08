@@ -59,6 +59,7 @@ token = config.get("TW_TOKEN", None)
 nickname = config.get("TW_NICKNAME", None)
 init_channels = config.get("TW_INIT_CHANNELS", None)
 broadcaster_id = config.get("TW_BROADCASTER_ID", None)
+check_stream_interval = config.get("CHECK_STREAM_INTERVAL", CHECK_STREAM_INTERVAL)
 
 discord_username_hashtag = config.get("DC_USER_NAME_HASHTAG", None)
 webhook_url_hashtag = config.get("DC_WEBHOOK_URL_HASHTAG", None)
@@ -69,8 +70,8 @@ dc_feature_clips = config.get("DC_FEATURE_CLIPS", DC_FEATURE_CLIPS)
 clip_thank_you_text = config.get("CLIP_THANK_YOU_TEXT", DEFAULT_CLIP_THANK_YOU_TEXT)
 clips_fetch_time = config.get("CLIPS_FETCH_TIME", UPDATE_INTERVAL_PUBLISH_NEW_CLIPS)
 
-hashtag_max_length = config.get("HASHTAG_MAX_LENGTH", 0)
-hashtag_min_length = config.get("HASHTAG_MIN_LENGTH", 0)
+hashtag_max_length = config.get("HASHTAG_MAX_LENGTH", HASHTAG_MAX_LENGTH)
+hashtag_min_length = config.get("HASHTAG_MIN_LENGTH", HASHTAG_MIN_LENGTH)
 tweet_max_length = config.get("TWEET_MAX_LENGTH", TWEET_MAX_LENGTH)
 tweet_start_string = config.get("TWEET_START_STRING", TWEET_START_STRING)
 tweet_end_string = config.get("TWEET_END_STRING", TWEET_END_STRING)
@@ -213,6 +214,11 @@ def check_twitch_env_available() -> bool:
     Check if environment variables available for twitch settings
     :return: result if settings available as bool
     """
+    app_settings["check_stream_interval"] = (
+        int(check_stream_interval)
+        if check_stream_interval.isdecimal()
+        else CHECK_STREAM_INTERVAL
+    )
     return None not in (client_id, token, nickname, init_channels)
 
 

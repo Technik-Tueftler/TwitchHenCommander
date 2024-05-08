@@ -6,8 +6,6 @@ Main function for starting app and bot
 import asyncio
 import environment_verification as env
 from twitch_bot import Bot
-# from twitch_api_websocket import websocket_listener
-# from twitch_websocket_2 import websocket_listener_2
 from hashtag_handler import app_started
 from twitch_api import new_clips_handler, streaming_handler
 
@@ -48,8 +46,6 @@ def main() -> None:
             env.app_settings["finish_bot_at_streamend"],
         ]
     ):
-        # twitch_websocket = loop.create_task(websocket_listener_2(env.app_settings))
-        # tasks_to_start.append(twitch_websocket)
         stream_handler = loop.create_task(
             every(
                 env.app_settings["check_stream_interval"],
