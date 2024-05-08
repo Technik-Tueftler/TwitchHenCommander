@@ -4,7 +4,7 @@
 All functions to collect the hashtags and send the collected to the configured platforms
 """
 import asyncio
-from datetime import datetime
+from datetime import datetime, UTC
 from requests import post
 import twitchio
 import environment_verification as env
@@ -30,12 +30,13 @@ async def tweet_hashtags() -> None:
     :return: None
     """
     with open(HASHTAG_FILE_PATH, "a", encoding="utf-8") as file:
-        file.write(f"Hashtags ({datetime.utcnow()} UTC): ")
+        file.write(f"Hashtags ({datetime.now(UTC)} UTC): ")
         hashtags = " ".join(app_data["tweets"])
         file.write(f"{hashtags}\n")
     if env.app_settings["dc_available"]:
         content = (
             env.tweet_settings["tweet_start_string"]
+            + " "
             + hashtags
             + " "
             + env.tweet_settings["tweet_end_string"]
