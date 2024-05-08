@@ -36,7 +36,7 @@ async def fetch_new_clips(settings) -> list:
     client_id = settings["ID"]
     token = settings["token"]
     timestamp = datetime.now(UTC)
-    seconds = UPDATE_INTERVAL_PUBLISH_NEW_CLIPS
+    seconds = settings["clips_fetch_time"]
     start_timestamp = (timestamp - timedelta(seconds=seconds)).strftime(
         TIMESTAMP_PATTERN
     )

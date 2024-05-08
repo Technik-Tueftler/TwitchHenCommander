@@ -7,7 +7,7 @@ from typing import List
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship
 from sqlalchemy import ForeignKey, select
 from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker
-from constants import UPDATE_INTERVAL_PUBLISH_NEW_CLIPS
+import environment_verification as env
 
 engine = create_async_engine("sqlite+aiosqlite:///../files/HenCommander.db", echo=False)
 
@@ -115,7 +115,7 @@ async def fetch_last_clip_ids() -> List[int]:
         List[int]: List of clip IDs
     """
     timestamp = datetime.now(UTC)
-    seconds = UPDATE_INTERVAL_PUBLISH_NEW_CLIPS
+    seconds = env.app_settings["clips_fetch_time"]
     start_timestamp = (timestamp - timedelta(seconds=seconds)).strftime(
         "%Y-%m-%dT%H:%M:%SZ"
     )

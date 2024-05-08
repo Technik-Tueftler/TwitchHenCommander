@@ -182,15 +182,15 @@ def check_tweet_settings():
     tweet_settings["hashtag_max_length"] = (
         int(hashtag_max_length)
         if hashtag_max_length.isdecimal()
-        else HASHTAG_MAX_LENGTH
+        else int(HASHTAG_MAX_LENGTH)
     )
     tweet_settings["hashtag_min_length"] = (
         int(hashtag_min_length)
         if hashtag_min_length.isdecimal()
-        else HASHTAG_MIN_LENGTH
+        else int(HASHTAG_MIN_LENGTH)
     )
     tweet_settings["tweet_max_length"] = (
-        int(tweet_max_length) if tweet_max_length.isdecimal() else TWEET_MAX_LENGTH
+        int(tweet_max_length) if tweet_max_length.isdecimal() else int(TWEET_MAX_LENGTH)
     )
     tweet_settings["hashtag_all_lower_case"] = hashtag_all_lower_case.lower() in (
         OPTIONS_POSITIVE_ARG
@@ -217,7 +217,7 @@ def check_twitch_env_available() -> bool:
     app_settings["check_stream_interval"] = (
         int(check_stream_interval)
         if check_stream_interval.isdecimal()
-        else CHECK_STREAM_INTERVAL
+        else int(CHECK_STREAM_INTERVAL)
     )
     return None not in (client_id, token, nickname, init_channels)
 
@@ -275,7 +275,7 @@ def discord_setting_verification() -> None:
     app_settings["clips_fetch_time"] = (
         int(clips_fetch_time)
         if clips_fetch_time.isdecimal()
-        else UPDATE_INTERVAL_PUBLISH_NEW_CLIPS
+        else int(UPDATE_INTERVAL_PUBLISH_NEW_CLIPS)
     )
 
 
