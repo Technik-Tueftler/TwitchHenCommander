@@ -14,20 +14,41 @@ Der TwitchHenCommander ist ein Programm, der auf einen einstellbaren Twitchchat 
 
 ## Was sonst noch benötigt wird
 - Ein Twitch-Bot muss erstellt werden über: https://dev.twitch.tv/console
-- Discord WebHook Verbindung, siehe `Unterstützte Plattformen für die Übertragung`
+- Discord WebHook Verbindungen, siehe `Unterstützte Plattformen für die Übertragung`
 
 ## Unterstützte Plattformen für die Übertragung
-Derzeit wird nur Discord über WebHook unterstützt. Dazu muss in den Servereinstellungen unter Integration ein neuer WebHook angelegt werden. Hier können Sie auch den Kanal einstellen, auf dem die Benachrichtigung gesendet werden soll.
+Derzeit wird nur Discord über WebHook unterstützt. Dazu muss in den Servereinstellungen unter `Integration` ein neuer WebHook angelegt werden. Hier können Sie auch den Kanal einstellen, auf dem die Benachrichtigung gesendet werden soll.
 
 ## Environment variables
-| Variable         | Erklärung                                                            | Beispiel                                        |
-|------------------|----------------------------------------------------------------------|-------------------------------------------------|
-| TW_CLIENT_ID     | Twitch client ID vom Bot.                                            | edr33sdfvbnmwsxdcfrt55jkdedded                  |
-| TW_TOKEN         | Twitch token vom Bot.                                                | hkedkodendoe343434gtgtdedexyde5667              |
-| TW_NICKNAME      | Anzeigename des Bots im Chat.                                        | Technik_Tueftler                                |
-| TW_INIT_CHANNELS | Alle Kanäle, die beobachtet werden sollen, getrennt durch ein Komma. | technik_tueftler,thebrutzler                    |
-| DC_USER_NAME     | Username des WebHook im Discord.                                     | HashtagBot                                      |
-| DC_WEBHOOK_URL   | WebHook-URL des WebHook im Discord.                                  | https://discord.com/api/webhooks/87364/oiehdied |
+Nachfolgend werden alle Environment Variablen aufgelistet, welche für die jeweilige Funktion benötigt werden.
+
+### Twitch Chat
+Alle Variablen die benötigt werden um den Twitch Chat zu lesen.
+| Variable                 | Erklärung                                                            | Beispiel                                        |
+|--------------------------|----------------------------------------------------------------------|-------------------------------------------------|
+| TW_CLIENT_ID             | Twitch client ID vom Bot.                                            | edr33sdfvbnmwsxdcfrt55jkdedded                  |
+| TW_TOKEN                 | Twitch token vom Bot.                                                | hkedkodendoe343434gtgtdedexyde5667              |
+| TW_NICKNAME              | Anzeigename des Bots im Chat.                                        | Technik_Tueftler                                |
+| TW_INIT_CHANNELS         | Alle Kanäle, die beobachtet werden sollen, getrennt durch ein Komma. | technik_tueftler,thebrutzler                    |
+| TW_BROADCASTER_ID        | Die ID des Broadcasters, optional, wird auch automatisch ermittelt.  | 123456789                                       |
+| CHECK_STREAM_INTERVAL    | Zeit (s) in geschaut wird, ob der Stream online oder offline ist.    | 60                                              |
+| START_BOT_AT_STREAMSTART | Legt fest, ob der Bot beim Streamstart gestartet werden soll.        | `active` für aktiv oder nichts für inactiv      |
+| FINISH_BOT_AT_STREAMEND  | Legt fest, ob der Bot beim Streamende beendet werden soll.           | `active` für aktiv oder nichts für inactiv      |
+
+# Hashtag Funktion
+Hier werden alle Variablen beschrieben, welche benötigt werden um Hashtags zu sammeln und am Ende im Discord zu posten.
+| Variable                     | Erklärung                                                             | Beispiel                                                  |
+|------------------------------|-----------------------------------------------------------------------|-----------------------------------------------------------|
+| DC_FEATURE_HASHTAG           | Legt fest, ob die Funktion aktiv sein soll oder nicht.                | `active` für aktiv oder nichts für inactiv                |
+| DC_USER_NAME_HASHTAGc        | Username des WebHook im Discord.                                      | HashtagBot                                                |
+| DC_WEBHOOK_URL_HASHTAG       | WebHook-URL des WebHook im Discord.                                   | https://discord.com/api/webhooks/87364/oiehdied           |
+| HASHTAG_MAX_LENGTH           | Legt fest was die maximale Länge eines Hashtags ist.                  | 20                                                        |
+| HASHTAG_MIN_LENGTH           | Legt fest was die minimale Länge eines Hashtags ist.                  | 3                                                         |
+| TWEET_MAX_LENGTH             | Hat aktuell keine Funktion                                            | NA                                                        |
+| TWEET_START_STRING           | Legt einen Text fest, der vor den Hashtags geschrieben wird.          | Das waren die Hashtags aus dem Stream:                    |
+| TWEET_END_STRING             | Legt einen Text fest, der nach den Hashtags geschrieben wird.         | Danke, dass ihr dabei wart.                               |
+| HASHTAG_ALL_LOWER_CASE       | Legt fest, ob alle Hashtags in Kleinbuchstaben umgewandelt werden.    | `active` für aktiv oder nichts für inactiv                |
+| HASHTAG_AUTHENTICATION_LEVEL | Legt den minimalen Rang fest, welche Hashtags gepostet werden sollen. | Möglich sind: EVERYONE, SUBSCRIBER, VIP, MOD, BROADCASTER |
 
 ## Befehle
 Wenn keine Befehle in der Konfigurationsdatei gesetzt werden, werden die folgenden Standardbefehle gesetzt:

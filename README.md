@@ -18,7 +18,7 @@ The TwitchHenCommander is a program that listens to an adjustable Twitch chat an
 - Discord WebHook connection, check `Supported platforms to broadcast`
 
 ## Supported platforms to broadcast
-Currently only Discord is supported via WebHook. To do this, a new WebHook must be created in the server settings under Integration. Here you can also set the channel on which the notification should be sent.
+Currently only Discord is supported via WebHook. To do this, a new WebHook must be created in the server settings under `Integration`. Here you can also set the channel on which the notification should be sent.
 
 ## Environment variables
 | Variable         | Explanation                                                    | Example                                         |
