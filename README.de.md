@@ -64,13 +64,13 @@ Hier werden alle Variablen beschrieben, welche benötigt werden um Clips zu erke
 ### Befehle
 Wenn keine Befehle in den environment Variablen festgelegt werden, werden die Standardbefehle. Möchte man diese umbenennen, muss die entsprechende variable angepasst werden. Das Erkennunszeichen ist dabei immer das Ausrufezeichen.
 
-| Standard Befehle     | Erklärung                                          | environment Variable       |
-|-------------|-------------------------------------------------------------|----------------------------|
-| !helphash   | Listet alle Befehle des Hashtag-Bot auf.                    | BOT_HASHTAG_COMMAND_HELP   |
-| !statushash | Gibt den Status des Bots aus ob er läuft oder pausiert ist. | BOT_HASHTAG_COMMAND_STATUS |
-| !starthash  | Beginnt das sammeln der Hashtags.                           | BOT_HASHTAG_COMMAND_START  |
-| !finishhash | Beendet das sammeln und sendet die Hashtags.                | BOT_HASHTAG_COMMAND_FINISH |
-| !stophash   | Beendet das sammeln und löscht die Hashtags.                | BOT_HASHTAG_COMMAND_STOP   |
+| Standard Befehle | Erklärung                                                   | environment Variable       |
+|------------------|-------------------------------------------------------------|----------------------------|
+| !helphash        | Listet alle Befehle des Hashtag-Bot auf.                    | BOT_HASHTAG_COMMAND_HELP   |
+| !statushash      | Gibt den Status des Bots aus ob er läuft oder pausiert ist. | BOT_HASHTAG_COMMAND_STATUS |
+| !starthash       | Beginnt das sammeln der Hashtags.                           | BOT_HASHTAG_COMMAND_START  |
+| !finishhash      | Beendet das sammeln und sendet die Hashtags.                | BOT_HASHTAG_COMMAND_FINISH |
+| !stophash        | Beendet das sammeln und löscht die Hashtags.                | BOT_HASHTAG_COMMAND_STOP   |
 
 ## Docker Compose Beispiel
 ````commandline
