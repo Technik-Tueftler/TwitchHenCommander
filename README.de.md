@@ -1,12 +1,16 @@
 # TwitchHenCommander
-Der TwitchHenCommander ist ein Bot, welcher auf den konfigurierten Twitchkanale hört und dort die Hashtags sammelt, welche vom Streamer, Mod oder Vip im Chat geschrieben wurde. Am Ende kann der Streamer diese auf konfigurierte Kanäle posten. Aktuell wird nur Discord unterstützt.  
+Der TwitchHenCommander ist ein Programm, der auf einen einstellbaren Twitchchat hört und dort verschiedene Dinge speichert und auf Events reagiert. Die genauen Funktionen sind unter der Überschrift `Funktionen` genauer beschrieben. Der Bot kann Local in einer Python Umgebung gestartet werden oder als Docker Container. Näheres unter der Überschrift `Installation / Ausführung`.
 
 [deutsche readme](https://github.com/Technik-Tueftler/TwitchHenCommander/blob/main/README.de.md)
  • [English readme](https://github.com/Technik-Tueftler/TwitchHenCommander/blob/main/README.md)
 
+## Funktionen
+1. Sammelt Hashtags im Twitchchat des Broadcasters und posted diese am Ende des Streams oder beim ausführen eines Befehls in den konfigurierten Discord Channel. Es kann eingestellt werden, dass nur Hashtags gesammelt werden, die einen einstellbaren Rang haben (Vips, Mods, Broadcaster). Des Weiteren kann festgelegt werden, ob die Hashtag-Funktion mit dem Stream-Start bzw. Stream-Ende gestartet bzw. beendet werden soll und damit automatisch gepostet werden soll.
+2. Wird ein neuer Clip erstellt in eurem Stream, kann dieser auch auf dem Discord gepostet werden.
+
 ## Installation / Ausführung
-1. führt das Programm lokal aus, indem es die Hauptdatei ausführt. Dazu wird einfach das Repository kopiert und `main.py` ausgeführt. Derzeit müssen zunächst Umgebungsvariablen in die IDE oder Umgebung geladen werden. Die Logindaten könne auch in der ``/files/config.json`` abgelegt werden. Das Programm wurde unter Python 3.11 getestet und entwickelt.  
-2. über einen Docker-Container. Beispiel siehe Punkt ``Docker Compose Example`` unten.  
+1. Führt das Programm lokal aus, indem es die Hauptdatei ausführt. Dazu wird einfach das Repository kopiert und `main.py` ausgeführt. Die Einstellungen müssen über die Umgebungsvariablen geladen werden. Dazu können die Variablen direkt im System hinterlegt sein oder man benutzt eine `.env` Datei. Hierzu kann die `template.env` Datei benutzt werden, indem man diese in `.env` umbenennt und in die benötigten Variablen den Wert schreibt. Das Programm wurde erstellt und getestet unter Python 3.11.
+2. Über einen Docker-Container. Beispiel siehe Punkt ``Docker Compose Example`` unten.
 
 ## Was sonst noch benötigt wird
 - Ein Twitch-Bot muss erstellt werden über: https://dev.twitch.tv/console
@@ -24,8 +28,6 @@ Derzeit wird nur Discord über WebHook unterstützt. Dazu muss in den Servereins
 | TW_INIT_CHANNELS | Alle Kanäle, die beobachtet werden sollen, getrennt durch ein Komma. | technik_tueftler,thebrutzler                    |
 | DC_USER_NAME     | Username des WebHook im Discord.                                     | HashtagBot                                      |
 | DC_WEBHOOK_URL   | WebHook-URL des WebHook im Discord.                                  | https://discord.com/api/webhooks/87364/oiehdied |
-
-Es ist möglich den Bot zu ohne die Umgebungsvariablen zu starten. Dazu müssen alle aufgeführten Variablen in der Konfigurationsdatei gesetzt werden. Siehe hierzu das Kapitel 
 
 ## Befehle
 Wenn keine Befehle in der Konfigurationsdatei gesetzt werden, werden die folgenden Standardbefehle gesetzt:

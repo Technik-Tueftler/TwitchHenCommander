@@ -1,11 +1,16 @@
 # TwitchHenCommander
-TwitchHenCommander is a bot that listens to configured twitch channel and collects hashtags from broadcaster, mod or vip in the chat. Finally, the broadcaster can post them on various platforms. Currently only post is supported on the DC.
+The TwitchHenCommander is a program that listens to an adjustable Twitch chat and saves various things there and reacts to events. The exact functions are described in more detail under the heading `Functions`. The bot can be started locally in a Python environment or as a Docker container. More details under the heading `Installation / Execution`.
 
 [English readme](https://github.com/Technik-Tueftler/TwitchHenCommander/blob/main/README.md)
  • [deutsche readme](https://github.com/Technik-Tueftler/TwitchHenCommander/blob/main/README.de.md)
 
+## Feature
+1. Collects hashtags in the broadcaster's twitch chat and posts them to the configured Discord channel at the end of the stream or when a command is executed. You can set that only hashtags with a configurable rank are collected (vips, mods, broadcasters). You can also specify whether the hashtag function should be started or ended with the start or end of the stream and thus be posted automatically.
+2. If a new clip is created in your stream, it can also be posted on the Discord.
+
+
 ## Installation / Execution
-1. locally runs the program by executing the main file. To do this, simply copy the repository and run `main.py`. Currently, first environment variables must be loaded into the IDE or environment. The login information can also be stored in ``/files/config.json``. The program was tested and developed under Python 3.11.
+1. Runs the program locally by executing the main file. To do this, simply copy the repository and execute `main.py`. The settings must be loaded via the environment variables. The variables can be stored directly in the system or you can use an `.env` file. The `template.env` file can be used for this by renaming it to `.env` and writing the value to the required variables. The program was tested and developed under Python 3.11.
 2. via a Docker container. Example see point ``Docker Compose Example`` below.
 
 ## What else is needed
