@@ -8,6 +8,7 @@ import environment_verification as env
 from twitch_bot import Bot
 from hashtag_handler import app_started
 from twitch_api import new_clips_handler, streaming_handler
+from watcher import logger
 
 
 async def every(__seconds: float, func, *args, **kwargs):
@@ -68,4 +69,5 @@ def main() -> None:
 
 
 if __name__ == "__main__":
+    logger.info("Programmstart")
     main()

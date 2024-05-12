@@ -13,6 +13,7 @@ from constants import (
     CLIP_WAIT_TIME,
     TIMESTAMP_PATTERN,
 )
+from watcher import logger
 
 class MyTemplate(Template):
     """This class allow the creation of a template with a user defined separator.
@@ -22,6 +23,7 @@ class MyTemplate(Template):
     """
     delimiter = "#"
 
+@logger.catch
 async def fetch_new_clips(settings) -> list:
     """Function to find new clips in the last interval
 
@@ -48,9 +50,15 @@ async def fetch_new_clips(settings) -> list:
     )
     headers = {"Client-ID": client_id, "Authorization": f"Bearer {token}"}
     # {'error': 'Not Found', 'status': 404, 'message': ''}
-    response = requests.get(fetch_url, headers=headers, timeout=REQUEST_TIMEOUT).json()
+    response_temp = requests.get(fetch_url, headers=headers, timeout=REQUEST_TIMEOUT)
+    response = response_temp.json()
+    limit = response_temp.headers.get("Ratelimit-Limit")
+    remaining = response_temp.headers.get("Ratelimit-Remaining")
+    reset_time = response_temp.headers.get("Ratelimit-Reset")
+    logger.info(f"Fetch new clips with: Limit: {limit} / Remaining: {remaining} / Reset Time: {reset_time}")
     return response["data"]
 
+@logger.catch
 async def streaming_handler(**settings) -> None:
     """Function check if stream is running or not and set configured interfaces 
 
@@ -77,7 +85,12 @@ async def streaming_handler(**settings) -> None:
     # 'tags': ['visuellesASMR', 'Deutsch', 'KeineBackseatgaming'],
     # 'title': '🐔 Noch 2 Achievements #34 🐔',
     # 'started_at': ''}], 'pagination': {}}
-    response = requests.get(is_live_url, headers=headers, timeout=REQUEST_TIMEOUT).json()
+    response_temp = requests.get(is_live_url, headers=headers, timeout=REQUEST_TIMEOUT)
+    response = response_temp.json()
+    limit = response_temp.headers.get("Ratelimit-Limit")
+    remaining = response_temp.headers.get("Ratelimit-Remaining")
+    reset_time = response_temp.headers.get("Ratelimit-Reset")
+    logger.info(f"Get online status with: Limit: {limit} / Remaining: {remaining} / Reset Time: {reset_time}")
     # print(response)
     if settings["start_bot_at_streamstart"]:
         if response["data"] and not hashh.app_data["online"] and response["data"][0]["is_live"]:
