@@ -36,6 +36,8 @@ from constants import (
     DEFAULT_CLIP_THANK_YOU_TEXT,
     UPDATE_INTERVAL_PUBLISH_NEW_CLIPS,
     CHECK_STREAM_INTERVAL,
+    LOG_LEVEL,
+    OPTIONS_LOG_LEVEL
 )
 
 config = {
@@ -60,6 +62,7 @@ nickname = config.get("TW_NICKNAME", None)
 init_channels = config.get("TW_INIT_CHANNELS", None)
 broadcaster_id = config.get("TW_BROADCASTER_ID", None)
 check_stream_interval = config.get("CHECK_STREAM_INTERVAL", CHECK_STREAM_INTERVAL)
+log_level = config.get("LOG_LEVEL", LOG_LEVEL)
 
 discord_username_hashtag = config.get("DC_USER_NAME_HASHTAG", None)
 webhook_url_hashtag = config.get("DC_WEBHOOK_URL_HASHTAG", None)
@@ -77,7 +80,6 @@ tweet_start_string = config.get("TWEET_START_STRING", TWEET_START_STRING)
 tweet_end_string = config.get("TWEET_END_STRING", TWEET_END_STRING)
 hashtag_all_lower_case = config.get("HASHTAG_ALL_LOWER_CASE", None)
 hashtag_authentication_level = config.get("HASHTAG_AUTHENTICATION_LEVEL", None)
-
 
 start_bot_at_streamstart = config.get("START_BOT_AT_STREAMSTART", None)
 finish_bot_at_streamend = config.get("FINISH_BOT_AT_STREAMEND", None)
@@ -103,6 +105,7 @@ app_settings = {
     "database_synchronized": False,
     "start_bot_at_streamstart": start_bot_at_streamstart,
     "finish_bot_at_streamend": finish_bot_at_streamend,
+    "log_level": log_level
 }
 
 bot_hashtag_commands = {
@@ -218,6 +221,11 @@ def check_twitch_env_available() -> bool:
         int(check_stream_interval)
         if check_stream_interval.isdecimal()
         else int(CHECK_STREAM_INTERVAL)
+    )
+    app_settings["log_level"] = (
+        log_level.upper()
+        if log_level.upper() in OPTIONS_LOG_LEVEL
+        else LOG_LEVEL
     )
     return None not in (client_id, token, nickname, init_channels)
 
