@@ -15,13 +15,16 @@ from constants import (
 )
 from watcher import logger
 
+
 class MyTemplate(Template):
     """This class allow the creation of a template with a user defined separator.
     The package is there to define templates for texts and then substitute them with certain values.
     Args:
         Template (_type_): Basic class that is inherited
     """
+
     delimiter = "#"
+
 
 @logger.catch
 async def fetch_new_clips(settings) -> list:
@@ -55,12 +58,15 @@ async def fetch_new_clips(settings) -> list:
     limit = response_temp.headers.get("Ratelimit-Limit")
     remaining = response_temp.headers.get("Ratelimit-Remaining")
     reset_time = response_temp.headers.get("Ratelimit-Reset")
-    logger.info(f"Fetch new clips with: Limit: {limit} / Remaining: {remaining} / Reset Time: {reset_time}")
+    logger.info(
+        f"Fetch new clips with: Limit: {limit} / Remaining: {remaining} / Reset Time: {reset_time}"
+    )
     return response["data"]
+
 
 @logger.catch
 async def streaming_handler(**settings) -> None:
-    """Function check if stream is running or not and set configured interfaces 
+    """Function check if stream is running or not and set configured interfaces
 
     Args:
         settings (_type_): App settings
@@ -90,16 +96,28 @@ async def streaming_handler(**settings) -> None:
     limit = response_temp.headers.get("Ratelimit-Limit")
     remaining = response_temp.headers.get("Ratelimit-Remaining")
     reset_time = response_temp.headers.get("Ratelimit-Reset")
-    logger.info(f"Get online status with: Limit: {limit} / Remaining: {remaining} / Reset Time: {reset_time}")
+    logger.info(
+        f"Get online status with: Limit: {limit} / "
+        + f"Remaining: {remaining} / "
+        + f"Reset Time: {reset_time}"
+    )
     # print(response)
     if settings["start_bot_at_streamstart"]:
-        if response["data"] and not hashh.app_data["online"] and response["data"][0]["is_live"]:
+        if (
+            response["data"]
+            and not hashh.app_data["online"]
+            and response["data"][0]["is_live"]
+        ):
             await hashh.allow_collecting(True)
     if settings["finish_bot_at_streamend"]:
         if not response["data"] and hashh.app_data["online"]:
             await hashh.allow_collecting(False)
             await hashh.tweet_hashtags()
-        elif response["data"] and hashh.app_data["online"] and not response["data"][0]["is_live"]:
+        elif (
+            response["data"]
+            and hashh.app_data["online"]
+            and not response["data"][0]["is_live"]
+        ):
             await hashh.allow_collecting(False)
             await hashh.tweet_hashtags()
 
@@ -110,9 +128,7 @@ async def new_clips_handler(**settings) -> None:
         await db.sync_db()
         settings["database_synchronized"] = True
     clips = await fetch_new_clips(settings)
-    last_clip_ids = (
-        await db.fetch_last_clip_ids()
-    )
+    last_clip_ids = await db.fetch_last_clip_ids()
     new_clips = [clip for clip in clips if clip["id"] not in last_clip_ids]
     if not new_clips:
         return

@@ -10,10 +10,10 @@ from pathlib import Path
 from enum import Enum
 import requests
 from dotenv import dotenv_values
+import watcher
 
 from constants import (
     CONFIGURATION_FILE_PATH,
-    LOG_FILE_PATH,
     HASHTAG_MAX_LENGTH,
     HASHTAG_MIN_LENGTH,
     TWEET_MAX_LENGTH,
@@ -227,6 +227,7 @@ def check_twitch_env_available() -> bool:
         if log_level.upper() in OPTIONS_LOG_LEVEL
         else LOG_LEVEL
     )
+    watcher.init_logging(app_settings["log_level"])
     return None not in (client_id, token, nickname, init_channels)
 
 
@@ -242,8 +243,7 @@ def twitch_setting_verification() -> bool:
         response = requests.get(url, headers=headers, timeout=REQUEST_TIMEOUT).json()
         app_settings["broadcaster_id"] = response["data"][0]["id"]
         return True
-    with open(LOG_FILE_PATH, "a", encoding="utf-8") as file:
-        file.write("The login data for twitch is missing or incomplete.")
+    watcher.logger.error("The login data for twitch is missing or incomplete.")
     return False
 
 
