@@ -5,15 +5,12 @@ Checks if all environment variables and input are given and provides helper func
 """
 import os
 import re
-import json
-from pathlib import Path
 from enum import Enum
 import requests
 from dotenv import dotenv_values
 import watcher
 
 from constants import (
-    CONFIGURATION_FILE_PATH,
     HASHTAG_MAX_LENGTH,
     HASHTAG_MIN_LENGTH,
     TWEET_MAX_LENGTH,
@@ -37,7 +34,7 @@ from constants import (
     UPDATE_INTERVAL_PUBLISH_NEW_CLIPS,
     CHECK_STREAM_INTERVAL,
     LOG_LEVEL,
-    OPTIONS_LOG_LEVEL
+    OPTIONS_LOG_LEVEL,
 )
 
 config = {
@@ -105,7 +102,7 @@ app_settings = {
     "database_synchronized": False,
     "start_bot_at_streamstart": start_bot_at_streamstart,
     "finish_bot_at_streamend": finish_bot_at_streamend,
-    "log_level": log_level
+    "log_level": log_level,
 }
 
 bot_hashtag_commands = {
@@ -217,17 +214,20 @@ def check_twitch_env_available() -> bool:
     Check if environment variables available for twitch settings
     :return: result if settings available as bool
     """
-    app_settings["check_stream_interval"] = (
-        int(check_stream_interval)
-        if check_stream_interval.isdecimal()
-        else int(CHECK_STREAM_INTERVAL)
-    )
-    app_settings["log_level"] = (
-        log_level.upper()
-        if log_level.upper() in OPTIONS_LOG_LEVEL
-        else LOG_LEVEL
-    )
-    watcher.init_logging(app_settings["log_level"])
+    if log_level.upper() in OPTIONS_LOG_LEVEL:
+        app_settings["log_level"] = log_level.upper()
+    else:
+        app_settings["log_level"] = LOG_LEVEL
+        watcher.init_logging(app_settings["log_level"])
+
+    if check_stream_interval.isdecimal():
+        app_settings["check_stream_interval"] = int(check_stream_interval)
+    else:
+        app_settings["check_stream_interval"] = int(CHECK_STREAM_INTERVAL)
+        watcher.logger.info(
+            f"Value for CHECK_STREAM_INTERVAL is not an integer and has been set to "
+            f"default value: {CHECK_STREAM_INTERVAL}"
+        )
     return None not in (client_id, token, nickname, init_channels)
 
 
@@ -245,18 +245,6 @@ def twitch_setting_verification() -> bool:
         return True
     watcher.logger.error("The login data for twitch is missing or incomplete.")
     return False
-
-
-def check_dc_config_available() -> bool:
-    """
-    Check if config file available and the discord settings
-    :return: result if settings available as bool
-    """
-    if not Path(CONFIGURATION_FILE_PATH).exists():
-        return False
-    with open(CONFIGURATION_FILE_PATH, encoding="utf-8") as file:
-        data = json.load(file)
-        return "discord" in data
 
 
 def discord_setting_verification() -> None:
