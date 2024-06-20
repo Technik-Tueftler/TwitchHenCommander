@@ -13,6 +13,9 @@ from constants import (
     CLIP_WAIT_TIME,
     TIMESTAMP_PATTERN,
 )
+from watcher import logger
+from generic_functions import generic_http_request
+
 
 class MyTemplate(Template):
     """This class allow the creation of a template with a user defined separator.
@@ -20,7 +23,9 @@ class MyTemplate(Template):
     Args:
         Template (_type_): Basic class that is inherited
     """
+
     delimiter = "#"
+
 
 async def fetch_new_clips(settings) -> list:
     """Function to find new clips in the last interval
@@ -48,11 +53,22 @@ async def fetch_new_clips(settings) -> list:
     )
     headers = {"Client-ID": client_id, "Authorization": f"Bearer {token}"}
     # {'error': 'Not Found', 'status': 404, 'message': ''}
-    response = requests.get(fetch_url, headers=headers, timeout=REQUEST_TIMEOUT).json()
+    response_temp = await generic_http_request(fetch_url, headers, logger=logger)
+    response = response_temp.json()
+    if settings["log_level"] == "DEBUG":
+        limit = response_temp.headers.get("Ratelimit-Limit")
+        remaining = response_temp.headers.get("Ratelimit-Remaining")
+        reset_time = response_temp.headers.get("Ratelimit-Reset")
+        logger.info(
+            f"Fetch new clips with: Limit: {limit} / "
+            f"Remaining: {remaining} / "
+            f"Reset Time: {reset_time}"
+        )
     return response["data"]
 
+
 async def streaming_handler(**settings) -> None:
-    """Function check if stream is running or not and set configured interfaces 
+    """Function check if stream is running or not and set configured interfaces
 
     Args:
         settings (_type_): App settings
@@ -77,16 +93,33 @@ async def streaming_handler(**settings) -> None:
     # 'tags': ['visuellesASMR', 'Deutsch', 'KeineBackseatgaming'],
     # 'title': '🐔 Noch 2 Achievements #34 🐔',
     # 'started_at': ''}], 'pagination': {}}
-    response = requests.get(is_live_url, headers=headers, timeout=REQUEST_TIMEOUT).json()
-    # print(response)
+    response_temp = await generic_http_request(is_live_url, headers, logger=logger)
+    response = response_temp.json()
+    if settings["log_level"] == "DEBUG":
+        limit = response_temp.headers.get("Ratelimit-Limit")
+        remaining = response_temp.headers.get("Ratelimit-Remaining")
+        reset_time = response_temp.headers.get("Ratelimit-Reset")
+        logger.info(
+            f"Get online status with: Limit: {limit} / "
+            f"Remaining: {remaining} / "
+            f"Reset Time: {reset_time}"
+    )
     if settings["start_bot_at_streamstart"]:
-        if response["data"] and not hashh.app_data["online"] and response["data"][0]["is_live"]:
+        if (
+            response["data"]
+            and not hashh.app_data["online"]
+            and response["data"][0]["is_live"]
+        ):
             await hashh.allow_collecting(True)
     if settings["finish_bot_at_streamend"]:
         if not response["data"] and hashh.app_data["online"]:
             await hashh.allow_collecting(False)
             await hashh.tweet_hashtags()
-        elif response["data"] and hashh.app_data["online"] and not response["data"][0]["is_live"]:
+        elif (
+            response["data"]
+            and hashh.app_data["online"]
+            and not response["data"][0]["is_live"]
+        ):
             await hashh.allow_collecting(False)
             await hashh.tweet_hashtags()
 
@@ -97,9 +130,7 @@ async def new_clips_handler(**settings) -> None:
         await db.sync_db()
         settings["database_synchronized"] = True
     clips = await fetch_new_clips(settings)
-    last_clip_ids = (
-        await db.fetch_last_clip_ids()
-    )
+    last_clip_ids = await db.fetch_last_clip_ids()
     new_clips = [clip for clip in clips if clip["id"] not in last_clip_ids]
     if not new_clips:
         return

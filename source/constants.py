@@ -1,6 +1,7 @@
 """
 File contains all constants for easy central import and usage.
 """
+APP_VERSION = "v1.4.2"
 CONFIGURATION_FILE_PATH = "../files/config.json"
 CACHE_FILE_PATH = "../files/cache.json"
 HASHTAG_FILE_PATH = "../files/hashtags.txt"
@@ -31,7 +32,9 @@ FINISH_BOT_AT_STREAMEND = "off"
 HASHTAG_AUTHENTICATION_LEVEL = "BROADCASTER"
 OPTIONS_POSITIVE_ARG = ("true", "on", "1", "t", "active")
 TIMESTAMP_PATTERN = "%Y-%m-%dT%H:%M:%SZ"
-DEFAULT_CACHE_DATA = {"Version": "v1.3.0", "clip_last_timestamp": "2024-02-02T12:00:00Z"}
 DEFAULT_CLIP_THANK_YOU_TEXT = "A clip from the current stream #link Thanks to #user for clipping"
 CLIP_WAIT_TIME = 2
 CHECK_STREAM_INTERVAL = "60"
+ # TRACE, DEBUG, INFO, SUCCESS, WARNING, ERROR, CRITICAL
+OPTIONS_LOG_LEVEL = ("DEBUG", "INFO", "WARNING", "ERROR")
+LOG_LEVEL = "ERROR"

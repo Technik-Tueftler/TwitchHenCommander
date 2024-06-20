@@ -95,15 +95,6 @@ async def register_new_hashtags(new_hashtags: list) -> None:
         app_data["tweets"] = list(merged_hashtags)
 
 
-def app_started() -> None:
-    """
-    Function to do stuff if the app started
-    :return:
-    """
-    with open(HASHTAG_FILE_PATH, "a", encoding="utf-8") as file:
-        file.write(f"Hashtag-Bot startet: {datetime.utcnow()} UTC \n")
-
-
 def main() -> None:
     """
     Scheduling function for regular call.

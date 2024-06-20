@@ -5,15 +5,12 @@ Checks if all environment variables and input are given and provides helper func
 """
 import os
 import re
-import json
-from pathlib import Path
 from enum import Enum
 import requests
 from dotenv import dotenv_values
+import watcher
 
 from constants import (
-    CONFIGURATION_FILE_PATH,
-    LOG_FILE_PATH,
     HASHTAG_MAX_LENGTH,
     HASHTAG_MIN_LENGTH,
     TWEET_MAX_LENGTH,
@@ -36,6 +33,8 @@ from constants import (
     DEFAULT_CLIP_THANK_YOU_TEXT,
     UPDATE_INTERVAL_PUBLISH_NEW_CLIPS,
     CHECK_STREAM_INTERVAL,
+    LOG_LEVEL,
+    OPTIONS_LOG_LEVEL,
 )
 
 config = {
@@ -60,6 +59,7 @@ nickname = config.get("TW_NICKNAME", None)
 init_channels = config.get("TW_INIT_CHANNELS", None)
 broadcaster_id = config.get("TW_BROADCASTER_ID", None)
 check_stream_interval = config.get("CHECK_STREAM_INTERVAL", CHECK_STREAM_INTERVAL)
+log_level = config.get("LOG_LEVEL", LOG_LEVEL)
 
 discord_username_hashtag = config.get("DC_USER_NAME_HASHTAG", None)
 webhook_url_hashtag = config.get("DC_WEBHOOK_URL_HASHTAG", None)
@@ -77,7 +77,6 @@ tweet_start_string = config.get("TWEET_START_STRING", TWEET_START_STRING)
 tweet_end_string = config.get("TWEET_END_STRING", TWEET_END_STRING)
 hashtag_all_lower_case = config.get("HASHTAG_ALL_LOWER_CASE", None)
 hashtag_authentication_level = config.get("HASHTAG_AUTHENTICATION_LEVEL", None)
-
 
 start_bot_at_streamstart = config.get("START_BOT_AT_STREAMSTART", None)
 finish_bot_at_streamend = config.get("FINISH_BOT_AT_STREAMEND", None)
@@ -103,6 +102,7 @@ app_settings = {
     "database_synchronized": False,
     "start_bot_at_streamstart": start_bot_at_streamstart,
     "finish_bot_at_streamend": finish_bot_at_streamend,
+    "log_level": log_level,
 }
 
 bot_hashtag_commands = {
@@ -214,11 +214,20 @@ def check_twitch_env_available() -> bool:
     Check if environment variables available for twitch settings
     :return: result if settings available as bool
     """
-    app_settings["check_stream_interval"] = (
-        int(check_stream_interval)
-        if check_stream_interval.isdecimal()
-        else int(CHECK_STREAM_INTERVAL)
-    )
+    if log_level.upper() in OPTIONS_LOG_LEVEL:
+        app_settings["log_level"] = log_level.upper()
+    else:
+        app_settings["log_level"] = LOG_LEVEL
+        watcher.init_logging(app_settings["log_level"])
+
+    if check_stream_interval.isdecimal():
+        app_settings["check_stream_interval"] = int(check_stream_interval)
+    else:
+        app_settings["check_stream_interval"] = int(CHECK_STREAM_INTERVAL)
+        watcher.logger.info(
+            f"Value for CHECK_STREAM_INTERVAL is not an integer and has been set to "
+            f"default value: {CHECK_STREAM_INTERVAL}"
+        )
     return None not in (client_id, token, nickname, init_channels)
 
 
@@ -234,21 +243,8 @@ def twitch_setting_verification() -> bool:
         response = requests.get(url, headers=headers, timeout=REQUEST_TIMEOUT).json()
         app_settings["broadcaster_id"] = response["data"][0]["id"]
         return True
-    with open(LOG_FILE_PATH, "a", encoding="utf-8") as file:
-        file.write("The login data for twitch is missing or incomplete.")
+    watcher.logger.error("The login data for twitch is missing or incomplete.")
     return False
-
-
-def check_dc_config_available() -> bool:
-    """
-    Check if config file available and the discord settings
-    :return: result if settings available as bool
-    """
-    if not Path(CONFIGURATION_FILE_PATH).exists():
-        return False
-    with open(CONFIGURATION_FILE_PATH, encoding="utf-8") as file:
-        data = json.load(file)
-        return "discord" in data
 
 
 def discord_setting_verification() -> None:

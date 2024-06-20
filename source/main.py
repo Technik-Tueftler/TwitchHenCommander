@@ -5,8 +5,9 @@ Main function for starting app and bot
 """
 import asyncio
 import environment_verification as env
+import watcher
+from constants import APP_VERSION
 from twitch_bot import Bot
-from hashtag_handler import app_started
 from twitch_api import new_clips_handler, streaming_handler
 
 
@@ -33,13 +34,12 @@ def main() -> None:
     env.discord_setting_verification()
     env.bot_setting_verification()
     env.clip_collection_setting_verification()
-    app_started()
     bot = Bot(env.app_settings)
     loop = asyncio.get_event_loop()
     tasks_to_start = []
     bot_task = loop.create_task(bot.start())
     tasks_to_start.append(bot_task)
-
+    watcher.logger.info(f"App started in version: {APP_VERSION}")
     if any(
         [
             env.app_settings["start_bot_at_streamstart"],
