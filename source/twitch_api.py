@@ -14,6 +14,7 @@ from constants import (
     TIMESTAMP_PATTERN,
 )
 from watcher import logger
+from generic_functions import generic_http_request
 
 
 class MyTemplate(Template):
@@ -53,7 +54,7 @@ async def fetch_new_clips(settings) -> list:
     )
     headers = {"Client-ID": client_id, "Authorization": f"Bearer {token}"}
     # {'error': 'Not Found', 'status': 404, 'message': ''}
-    response_temp = requests.get(fetch_url, headers=headers, timeout=REQUEST_TIMEOUT)
+    response_temp = await generic_http_request(fetch_url, headers, logger=logger)
     response = response_temp.json()
     limit = response_temp.headers.get("Ratelimit-Limit")
     remaining = response_temp.headers.get("Ratelimit-Remaining")
@@ -91,7 +92,7 @@ async def streaming_handler(**settings) -> None:
     # 'tags': ['visuellesASMR', 'Deutsch', 'KeineBackseatgaming'],
     # 'title': '🐔 Noch 2 Achievements #34 🐔',
     # 'started_at': ''}], 'pagination': {}}
-    response_temp = requests.get(is_live_url, headers=headers, timeout=REQUEST_TIMEOUT)
+    response_temp = await generic_http_request(is_live_url, headers, logger=logger)
     response = response_temp.json()
     limit = response_temp.headers.get("Ratelimit-Limit")
     remaining = response_temp.headers.get("Ratelimit-Remaining")
