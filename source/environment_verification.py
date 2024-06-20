@@ -8,7 +8,7 @@ import re
 from enum import Enum
 import requests
 from dotenv import dotenv_values
-import watcher
+import TeTueGeneric.source.watcher as watcher
 
 from constants import (
     HASHTAG_MAX_LENGTH,

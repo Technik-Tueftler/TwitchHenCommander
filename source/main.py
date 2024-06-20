@@ -5,7 +5,7 @@ Main function for starting app and bot
 """
 import asyncio
 import environment_verification as env
-import watcher
+from TeTueGeneric.source.watcher import logger
 from constants import APP_VERSION
 from twitch_bot import Bot
 from twitch_api import new_clips_handler, streaming_handler
@@ -39,7 +39,7 @@ def main() -> None:
     tasks_to_start = []
     bot_task = loop.create_task(bot.start())
     tasks_to_start.append(bot_task)
-    watcher.logger.info(f"App started in version: {APP_VERSION}")
+    logger.info(f"App started in version: {APP_VERSION}")
     if any(
         [
             env.app_settings["start_bot_at_streamstart"],

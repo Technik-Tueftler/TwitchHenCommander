@@ -13,8 +13,8 @@ from constants import (
     CLIP_WAIT_TIME,
     TIMESTAMP_PATTERN,
 )
-from watcher import logger
-from generic_functions import generic_http_request
+from TeTueGeneric.source.watcher import logger
+from TeTueGeneric.source.generic_functions import generic_http_request
 
 
 class MyTemplate(Template):
@@ -59,7 +59,7 @@ async def fetch_new_clips(settings) -> list:
         limit = response_temp.headers.get("Ratelimit-Limit")
         remaining = response_temp.headers.get("Ratelimit-Remaining")
         reset_time = response_temp.headers.get("Ratelimit-Reset")
-        logger.info(
+        logger.debug(
             f"Fetch new clips with: Limit: {limit} / "
             f"Remaining: {remaining} / "
             f"Reset Time: {reset_time}"
@@ -99,7 +99,7 @@ async def streaming_handler(**settings) -> None:
         limit = response_temp.headers.get("Ratelimit-Limit")
         remaining = response_temp.headers.get("Ratelimit-Remaining")
         reset_time = response_temp.headers.get("Ratelimit-Reset")
-        logger.info(
+        logger.debug(
             f"Get online status with: Limit: {limit} / "
             f"Remaining: {remaining} / "
             f"Reset Time: {reset_time}"
