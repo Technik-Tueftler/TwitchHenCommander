@@ -27,7 +27,6 @@ class MyTemplate(Template):
     delimiter = "#"
 
 
-@logger.catch
 async def fetch_new_clips(settings) -> list:
     """Function to find new clips in the last interval
 
@@ -56,16 +55,18 @@ async def fetch_new_clips(settings) -> list:
     # {'error': 'Not Found', 'status': 404, 'message': ''}
     response_temp = await generic_http_request(fetch_url, headers, logger=logger)
     response = response_temp.json()
-    limit = response_temp.headers.get("Ratelimit-Limit")
-    remaining = response_temp.headers.get("Ratelimit-Remaining")
-    reset_time = response_temp.headers.get("Ratelimit-Reset")
-    logger.info(
-        f"Fetch new clips with: Limit: {limit} / Remaining: {remaining} / Reset Time: {reset_time}"
-    )
+    if settings["log_level"] == "DEBUG":
+        limit = response_temp.headers.get("Ratelimit-Limit")
+        remaining = response_temp.headers.get("Ratelimit-Remaining")
+        reset_time = response_temp.headers.get("Ratelimit-Reset")
+        logger.info(
+            f"Fetch new clips with: Limit: {limit} / "
+            f"Remaining: {remaining} / "
+            f"Reset Time: {reset_time}"
+        )
     return response["data"]
 
 
-@logger.catch
 async def streaming_handler(**settings) -> None:
     """Function check if stream is running or not and set configured interfaces
 
@@ -94,15 +95,15 @@ async def streaming_handler(**settings) -> None:
     # 'started_at': ''}], 'pagination': {}}
     response_temp = await generic_http_request(is_live_url, headers, logger=logger)
     response = response_temp.json()
-    limit = response_temp.headers.get("Ratelimit-Limit")
-    remaining = response_temp.headers.get("Ratelimit-Remaining")
-    reset_time = response_temp.headers.get("Ratelimit-Reset")
-    logger.info(
-        f"Get online status with: Limit: {limit} / "
-        + f"Remaining: {remaining} / "
-        + f"Reset Time: {reset_time}"
+    if settings["log_level"] == "DEBUG":
+        limit = response_temp.headers.get("Ratelimit-Limit")
+        remaining = response_temp.headers.get("Ratelimit-Remaining")
+        reset_time = response_temp.headers.get("Ratelimit-Reset")
+        logger.info(
+            f"Get online status with: Limit: {limit} / "
+            f"Remaining: {remaining} / "
+            f"Reset Time: {reset_time}"
     )
-    # print(response)
     if settings["start_bot_at_streamstart"]:
         if (
             response["data"]
