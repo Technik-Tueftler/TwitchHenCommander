@@ -8,7 +8,7 @@ import re
 from enum import Enum
 import requests
 from dotenv import dotenv_values
-import TeTueGeneric.source.watcher as watcher
+from TeTueGeneric.source.watcher import logger, init_logging
 
 from constants import (
     HASHTAG_MAX_LENGTH,
@@ -218,13 +218,13 @@ def check_twitch_env_available() -> bool:
         app_settings["log_level"] = log_level.upper()
     else:
         app_settings["log_level"] = LOG_LEVEL
-        watcher.init_logging(app_settings["log_level"])
+    init_logging(app_settings["log_level"])
 
     if check_stream_interval.isdecimal():
         app_settings["check_stream_interval"] = int(check_stream_interval)
     else:
         app_settings["check_stream_interval"] = int(CHECK_STREAM_INTERVAL)
-        watcher.logger.info(
+        logger.info(
             f"Value for CHECK_STREAM_INTERVAL is not an integer and has been set to "
             f"default value: {CHECK_STREAM_INTERVAL}"
         )
@@ -243,7 +243,7 @@ def twitch_setting_verification() -> bool:
         response = requests.get(url, headers=headers, timeout=REQUEST_TIMEOUT).json()
         app_settings["broadcaster_id"] = response["data"][0]["id"]
         return True
-    watcher.logger.error("The login data for twitch is missing or incomplete.")
+    logger.error("The login data for twitch is missing or incomplete.")
     return False
 
 
