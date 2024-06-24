@@ -8,7 +8,6 @@ import re
 from enum import Enum
 import requests
 from dotenv import dotenv_values
-from TeTueGeneric.source.watcher import logger, init_logging
 
 from constants import (
     HASHTAG_MAX_LENGTH,
@@ -36,6 +35,8 @@ from constants import (
     LOG_LEVEL,
     OPTIONS_LOG_LEVEL,
 )
+
+from TeTueGeneric.source.watcher import logger, init_logging
 
 config = {
     **dotenv_values("../files/.env"),

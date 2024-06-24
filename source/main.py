@@ -3,16 +3,15 @@
 """
 Main function for starting app and bot
 """
+import asyncio
 import sys
 import pathlib
 sys.path.append(str(pathlib.Path.cwd().parent))
-import asyncio
 import environment_verification as env
-from TeTueGeneric.source.watcher import logger
 from constants import APP_VERSION
 from twitch_bot import Bot
 from twitch_api import new_clips_handler, streaming_handler
-
+from TeTueGeneric.source.watcher import logger
 
 async def every(__seconds: float, func, *args, **kwargs):
     """Function to call cyclic another function
