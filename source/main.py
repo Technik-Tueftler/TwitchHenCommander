@@ -3,6 +3,9 @@
 """
 Main function for starting app and bot
 """
+import sys
+import pathlib
+sys.path.append(str(pathlib.Path.cwd().parent))
 import asyncio
 import environment_verification as env
 from TeTueGeneric.source.watcher import logger
