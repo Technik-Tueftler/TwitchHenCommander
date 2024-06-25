@@ -8,7 +8,7 @@ import environment_verification as env
 from constants import APP_VERSION
 from twitch_bot import Bot
 from twitch_api import new_clips_handler, streaming_handler
-from TeTueGeneric.source.watcher import logger # pylint: disable=import-error, no-name-in-module
+from watcher import logger
 
 
 async def every(__seconds: float, func, *args, **kwargs):

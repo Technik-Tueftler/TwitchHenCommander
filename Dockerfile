@@ -16,7 +16,6 @@ COPY files/ ./files/
 COPY source/ ./source/
 
 ENV PYTHONPATH "${PYTHONPATH}:/user/app/TwitchHenCommander"
-ENV PYTHONPATH "${PYTHONPATH}:/user/app/TwitchHenCommander/source"
 
 WORKDIR /user/app/TwitchHenCommander/source/
 
