@@ -54,6 +54,8 @@ async def fetch_new_clips(settings) -> list:
     headers = {"Client-ID": client_id, "Authorization": f"Bearer {token}"}
     # {'error': 'Not Found', 'status': 404, 'message': ''}
     response_temp = await generic_http_request(fetch_url, headers, logger=logger)
+    if response_temp is None:
+        return None
     response = response_temp.json()
     if settings["log_level"] == "DEBUG":
         limit = response_temp.headers.get("Ratelimit-Limit")
@@ -94,6 +96,8 @@ async def streaming_handler(**settings) -> None:
     # 'title': '🐔 Noch 2 Achievements #34 🐔',
     # 'started_at': ''}], 'pagination': {}}
     response_temp = await generic_http_request(is_live_url, headers, logger=logger)
+    if response_temp is None:
+        return
     response = response_temp.json()
     if settings["log_level"] == "DEBUG":
         limit = response_temp.headers.get("Ratelimit-Limit")
@@ -130,6 +134,8 @@ async def new_clips_handler(**settings) -> None:
         await db.sync_db()
         settings["database_synchronized"] = True
     clips = await fetch_new_clips(settings)
+    if clips is None:
+        return
     last_clip_ids = await db.fetch_last_clip_ids()
     new_clips = [clip for clip in clips if clip["id"] not in last_clip_ids]
     if not new_clips:
