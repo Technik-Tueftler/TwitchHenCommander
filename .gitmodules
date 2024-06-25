@@ -1,0 +1,3 @@
+[submodule "source/TeTueGeneric"]
+	path = source/TeTueGeneric
+	url = https://github.com/Technik-Tueftler/TeTueGeneric
