@@ -36,7 +36,7 @@ from constants import (
     OPTIONS_LOG_LEVEL,
 )
 
-from TeTueGeneric.source.watcher import logger, init_logging
+from TeTueGeneric.source.watcher import logger, init_logging # pylint: disable=import-error, no-name-in-module
 
 config = {
     **dotenv_values("../files/.env"),

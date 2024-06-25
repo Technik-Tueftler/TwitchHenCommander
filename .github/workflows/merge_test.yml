@@ -21,9 +21,6 @@ jobs:
         if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
         pip install twitchio
         pip install pytest
-    - name: set pythonpath
-      run: |
-        echo "PYTHONPATH=TwitchHenCommander/" >> $GITHUB_ENV
     - name: Analysing the code with pylint
       run: |
         pylint $(git ls-files '*.py')

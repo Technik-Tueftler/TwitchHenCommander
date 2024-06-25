@@ -13,8 +13,8 @@ from constants import (
     CLIP_WAIT_TIME,
     TIMESTAMP_PATTERN,
 )
-from TeTueGeneric.source.generic_functions import generic_http_request
-from TeTueGeneric.source.watcher import logger
+from TeTueGeneric.source.generic_functions import generic_http_request # pylint: disable=import-error, no-name-in-module
+from TeTueGeneric.source.watcher import logger # pylint: disable=import-error, no-name-in-module
 
 
 class MyTemplate(Template):
