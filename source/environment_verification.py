@@ -8,6 +8,7 @@ import re
 from enum import Enum
 import requests
 from dotenv import dotenv_values
+from watcher import logger, init_logging
 
 from constants import (
     HASHTAG_MAX_LENGTH,
@@ -36,7 +37,6 @@ from constants import (
     OPTIONS_LOG_LEVEL,
 )
 
-from TeTueGeneric.source.watcher import logger, init_logging # pylint: disable=import-error, no-name-in-module
 
 config = {
     **dotenv_values("../files/.env"),
