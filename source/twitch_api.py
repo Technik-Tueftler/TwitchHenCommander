@@ -13,8 +13,8 @@ from constants import (
     CLIP_WAIT_TIME,
     TIMESTAMP_PATTERN,
 )
-from watcher import logger
-from generic_functions import generic_http_request
+from TeTueGeneric.source.generic_functions import generic_http_request
+from TeTueGeneric.source.watcher import logger
 
 
 class MyTemplate(Template):
