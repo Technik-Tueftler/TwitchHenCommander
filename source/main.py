@@ -9,6 +9,7 @@ from constants import APP_VERSION
 from twitch_bot import Bot
 from twitch_api import new_clips_handler, streaming_handler
 from watcher import logger
+import hashtag_handler as hashh
 
 
 async def every(__seconds: float, func, *args, **kwargs):
@@ -35,6 +36,7 @@ def main() -> None:
     env.bot_setting_verification()
     env.clip_collection_setting_verification()
     env.log_settings()
+    hashh.init_blacklist()
     bot = Bot(env.app_settings)
     loop = asyncio.get_event_loop()
     tasks_to_start = []

@@ -14,8 +14,9 @@ from constants import (
     REQUEST_TIMEOUT,
 )
 
-app_data = {"online": False, "allowed": True, "tweets": []}
+app_data = {"online": False, "allowed": True, "tweets": [], "blacklist": {}}
 lock = asyncio.Lock()
+
 
 async def delete_hashtags() -> None:
     """
@@ -84,6 +85,7 @@ async def separate_hash(message: twitchio.message.Message) -> set:
         converted_message = message.content.lower()
     return env.tweet_settings["hashtag_pattern"].findall(converted_message)
 
+
 async def register_new_hashtags(new_hashtags: list) -> None:
     """
     Prevents duplications and add all new hashtags to app_data.
@@ -95,11 +97,21 @@ async def register_new_hashtags(new_hashtags: list) -> None:
         app_data["tweets"] = list(merged_hashtags)
 
 
+async def review_hashtags(hashtags: list) -> list:
+    filter(lambda x: x not in blacklist, new_hashtags)
+
+
+def init_blacklist() -> None:
+    with open("../files/blacklist.txt", "r", encoding="utf-8") as file:
+        app_data["blacklist"] = set(hashtag.strip().lower() for hashtag in file.read().splitlines() if hashtag.strip())
+
+
 def main() -> None:
     """
     Scheduling function for regular call.
     :return: None
     """
+    init_blacklist()
 
 
 if __name__ == "__main__":
