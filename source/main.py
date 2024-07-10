@@ -34,6 +34,7 @@ def main() -> None:
     env.discord_setting_verification()
     env.bot_setting_verification()
     env.clip_collection_setting_verification()
+    env.log_settings()
     bot = Bot(env.app_settings)
     loop = asyncio.get_event_loop()
     tasks_to_start = []

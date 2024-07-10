@@ -132,6 +132,19 @@ discord_settings = {
     "clip_thank_you_text": clip_thank_you_text,
 }
 
+def log_settings() -> None:
+    """Log all settings for user information
+    """
+    logger.info(f"Log-Level: {app_settings["log_level"]}")
+    logger.info(
+        f"Bot-Settings / Start: {app_settings["start_bot_at_streamstart"]} / "
+        f"End: {app_settings["finish_bot_at_streamend"]}"
+        )
+    logger.info(
+        f"DC-Settings / Active: {app_settings["dc_available"]} / "
+        f"Hashtag: {app_settings["dc_feature_hashtag"]} / "
+        f"Clips: {app_settings["dc_feature_clips"]}"
+        )
 
 def bot_setting_verification() -> None:
     """
