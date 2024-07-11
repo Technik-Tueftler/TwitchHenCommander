@@ -135,15 +135,21 @@ discord_settings = {
 def log_settings() -> None:
     """Log all settings for user information
     """
-    logger.info(f"Log-Level: {app_settings["log_level"]}")
+    log_level = app_settings["log_level"]
+    streamstart = app_settings["start_bot_at_streamstart"]
+    streamend = app_settings["finish_bot_at_streamend"]
+    dc_active = app_settings["dc_available"]
+    dc_hashtags = app_settings["dc_feature_hashtag"]
+    dc_clips = app_settings["dc_feature_clips"]
+    logger.info(f"Log-Level: {log_level}")
     logger.info(
-        f"Bot-Settings / Start: {app_settings["start_bot_at_streamstart"]} / "
-        f"End: {app_settings["finish_bot_at_streamend"]}"
+        f"Bot-Settings / Start: {streamstart} / "
+        f"End: {streamend}"
         )
     logger.info(
-        f"DC-Settings / Active: {app_settings["dc_available"]} / "
-        f"Hashtag: {app_settings["dc_feature_hashtag"]} / "
-        f"Clips: {app_settings["dc_feature_clips"]}"
+        f"DC-Settings / Active: {dc_active} / "
+        f"Hashtags: {dc_hashtags} / "
+        f"Clips: {dc_clips}"
         )
 
 def bot_setting_verification() -> None:
