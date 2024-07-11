@@ -3,6 +3,7 @@
 """
 All functions to collect the hashtags and send the collected to the configured platforms
 """
+from pathlib import Path
 import asyncio
 from datetime import datetime, UTC
 from requests import post
@@ -12,6 +13,7 @@ import db
 from constants import (
     HASHTAG_FILE_PATH,
     REQUEST_TIMEOUT,
+    HASHTAG_BLACKLIST_FILE_PATH,
 )
 
 app_data = {"online": False, "allowed": True, "tweets": [], "blacklist": {}}
@@ -32,8 +34,7 @@ async def tweet_hashtags() -> None:
     :return: None
     """
     stream = db.Stream(
-        timestamp=datetime.now(UTC),
-        hashtags=" ".join(app_data["tweets"])
+        timestamp=datetime.now(UTC), hashtags=" ".join(app_data["tweets"])
     )
     await db.add_data(stream)
     with open(HASHTAG_FILE_PATH, "a", encoding="utf-8") as file:
@@ -48,8 +49,15 @@ async def tweet_hashtags() -> None:
             + " "
             + env.tweet_settings["tweet_end_string"]
         )
-        data = {"content": content, "username": env.discord_settings["discord_username_hashtag"]}
-        post(env.discord_settings["webhook_url_hashtag"], data=data, timeout=REQUEST_TIMEOUT)
+        data = {
+            "content": content,
+            "username": env.discord_settings["discord_username_hashtag"],
+        }
+        post(
+            env.discord_settings["webhook_url_hashtag"],
+            data=data,
+            timeout=REQUEST_TIMEOUT,
+        )
     app_data["tweets"] = []
 
 
@@ -86,7 +94,7 @@ async def separate_hash(message: twitchio.message.Message) -> set:
     return env.tweet_settings["hashtag_pattern"].findall(converted_message)
 
 
-async def register_new_hashtags(new_hashtags: list) -> None:
+async def register_new_hashtags(new_hashtags: set) -> None:
     """
     Prevents duplications and add all new hashtags to app_data.
     :param new_hashtags: List of hashtags from a message
@@ -97,13 +105,34 @@ async def register_new_hashtags(new_hashtags: list) -> None:
         app_data["tweets"] = list(merged_hashtags)
 
 
-async def review_hashtags(hashtags: list) -> list:
-    filter(lambda x: x not in blacklist, new_hashtags)
+async def review_hashtags(hashtags: set) -> set:
+    """Review the seperated hashtags and check if there are allowed
+
+    Args:
+        hashtags (set): new hashtags from message
+
+    Returns:
+        set: reviewed hashtags
+    """
+
+    def check(hashtag: str):
+        if hashtag.lower() not in app_data["blacklist"]:
+            return True
+        return False
+
+    return set(filter(check, hashtags))
 
 
 def init_blacklist() -> None:
+    """Read and init the blacklist for hashtags"""
+    if not Path(HASHTAG_BLACKLIST_FILE_PATH).is_file():
+        return
     with open("../files/blacklist.txt", "r", encoding="utf-8") as file:
-        app_data["blacklist"] = set(hashtag.strip().lower() for hashtag in file.read().splitlines() if hashtag.strip())
+        app_data["blacklist"] = set(
+            hashtag.strip().lower()
+            for hashtag in file.read().splitlines()
+            if hashtag.strip()
+        )
 
 
 def main() -> None:

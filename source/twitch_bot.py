@@ -62,7 +62,7 @@ class Bot(commands.Bot):
                 new_hashtags = await hashh.separate_hash(message)
                 if len(new_hashtags) > 0:
                     reviewed_hashtags = await hashh.review_hashtags(new_hashtags)
-                    await hashh.register_new_hashtags(new_hashtags)
+                    await hashh.register_new_hashtags(reviewed_hashtags)
 
         await self.handle_commands(message)
 
