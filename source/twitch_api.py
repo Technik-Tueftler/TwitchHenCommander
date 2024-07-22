@@ -27,6 +27,24 @@ class MyTemplate(Template):
     delimiter = "#"
 
 
+def log_ratelimit(debug_level: str, response: requests.models.Response):
+    """Log ratelimits for twitch API
+
+    Args:
+        debug_level (str): log level from settings
+        response (requests.models.Response): response from request
+    """
+    if debug_level == "DEBUG":
+        limit = response.headers.get("Ratelimit-Limit", "NA")
+        remaining = response.headers.get("Ratelimit-Remaining")
+        reset_time = response.headers.get("Ratelimit-Reset")
+        logger.debug(
+            f"Get online status with: Limit: {limit} / "
+            f"Remaining: {remaining} / "
+            f"Reset Time: {reset_time}"
+        )
+
+
 async def fetch_new_clips(settings) -> list:
     """Function to find new clips in the last interval
 
@@ -56,16 +74,8 @@ async def fetch_new_clips(settings) -> list:
     response_temp = await generic_http_request(fetch_url, headers, logger=logger)
     if response_temp is None:
         return None
+    log_ratelimit(settings["log_level"], response_temp)
     response = response_temp.json()
-    if settings["log_level"] == "DEBUG":
-        limit = response_temp.headers.get("Ratelimit-Limit")
-        remaining = response_temp.headers.get("Ratelimit-Remaining")
-        reset_time = response_temp.headers.get("Ratelimit-Reset")
-        logger.debug(
-            f"Fetch new clips with: Limit: {limit} / "
-            f"Remaining: {remaining} / "
-            f"Reset Time: {reset_time}"
-        )
     return response["data"]
 
 
@@ -98,16 +108,8 @@ async def streaming_handler(**settings) -> None:
     response_temp = await generic_http_request(is_live_url, headers, logger=logger)
     if response_temp is None:
         return
+    log_ratelimit(settings["log_level"], response_temp)
     response = response_temp.json()
-    if settings["log_level"] == "DEBUG":
-        limit = response_temp.headers.get("Ratelimit-Limit")
-        remaining = response_temp.headers.get("Ratelimit-Remaining")
-        reset_time = response_temp.headers.get("Ratelimit-Reset")
-        logger.debug(
-            f"Get online status with: Limit: {limit} / "
-            f"Remaining: {remaining} / "
-            f"Reset Time: {reset_time}"
-    )
     if settings["start_bot_at_streamstart"]:
         if (
             response["data"]
