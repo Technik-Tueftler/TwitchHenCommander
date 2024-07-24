@@ -34,15 +34,16 @@ def log_ratelimit(debug_level: str, response: requests.models.Response):
         debug_level (str): log level from settings
         response (requests.models.Response): response from request
     """
-    if debug_level == "DEBUG":
-        limit = response.headers.get("Ratelimit-Limit", "NA")
-        remaining = response.headers.get("Ratelimit-Remaining")
-        reset_time = response.headers.get("Ratelimit-Reset")
-        logger.debug(
-            f"Get online status with: Limit: {limit} / "
-            f"Remaining: {remaining} / "
-            f"Reset Time: {reset_time}"
-        )
+    if debug_level != "DEBUG":
+        return
+    limit = response.headers.get("Ratelimit-Limit", "NA")
+    remaining = response.headers.get("Ratelimit-Remaining")
+    reset_time = response.headers.get("Ratelimit-Reset")
+    logger.debug(
+        f"Get online status with: Limit: {limit} / "
+        f"Remaining: {remaining} / "
+        f"Reset Time: {reset_time}"
+    )
 
 
 async def fetch_new_clips(settings) -> list:
@@ -117,21 +118,18 @@ async def streaming_handler(**settings) -> None:
             and response["data"][0]["is_live"]
         ):
             await hashh.allow_collecting(True)
-            if settings["log_level"] == "DEBUG":
-                logger.debug("Automatic Stream-Start detected, collecting hashtags allowed.")
+            logger.debug("Automatic Stream-Start detected, collecting hashtags allowed.")
     if settings["finish_bot_at_streamend"]:
         if not response["data"] and hashh.app_data["online"]:
             await hashh.allow_collecting(False)
             await hashh.tweet_hashtags()
-            if settings["log_level"] == "DEBUG":
-                logger.debug("Automatic Stream-End (1) detected, hashtags puplished.")
+            logger.debug("Automatic Stream-End (1) detected, hashtags puplished.")
         elif (
             response["data"]
             and hashh.app_data["online"]
             and not response["data"][0]["is_live"]
         ):
-            if settings["log_level"] == "DEBUG":
-                logger.debug("Automatic Stream-End (2) detected, hashtags puplished.")
+            logger.debug("Automatic Stream-End (2) detected, hashtags puplished.")
             await hashh.allow_collecting(False)
             await hashh.tweet_hashtags()
 
