@@ -5,18 +5,20 @@ All functions to collect the hashtags and send the collected to the configured p
 """
 from pathlib import Path
 import asyncio
+import aiofiles
 from datetime import datetime, UTC
 from requests import post
 import twitchio
 import environment_verification as env
 import db
+from watcher import logger
 from constants import (
     HASHTAG_FILE_PATH,
     REQUEST_TIMEOUT,
     HASHTAG_BLACKLIST_FILE_PATH,
 )
 
-app_data = {"online": False, "allowed": True, "tweets": [], "blacklist": {}}
+app_data = {"online": False, "allowed": True, "tweets": [], "blacklist": set()}
 lock = asyncio.Lock()
 
 
@@ -82,6 +84,12 @@ async def set_stream_status(status: bool) -> None:
         app_data["online"] = status
 
 
+async def add_hashtag_blacklist(new_hashtags: set) -> None:
+    async with lock:
+        app_data["blacklist"].update(hashtag.lower() for hashtag in new_hashtags)
+        print(app_data)
+    
+
 async def separate_hash(message: twitchio.message.Message) -> set:
     """
     Separate all Hashtags from a twitch message
@@ -105,7 +113,7 @@ async def register_new_hashtags(new_hashtags: set) -> None:
         app_data["tweets"] = list(merged_hashtags)
 
 
-async def review_hashtags(hashtags: set) -> set:
+async def review_hashtags(hashtags: set, author: str) -> set:
     """Review the seperated hashtags and check if there are allowed
 
     Args:
@@ -114,10 +122,11 @@ async def review_hashtags(hashtags: set) -> set:
     Returns:
         set: reviewed hashtags
     """
-
     def check(hashtag: str):
+        print(app_data["blacklist"])
         if hashtag.lower() not in app_data["blacklist"]:
             return True
+        logger.info(f"{author} has used hashtag {hashtag}, which is not allowed.")
         return False
 
     return set(filter(check, hashtags))
@@ -133,6 +142,14 @@ def init_blacklist() -> None:
             for hashtag in file.read().splitlines()
             if hashtag.strip()
         )
+
+
+async def write_blacklist() -> None:
+    """Write new banned hashtags in file
+    """
+    async with aiofiles.open('../files/blacklist.txt', mode='w', encoding="utf-8") as file:
+        for string in app_data["blacklist"]:
+            await file.write(string + "\n")
 
 
 def main() -> None:

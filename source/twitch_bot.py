@@ -18,6 +18,18 @@ async def check_if_command_authorized(ctx: commands.Context) -> bool:
     return ctx.author.is_broadcaster
 
 
+async def check_if_setting_change_authorized(message: twitchio.message.Message) -> bool:
+    """
+    Check if user has permission to change the hashtag rules
+    :param message: Sent message from user
+    :return: Allowance as bool
+    """
+    print(message.author.is_broadcaster)
+    if message.author.is_broadcaster or message.author.is_mod:
+        return True
+    return False
+
+
 async def check_if_hash_authorized(message: twitchio.message.Message) -> bool:
     """
     Check if user has permission to register hashtags
@@ -56,12 +68,13 @@ class Bot(commands.Bot):
         # Messages with echo set to True are messages sent by the bot
         if message.echo:
             return
-        # print(message.content)
         if hashh.app_data["allowed"]:
             if await check_if_hash_authorized(message):
                 new_hashtags = await hashh.separate_hash(message)
                 if len(new_hashtags) > 0:
-                    reviewed_hashtags = await hashh.review_hashtags(new_hashtags)
+                    reviewed_hashtags = await hashh.review_hashtags(
+                        new_hashtags, message.author.display_name
+                    )
                     await hashh.register_new_hashtags(reviewed_hashtags)
 
         await self.handle_commands(message)
@@ -69,7 +82,6 @@ class Bot(commands.Bot):
     async def event_command_error(self, context: commands.Context, error: Exception):
         if isinstance(error, commands.CommandNotFound):
             return
-
 
     @commands.command(name=env.bot_hashtag_commands["finish_hashtag_bot_command"])
     async def finish_hash(self, ctx: commands.Context):
@@ -98,6 +110,15 @@ class Bot(commands.Bot):
             await hashh.allow_collecting(False)
             await hashh.delete_hashtags()
             await ctx.send("Hashtag-Bot is stopped and hashtags are deleted.")
+
+    @commands.command(name="hashblacklist")
+    async def blacklist_hash(self, ctx: commands.Context):
+        if not await check_if_setting_change_authorized(ctx):
+            return
+        new_hashtags = await hashh.separate_hash(ctx.message)
+        await hashh.add_hashtag_blacklist(new_hashtags)
+        await hashh.write_blacklist()
+
 
     @commands.command(name=env.bot_hashtag_commands["start_hashtag_bot_command"])
     async def start_hash(self, ctx: commands.Context) -> None:
