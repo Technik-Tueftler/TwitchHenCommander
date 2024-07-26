@@ -23,6 +23,7 @@ from constants import (
     BOT_HASHTAG_COMMAND_STOP,
     BOT_HASHTAG_COMMAND_HELP,
     BOT_HASHTAG_COMMAND_STATUS,
+    BOT_HASHTAG_ADD_BLACKLIST,
     START_BOT_AT_STREAMSTART,
     FINISH_BOT_AT_STREAMEND,
     HASHTAG_AUTHENTICATION_LEVEL,
@@ -86,6 +87,7 @@ finish_hashtag_bot_command = config.get("BOT_HASHTAG_COMMAND_FINISH", None)
 stop_hashtag_bot_command = config.get("BOT_HASHTAG_COMMAND_STOP", None)
 help_hashtag_bot_command = config.get("BOT_HASHTAG_COMMAND_HELP", None)
 status_hashtag_bot_command = config.get("BOT_HASHTAG_COMMAND_STATUS", None)
+blacklist_hashtag_bot_command = config.get("BOT_HASHTAG_ADD_BLACKLIST", None)
 
 bot_command_pattern = re.compile(BOT_COMMAND_PATTERN)
 
@@ -112,6 +114,7 @@ bot_hashtag_commands = {
     "stop_hashtag_bot_command": stop_hashtag_bot_command,
     "help_hashtag_bot_command": help_hashtag_bot_command,
     "status_hashtag_bot_command": status_hashtag_bot_command,
+    "blacklist_hashtag_bot_command": blacklist_hashtag_bot_command
 }
 
 tweet_settings = {
@@ -179,8 +182,13 @@ def bot_setting_verification() -> None:
     )
     bot_hashtag_commands["status_hashtag_bot_command"] = (
         status_hashtag_bot_command
-        if re.match(bot_command_pattern, help_hashtag_bot_command)
+        if re.match(bot_command_pattern, status_hashtag_bot_command)
         else BOT_HASHTAG_COMMAND_STATUS
+    )
+    bot_hashtag_commands["blacklist_hashtag_bot_command"] = (
+        blacklist_hashtag_bot_command
+        if re.match(bot_command_pattern, blacklist_hashtag_bot_command)
+        else BOT_HASHTAG_ADD_BLACKLIST
     )
     app_settings["start_bot_at_streamstart"] = (
         True

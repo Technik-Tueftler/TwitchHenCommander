@@ -111,7 +111,7 @@ class Bot(commands.Bot):
             await hashh.delete_hashtags()
             await ctx.send("Hashtag-Bot is stopped and hashtags are deleted.")
 
-    @commands.command(name="hashblacklist")
+    @commands.command(name=env.bot_hashtag_commands["blacklist_hashtag_bot_command"])
     async def blacklist_hash(self, ctx: commands.Context):
         if not await check_if_setting_change_authorized(ctx):
             return
