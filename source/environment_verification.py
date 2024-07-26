@@ -61,7 +61,7 @@ nickname = config.get("TW_NICKNAME", None)
 init_channels = config.get("TW_INIT_CHANNELS", None)
 broadcaster_id = config.get("TW_BROADCASTER_ID", None)
 check_stream_interval = config.get("CHECK_STREAM_INTERVAL", CHECK_STREAM_INTERVAL)
-log_level = config.get("LOG_LEVEL", LOG_LEVEL)
+log_level_env = config.get("LOG_LEVEL", LOG_LEVEL)
 
 discord_username_hashtag = config.get("DC_USER_NAME_HASHTAG", None)
 webhook_url_hashtag = config.get("DC_WEBHOOK_URL_HASHTAG", None)
@@ -105,7 +105,7 @@ app_settings = {
     "database_synchronized": False,
     "start_bot_at_streamstart": start_bot_at_streamstart,
     "finish_bot_at_streamend": finish_bot_at_streamend,
-    "log_level": log_level,
+    "log_level": log_level_env,
 }
 
 bot_hashtag_commands = {
@@ -242,8 +242,8 @@ def check_twitch_env_available() -> bool:
     Check if environment variables available for twitch settings
     :return: result if settings available as bool
     """
-    if log_level.upper() in OPTIONS_LOG_LEVEL:
-        app_settings["log_level"] = log_level.upper()
+    if log_level_env.upper() in OPTIONS_LOG_LEVEL:
+        app_settings["log_level"] = log_level_env.upper()
     else:
         app_settings["log_level"] = LOG_LEVEL
     init_logging(app_settings["log_level"])

@@ -5,8 +5,8 @@ All functions to collect the hashtags and send the collected to the configured p
 """
 from pathlib import Path
 import asyncio
-import aiofiles
 from datetime import datetime, UTC
+import aiofiles
 from requests import post
 import twitchio
 import environment_verification as env
@@ -85,10 +85,14 @@ async def set_stream_status(status: bool) -> None:
 
 
 async def add_hashtag_blacklist(new_hashtags: set) -> None:
+    """Function to protect the information for banned hashtags during blacklist update command
+
+    Args:
+        new_hashtags (set): banned hashtags
+    """
     async with lock:
         app_data["blacklist"].update(hashtag.lower() for hashtag in new_hashtags)
-        print(app_data)
-    
+
 
 async def separate_hash(message: twitchio.message.Message) -> set:
     """
