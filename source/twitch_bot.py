@@ -7,6 +7,7 @@ import twitchio
 from twitchio.ext import commands
 import hashtag_handler as hashh
 import environment_verification as env
+from watcher import logger
 
 
 async def check_if_command_authorized(ctx: commands.Context) -> bool:
@@ -113,11 +114,17 @@ class Bot(commands.Bot):
 
     @commands.command(name=env.bot_hashtag_commands["blacklist_hashtag_bot_command"])
     async def blacklist_hash(self, ctx: commands.Context):
+        """Function command to add new banned hashtags to blacklist.
+
+        Args:
+            ctx (commands.Context): Context for bot to send a message
+        """
         if not await check_if_setting_change_authorized(ctx):
             return
         new_hashtags = await hashh.separate_hash(ctx.message)
         await hashh.add_hashtag_blacklist(new_hashtags)
         await hashh.write_blacklist()
+        logger.info(f"{ctx.message.author.display_name} has added: {new_hashtags} to banned list.")
 
 
     @commands.command(name=env.bot_hashtag_commands["start_hashtag_bot_command"])

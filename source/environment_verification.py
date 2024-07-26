@@ -23,7 +23,7 @@ from constants import (
     BOT_HASHTAG_COMMAND_STOP,
     BOT_HASHTAG_COMMAND_HELP,
     BOT_HASHTAG_COMMAND_STATUS,
-    BOT_HASHTAG_ADD_BLACKLIST,
+    BOT_HASHTAG_COMMAND_BANN,
     START_BOT_AT_STREAMSTART,
     FINISH_BOT_AT_STREAMEND,
     HASHTAG_AUTHENTICATION_LEVEL,
@@ -82,12 +82,12 @@ hashtag_authentication_level = config.get("HASHTAG_AUTHENTICATION_LEVEL", None)
 
 start_bot_at_streamstart = config.get("START_BOT_AT_STREAMSTART", None)
 finish_bot_at_streamend = config.get("FINISH_BOT_AT_STREAMEND", None)
-start_hashtag_bot_command = config.get("BOT_HASHTAG_COMMAND_START", None)
-finish_hashtag_bot_command = config.get("BOT_HASHTAG_COMMAND_FINISH", None)
-stop_hashtag_bot_command = config.get("BOT_HASHTAG_COMMAND_STOP", None)
-help_hashtag_bot_command = config.get("BOT_HASHTAG_COMMAND_HELP", None)
-status_hashtag_bot_command = config.get("BOT_HASHTAG_COMMAND_STATUS", None)
-blacklist_hashtag_bot_command = config.get("BOT_HASHTAG_ADD_BLACKLIST", None)
+start_hashtag_bot_command = config.get("BOT_HASHTAG_COMMAND_START", BOT_HASHTAG_COMMAND_START)
+finish_hashtag_bot_command = config.get("BOT_HASHTAG_COMMAND_FINISH", BOT_HASHTAG_COMMAND_FINISH)
+stop_hashtag_bot_command = config.get("BOT_HASHTAG_COMMAND_STOP", BOT_HASHTAG_COMMAND_STOP)
+help_hashtag_bot_command = config.get("BOT_HASHTAG_COMMAND_HELP", BOT_HASHTAG_COMMAND_HELP)
+status_hashtag_bot_command = config.get("BOT_HASHTAG_COMMAND_STATUS", BOT_HASHTAG_COMMAND_STATUS)
+blacklist_hashtag_bot_command = config.get("BOT_HASHTAG_COMMAND_BANN", BOT_HASHTAG_COMMAND_BANN)
 
 bot_command_pattern = re.compile(BOT_COMMAND_PATTERN)
 
@@ -188,7 +188,7 @@ def bot_setting_verification() -> None:
     bot_hashtag_commands["blacklist_hashtag_bot_command"] = (
         blacklist_hashtag_bot_command
         if re.match(bot_command_pattern, blacklist_hashtag_bot_command)
-        else BOT_HASHTAG_ADD_BLACKLIST
+        else BOT_HASHTAG_COMMAND_BANN
     )
     app_settings["start_bot_at_streamstart"] = (
         True
