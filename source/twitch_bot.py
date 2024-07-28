@@ -147,6 +147,8 @@ class Bot(commands.Bot):
             await hashh.allow_collecting(True)
             await ctx.send("Hashtag-Bot is running.")
 
+
+    # ToDo: rückgängig machen
     @commands.command(name="statushash")
     async def status_hash(self, ctx: commands.Context) -> None:
         """
