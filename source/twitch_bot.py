@@ -72,11 +72,14 @@ class Bot(commands.Bot):
         if hashh.app_data["allowed"]:
             if await check_if_hash_authorized(message):
                 new_hashtags = await hashh.separate_hash(message)
-                if len(new_hashtags) > 0:
-                    reviewed_hashtags = await hashh.review_hashtags(
-                        new_hashtags, message.author.display_name
-                    )
-                    await hashh.register_new_hashtags(reviewed_hashtags)
+                if not len(new_hashtags) > 0:
+                    return
+                reviewed_hashtags = await hashh.review_hashtags(
+                    new_hashtags, message.author.display_name
+                )
+                if not len(reviewed_hashtags) > 0:
+                    return
+                await hashh.register_new_hashtags(reviewed_hashtags)
 
         await self.handle_commands(message)
 
@@ -91,8 +94,11 @@ class Bot(commands.Bot):
         :param ctx: Context for bot to send a message
         :return: None
         """
+        print("beenden aufgerufen")
         if not await check_if_command_authorized(ctx):
             return
+        print("beenden authorized")
+        print(f"beenden erlaubt: {hashh.app_data['allowed']}")
         if hashh.app_data["allowed"]:
             await hashh.allow_collecting(False)
             await hashh.tweet_hashtags()
@@ -124,8 +130,9 @@ class Bot(commands.Bot):
         new_hashtags = await hashh.separate_hash(ctx.message)
         await hashh.add_hashtag_blacklist(new_hashtags)
         await hashh.write_blacklist()
-        logger.info(f"{ctx.message.author.display_name} has added: {new_hashtags} to banned list.")
-
+        logger.info(
+            f"{ctx.message.author.display_name} has added: {new_hashtags} to banned list."
+        )
 
     @commands.command(name=env.bot_hashtag_commands["start_hashtag_bot_command"])
     async def start_hash(self, ctx: commands.Context) -> None:
@@ -140,13 +147,14 @@ class Bot(commands.Bot):
             await hashh.allow_collecting(True)
             await ctx.send("Hashtag-Bot is running.")
 
-    @commands.command(name=env.bot_hashtag_commands["status_hashtag_bot_command"])
+    @commands.command(name="statushash")
     async def status_hash(self, ctx: commands.Context) -> None:
         """
         Function command to get current status of bot
         :param ctx: Context for bot to send a message
         :return: None
         """
+        print("status aufgerufen")
         if not await check_if_command_authorized(ctx):
             return
         if hashh.app_data["allowed"]:

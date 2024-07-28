@@ -35,14 +35,20 @@ async def tweet_hashtags() -> None:
     Send all the hashtags to the configured platforms
     :return: None
     """
+    print(app_data["tweets"])
+    reviewed_hashtags = await review_hashtags(app_data["tweets"])
+    print(reviewed_hashtags)
     stream = db.Stream(
-        timestamp=datetime.now(UTC), hashtags=" ".join(app_data["tweets"])
+        timestamp=datetime.now(UTC), hashtags=" ".join(reviewed_hashtags)
     )
     await db.add_data(stream)
-    with open(HASHTAG_FILE_PATH, "a", encoding="utf-8") as file:
-        file.write(f"Hashtags ({datetime.now(UTC)} UTC): ")
-        hashtags = " ".join(app_data["tweets"])
-        file.write(f"{hashtags}\n")
+   
+    async with aiofiles.open(HASHTAG_FILE_PATH, mode='w', encoding="utf-8") as file:
+        for string in app_data["blacklist"]:
+            await file.write(f"Hashtags ({datetime.now(UTC)} UTC): ")
+            hashtags = " ".join(reviewed_hashtags)
+            await file.write(f"{hashtags}\n")
+
     if env.app_settings["dc_available"]:
         content = (
             env.tweet_settings["tweet_start_string"]
@@ -92,6 +98,7 @@ async def add_hashtag_blacklist(new_hashtags: set) -> None:
     """
     async with lock:
         app_data["blacklist"].update(hashtag.lower() for hashtag in new_hashtags)
+        logger.debug(f"Add hashtags to blacklist: {new_hashtags}")
 
 
 async def separate_hash(message: twitchio.message.Message) -> set:
@@ -115,9 +122,10 @@ async def register_new_hashtags(new_hashtags: set) -> None:
     async with lock:
         merged_hashtags = set(app_data["tweets"]).union(set(new_hashtags))
         app_data["tweets"] = list(merged_hashtags)
+        logger.debug(f"Registered new hashtags: {new_hashtags}")
 
 
-async def review_hashtags(hashtags: set, author: str) -> set:
+async def review_hashtags(hashtags: set, author: str = None) -> set:
     """Review the seperated hashtags and check if there are allowed
 
     Args:
@@ -127,10 +135,10 @@ async def review_hashtags(hashtags: set, author: str) -> set:
         set: reviewed hashtags
     """
     def check(hashtag: str):
-        print(app_data["blacklist"])
         if hashtag.lower() not in app_data["blacklist"]:
             return True
-        logger.info(f"{author} has used hashtag {hashtag}, which is not allowed.")
+        if author is not None:
+            logger.info(f"{author} has used hashtag {hashtag}, which is not allowed.")
         return False
 
     return set(filter(check, hashtags))
@@ -151,7 +159,7 @@ def init_blacklist() -> None:
 async def write_blacklist() -> None:
     """Write new banned hashtags in file
     """
-    async with aiofiles.open('../files/blacklist.txt', mode='w', encoding="utf-8") as file:
+    async with aiofiles.open(HASHTAG_BLACKLIST_FILE_PATH, mode='w', encoding="utf-8") as file:
         for string in app_data["blacklist"]:
             await file.write(string + "\n")
 
