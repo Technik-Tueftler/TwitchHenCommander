@@ -35,20 +35,17 @@ async def tweet_hashtags() -> None:
     Send all the hashtags to the configured platforms
     :return: None
     """
-    print(app_data["tweets"])
     reviewed_hashtags = await review_hashtags(app_data["tweets"])
-    print(reviewed_hashtags)
     stream = db.Stream(
         timestamp=datetime.now(UTC), hashtags=" ".join(reviewed_hashtags)
     )
     await db.add_data(stream)
-   
-    async with aiofiles.open(HASHTAG_FILE_PATH, mode='w', encoding="utf-8") as file:
-        for string in app_data["blacklist"]:
-            await file.write(f"Hashtags ({datetime.now(UTC)} UTC): ")
-            hashtags = " ".join(reviewed_hashtags)
-            await file.write(f"{hashtags}\n")
-
+    async with aiofiles.open(HASHTAG_FILE_PATH, mode='a', encoding="utf-8") as file:
+        await file.write(f"Hashtags ({datetime.now(UTC)} UTC): ")
+        hashtags = " ".join(reviewed_hashtags)
+        await file.write(f"{hashtags}\n")
+    if len(reviewed_hashtags) <= 0:
+        return
     if env.app_settings["dc_available"]:
         content = (
             env.tweet_settings["tweet_start_string"]
@@ -148,7 +145,7 @@ def init_blacklist() -> None:
     """Read and init the blacklist for hashtags"""
     if not Path(HASHTAG_BLACKLIST_FILE_PATH).is_file():
         return
-    with open("../files/blacklist.txt", "r", encoding="utf-8") as file:
+    with open(HASHTAG_BLACKLIST_FILE_PATH, "r", encoding="utf-8") as file:
         app_data["blacklist"] = set(
             hashtag.strip().lower()
             for hashtag in file.read().splitlines()

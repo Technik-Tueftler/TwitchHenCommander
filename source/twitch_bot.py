@@ -72,20 +72,20 @@ class Bot(commands.Bot):
         if hashh.app_data["allowed"]:
             if await check_if_hash_authorized(message):
                 new_hashtags = await hashh.separate_hash(message)
-                if not len(new_hashtags) > 0:
-                    return
-                reviewed_hashtags = await hashh.review_hashtags(
-                    new_hashtags, message.author.display_name
-                )
-                if not len(reviewed_hashtags) > 0:
-                    return
-                await hashh.register_new_hashtags(reviewed_hashtags)
+                if len(new_hashtags) > 0:
+                    reviewed_hashtags = await hashh.review_hashtags(
+                        new_hashtags, message.author.display_name
+                    )
+                    if len(reviewed_hashtags) > 0:
+                        await hashh.register_new_hashtags(reviewed_hashtags)
 
         await self.handle_commands(message)
+
 
     async def event_command_error(self, context: commands.Context, error: Exception):
         if isinstance(error, commands.CommandNotFound):
             return
+
 
     @commands.command(name=env.bot_hashtag_commands["finish_hashtag_bot_command"])
     async def finish_hash(self, ctx: commands.Context):
@@ -94,11 +94,8 @@ class Bot(commands.Bot):
         :param ctx: Context for bot to send a message
         :return: None
         """
-        print("beenden aufgerufen")
         if not await check_if_command_authorized(ctx):
             return
-        print("beenden authorized")
-        print(f"beenden erlaubt: {hashh.app_data['allowed']}")
         if hashh.app_data["allowed"]:
             await hashh.allow_collecting(False)
             await hashh.tweet_hashtags()
@@ -148,8 +145,7 @@ class Bot(commands.Bot):
             await ctx.send("Hashtag-Bot is running.")
 
 
-    # ToDo: rückgängig machen
-    @commands.command(name="statushash")
+    @commands.command(name=env.bot_hashtag_commands["status_hashtag_bot_command"])
     async def status_hash(self, ctx: commands.Context) -> None:
         """
         Function command to get current status of bot
