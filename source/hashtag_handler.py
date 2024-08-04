@@ -95,6 +95,7 @@ async def add_hashtag_blacklist(new_hashtags: set) -> None:
         app_data["blacklist"].update(hashtag.lower() for hashtag in new_hashtags)
         logger.debug(f"Add hashtags to blacklist: {new_hashtags}")
 
+
 async def separate_hash(message: twitchio.message.Message) -> set:
     """
     Separate all Hashtags from a twitch message
@@ -117,6 +118,7 @@ async def register_new_hashtags(new_hashtags: set) -> None:
         merged_hashtags = set(app_data["tweets"]).union(set(new_hashtags))
         app_data["tweets"] = list(merged_hashtags)
         logger.debug(f"Registered new hashtags: {new_hashtags}")
+
 
 async def review_hashtags(hashtags: set, author: str = None) -> set:
     """Review the seperated hashtags and check if there are allowed
@@ -152,7 +154,7 @@ def init_blacklist() -> None:
 async def write_blacklist() -> None:
     """Write new banned hashtags in file
     """
-    async with aiofiles.open('../files/blacklist.txt', mode='w', encoding="utf-8") as file:
+    async with aiofiles.open(HASHTAG_BLACKLIST_FILE_PATH, mode='w', encoding="utf-8") as file:
         for string in app_data["blacklist"]:
             await file.write(string + "\n")
 
