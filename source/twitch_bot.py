@@ -25,7 +25,6 @@ async def check_if_setting_change_authorized(message: twitchio.message.Message) 
     :param message: Sent message from user
     :return: Allowance as bool
     """
-    print(message.author.is_broadcaster)
     if message.author.is_broadcaster or message.author.is_mod:
         return True
     return False
@@ -62,8 +61,7 @@ class Bot(commands.Bot):
         self.settings = settings
 
     async def event_ready(self):
-        print(f"Logged in as | {self.nick}")
-        print(f"User id is | {self.user_id}")
+        logger.info(f"Logged in as {self.nick} with id: {self.user_id}.")
 
     async def event_message(self, message):
         # Messages with echo set to True are messages sent by the bot
@@ -152,7 +150,6 @@ class Bot(commands.Bot):
         :param ctx: Context for bot to send a message
         :return: None
         """
-        print("status aufgerufen")
         if not await check_if_command_authorized(ctx):
             return
         if hashh.app_data["allowed"]:
