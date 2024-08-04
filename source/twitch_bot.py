@@ -94,11 +94,8 @@ class Bot(commands.Bot):
         :param ctx: Context for bot to send a message
         :return: None
         """
-        print("beenden aufgerufen")
         if not await check_if_command_authorized(ctx):
             return
-        print("beenden authorized")
-        print(f"beenden erlaubt: {hashh.app_data['allowed']}")
         if hashh.app_data["allowed"]:
             await hashh.allow_collecting(False)
             await hashh.tweet_hashtags()

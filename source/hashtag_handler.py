@@ -44,6 +44,8 @@ async def tweet_hashtags() -> None:
         await file.write(f"Hashtags ({datetime.now(UTC)} UTC): ")
         hashtags = " ".join(reviewed_hashtags)
         await file.write(f"{hashtags}\n")
+    if len(reviewed_hashtags) <= 0:
+        return
     if env.app_settings["dc_available"]:
         content = (
             env.tweet_settings["tweet_start_string"]
