@@ -148,8 +148,7 @@ class Bot(commands.Bot):
             await ctx.send("Hashtag-Bot is running.")
 
 
-    # ToDo: rückgängig machen
-    @commands.command(name="statushash")
+    @commands.command(name=env.bot_hashtag_commands["status_hashtag_bot_command"])
     async def status_hash(self, ctx: commands.Context) -> None:
         """
         Function command to get current status of bot
