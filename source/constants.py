@@ -1,11 +1,12 @@
 """
 File contains all constants for easy central import and usage.
 """
-APP_VERSION = "v1.4.2"
+APP_VERSION = "v1.5.0"
 CONFIGURATION_FILE_PATH = "../files/config.json"
 CACHE_FILE_PATH = "../files/cache.json"
 HASHTAG_FILE_PATH = "../files/hashtags.txt"
 LOG_FILE_PATH = "../files/log.txt"
+HASHTAG_BLACKLIST_FILE_PATH = "../files/blacklist.txt"
 HASHTAG_MAX_LENGTH = "10"
 HASHTAG_MIN_LENGTH = "3"
 TWEET_MAX_LENGTH = "280"
@@ -27,6 +28,7 @@ BOT_HASHTAG_COMMAND_FINISH = "finishhash"
 BOT_HASHTAG_COMMAND_STOP = "stophash"
 BOT_HASHTAG_COMMAND_STATUS = "statushash"
 BOT_HASHTAG_COMMAND_HELP = "helphash"
+BOT_HASHTAG_COMMAND_BANN = "hashblacklist"
 START_BOT_AT_STREAMSTART = "off"
 FINISH_BOT_AT_STREAMEND = "off"
 HASHTAG_AUTHENTICATION_LEVEL = "BROADCASTER"
@@ -36,5 +38,5 @@ DEFAULT_CLIP_THANK_YOU_TEXT = "A clip from the current stream #link Thanks to #u
 CLIP_WAIT_TIME = 2
 CHECK_STREAM_INTERVAL = "60"
  # TRACE, DEBUG, INFO, SUCCESS, WARNING, ERROR, CRITICAL
-OPTIONS_LOG_LEVEL = ("DEBUG", "INFO", "WARNING", "ERROR")
-LOG_LEVEL = "ERROR"
+OPTIONS_LOG_LEVEL = ("DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL")
+LOG_LEVEL = "INFO"

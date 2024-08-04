@@ -23,6 +23,7 @@ from constants import (
     BOT_HASHTAG_COMMAND_STOP,
     BOT_HASHTAG_COMMAND_HELP,
     BOT_HASHTAG_COMMAND_STATUS,
+    BOT_HASHTAG_COMMAND_BANN,
     START_BOT_AT_STREAMSTART,
     FINISH_BOT_AT_STREAMEND,
     HASHTAG_AUTHENTICATION_LEVEL,
@@ -60,7 +61,7 @@ nickname = config.get("TW_NICKNAME", None)
 init_channels = config.get("TW_INIT_CHANNELS", None)
 broadcaster_id = config.get("TW_BROADCASTER_ID", None)
 check_stream_interval = config.get("CHECK_STREAM_INTERVAL", CHECK_STREAM_INTERVAL)
-log_level = config.get("LOG_LEVEL", LOG_LEVEL)
+log_level_env = config.get("LOG_LEVEL", LOG_LEVEL)
 
 discord_username_hashtag = config.get("DC_USER_NAME_HASHTAG", None)
 webhook_url_hashtag = config.get("DC_WEBHOOK_URL_HASHTAG", None)
@@ -81,11 +82,12 @@ hashtag_authentication_level = config.get("HASHTAG_AUTHENTICATION_LEVEL", None)
 
 start_bot_at_streamstart = config.get("START_BOT_AT_STREAMSTART", None)
 finish_bot_at_streamend = config.get("FINISH_BOT_AT_STREAMEND", None)
-start_hashtag_bot_command = config.get("BOT_HASHTAG_COMMAND_START", None)
-finish_hashtag_bot_command = config.get("BOT_HASHTAG_COMMAND_FINISH", None)
-stop_hashtag_bot_command = config.get("BOT_HASHTAG_COMMAND_STOP", None)
-help_hashtag_bot_command = config.get("BOT_HASHTAG_COMMAND_HELP", None)
-status_hashtag_bot_command = config.get("BOT_HASHTAG_COMMAND_STATUS", None)
+start_hashtag_bot_command = config.get("BOT_HASHTAG_COMMAND_START", BOT_HASHTAG_COMMAND_START)
+finish_hashtag_bot_command = config.get("BOT_HASHTAG_COMMAND_FINISH", BOT_HASHTAG_COMMAND_FINISH)
+stop_hashtag_bot_command = config.get("BOT_HASHTAG_COMMAND_STOP", BOT_HASHTAG_COMMAND_STOP)
+help_hashtag_bot_command = config.get("BOT_HASHTAG_COMMAND_HELP", BOT_HASHTAG_COMMAND_HELP)
+status_hashtag_bot_command = config.get("BOT_HASHTAG_COMMAND_STATUS", BOT_HASHTAG_COMMAND_STATUS)
+blacklist_hashtag_bot_command = config.get("BOT_HASHTAG_COMMAND_BANN", BOT_HASHTAG_COMMAND_BANN)
 
 bot_command_pattern = re.compile(BOT_COMMAND_PATTERN)
 
@@ -103,7 +105,7 @@ app_settings = {
     "database_synchronized": False,
     "start_bot_at_streamstart": start_bot_at_streamstart,
     "finish_bot_at_streamend": finish_bot_at_streamend,
-    "log_level": log_level,
+    "log_level": log_level_env,
 }
 
 bot_hashtag_commands = {
@@ -112,6 +114,7 @@ bot_hashtag_commands = {
     "stop_hashtag_bot_command": stop_hashtag_bot_command,
     "help_hashtag_bot_command": help_hashtag_bot_command,
     "status_hashtag_bot_command": status_hashtag_bot_command,
+    "blacklist_hashtag_bot_command": blacklist_hashtag_bot_command
 }
 
 tweet_settings = {
@@ -132,6 +135,25 @@ discord_settings = {
     "clip_thank_you_text": clip_thank_you_text,
 }
 
+def log_settings() -> None:
+    """Log all settings for user information
+    """
+    log_level = app_settings["log_level"]
+    streamstart = app_settings["start_bot_at_streamstart"]
+    streamend = app_settings["finish_bot_at_streamend"]
+    dc_active = app_settings["dc_available"]
+    dc_hashtags = app_settings["dc_feature_hashtag"]
+    dc_clips = app_settings["dc_feature_clips"]
+    logger.info(f"Log-Level: {log_level}")
+    logger.info(
+        f"Bot-Settings / Start: {streamstart} / "
+        f"End: {streamend}"
+        )
+    logger.info(
+        f"DC-Settings / Active: {dc_active} / "
+        f"Hashtags: {dc_hashtags} / "
+        f"Clips: {dc_clips}"
+        )
 
 def bot_setting_verification() -> None:
     """
@@ -160,8 +182,13 @@ def bot_setting_verification() -> None:
     )
     bot_hashtag_commands["status_hashtag_bot_command"] = (
         status_hashtag_bot_command
-        if re.match(bot_command_pattern, help_hashtag_bot_command)
+        if re.match(bot_command_pattern, status_hashtag_bot_command)
         else BOT_HASHTAG_COMMAND_STATUS
+    )
+    bot_hashtag_commands["blacklist_hashtag_bot_command"] = (
+        blacklist_hashtag_bot_command
+        if re.match(bot_command_pattern, blacklist_hashtag_bot_command)
+        else BOT_HASHTAG_COMMAND_BANN
     )
     app_settings["start_bot_at_streamstart"] = (
         True
@@ -215,8 +242,8 @@ def check_twitch_env_available() -> bool:
     Check if environment variables available for twitch settings
     :return: result if settings available as bool
     """
-    if log_level.upper() in OPTIONS_LOG_LEVEL:
-        app_settings["log_level"] = log_level.upper()
+    if log_level_env.upper() in OPTIONS_LOG_LEVEL:
+        app_settings["log_level"] = log_level_env.upper()
     else:
         app_settings["log_level"] = LOG_LEVEL
     init_logging(app_settings["log_level"])
