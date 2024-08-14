@@ -80,6 +80,66 @@ async def fetch_new_clips(settings) -> list:
     return response["data"]
 
 
+async def check_stream_start_message(settings: dict, response: dict) -> None:
+    """Check if feature active and call the right method for stream start message
+
+        Args:
+        settings (dict): _description_
+        response (dict): _description_
+    """
+    if settings["dc_feature_start_message"] and not hashh.app_data["start_message_done"]:
+        if (
+            response["data"]
+            and response["data"][0]["is_live"]
+        ):
+            await hashh.stream_start_message()
+            async with hashh.lock:
+                hashh.app_data["start_message_done"] = True
+            logger.debug("Send Stream-Start Message to discord")
+    elif settings["dc_feature_start_message"] and hashh.app_data["start_message_done"]:
+        # ToDo: hier gehts weiter
+        ...
+
+
+async def check_stream_start(settings: dict, response: dict) -> None:
+    """_summary_
+
+    Args:
+        settings (dict): _description_
+        response (dict): _description_
+    """
+    if settings["start_bot_at_streamstart"]:
+        if (
+            response["data"]
+            and not hashh.app_data["online"]
+            and response["data"][0]["is_live"]
+        ):
+            await hashh.allow_collecting(True)
+            logger.debug("Automatic Stream-Start detected, collecting hashtags allowed.")
+
+
+async def check_stream_end(settings: dict, response: dict) -> None:
+    """_summary_
+
+    Args:
+        settings (dict): _description_
+        response (dict): _description_
+    """
+    if settings["finish_bot_at_streamend"]:
+        if not response["data"] and hashh.app_data["online"]:
+            await hashh.allow_collecting(False)
+            await hashh.tweet_hashtags()
+            logger.debug("Automatic Stream-End (1) detected, hashtags puplished.")
+        elif (
+            response["data"]
+            and hashh.app_data["online"]
+            and not response["data"][0]["is_live"]
+        ):
+            logger.debug("Automatic Stream-End (2) detected, hashtags puplished.")
+            await hashh.allow_collecting(False)
+            await hashh.tweet_hashtags()
+
+
 async def streaming_handler(**settings) -> None:
     """Function check if stream is running or not and set configured interfaces
 
@@ -111,27 +171,9 @@ async def streaming_handler(**settings) -> None:
         return
     log_ratelimit(settings["log_level"], response_temp)
     response = response_temp.json()
-    if settings["start_bot_at_streamstart"]:
-        if (
-            response["data"]
-            and not hashh.app_data["online"]
-            and response["data"][0]["is_live"]
-        ):
-            await hashh.allow_collecting(True)
-            logger.debug("Automatic Stream-Start detected, collecting hashtags allowed.")
-    if settings["finish_bot_at_streamend"]:
-        if not response["data"] and hashh.app_data["online"]:
-            await hashh.allow_collecting(False)
-            await hashh.tweet_hashtags()
-            logger.debug("Automatic Stream-End (1) detected, hashtags puplished.")
-        elif (
-            response["data"]
-            and hashh.app_data["online"]
-            and not response["data"][0]["is_live"]
-        ):
-            logger.debug("Automatic Stream-End (2) detected, hashtags puplished.")
-            await hashh.allow_collecting(False)
-            await hashh.tweet_hashtags()
+    check_stream_start_message(settings, response)
+    check_stream_start(settings, response)
+    check_stream_end(settings, response)
 
 
 async def new_clips_handler(**settings) -> None:

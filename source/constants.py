@@ -1,7 +1,7 @@
 """
 File contains all constants for easy central import and usage.
 """
-APP_VERSION = "v1.5.0"
+APP_VERSION = "v1.6.0"
 CONFIGURATION_FILE_PATH = "../files/config.json"
 CACHE_FILE_PATH = "../files/cache.json"
 HASHTAG_FILE_PATH = "../files/hashtags.txt"

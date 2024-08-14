@@ -18,7 +18,13 @@ from constants import (
     HASHTAG_BLACKLIST_FILE_PATH,
 )
 
-app_data = {"online": False, "allowed": True, "tweets": [], "blacklist": set()}
+app_data = {
+    "online": False,
+    "allowed": True,
+    "tweets": [],
+    "blacklist": set(),
+    "start_message_done": False,
+}
 lock = asyncio.Lock()
 
 
@@ -28,6 +34,10 @@ async def delete_hashtags() -> None:
     :return: None
     """
     app_data["tweets"] = []
+
+
+async def stream_start_message() -> None:
+    """Send a Stream-Start information in DC"""
 
 
 async def tweet_hashtags() -> None:
@@ -40,7 +50,7 @@ async def tweet_hashtags() -> None:
         timestamp=datetime.now(UTC), hashtags=" ".join(reviewed_hashtags)
     )
     await db.add_data(stream)
-    async with aiofiles.open(HASHTAG_FILE_PATH, mode='a', encoding="utf-8") as file:
+    async with aiofiles.open(HASHTAG_FILE_PATH, mode="a", encoding="utf-8") as file:
         await file.write(f"Hashtags ({datetime.now(UTC)} UTC): ")
         hashtags = " ".join(reviewed_hashtags)
         await file.write(f"{hashtags}\n")
@@ -131,6 +141,7 @@ async def review_hashtags(hashtags: set, author: str = None) -> set:
     Returns:
         set: reviewed hashtags
     """
+
     def check(hashtag: str):
         if hashtag.lower() not in app_data["blacklist"]:
             return True
@@ -154,9 +165,10 @@ def init_blacklist() -> None:
 
 
 async def write_blacklist() -> None:
-    """Write new banned hashtags in file
-    """
-    async with aiofiles.open(HASHTAG_BLACKLIST_FILE_PATH, mode='w', encoding="utf-8") as file:
+    """Write new banned hashtags in file"""
+    async with aiofiles.open(
+        HASHTAG_BLACKLIST_FILE_PATH, mode="w", encoding="utf-8"
+    ) as file:
         for string in app_data["blacklist"]:
             await file.write(string + "\n")
 

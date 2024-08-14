@@ -74,6 +74,9 @@ dc_feature_clips = config.get("DC_FEATURE_CLIPS", DC_FEATURE_CLIPS)
 clip_thank_you_text = config.get("CLIP_THANK_YOU_TEXT", CLIP_THANK_YOU_TEXT)
 clips_fetch_time = config.get("CLIPS_FETCH_TIME", UPDATE_INTERVAL_PUBLISH_NEW_CLIPS)
 dc_feature_message_streamstart = config.get("DC_FEATURE_MESSAGE_STREAMSTART", DC_FEATURE_MESSAGE_STREAMSTART)
+dc_username_message_streamstart = config.get("DC_USER_NAME_MESSAGE_STREAMSTART", None)
+webhook_url_message_streamstart = config.get("DC_WEBHOOK_URL_MESSAGE_STREAMSTART", None)
+dc_feature_message_streamstart = config.get("DC_FEATURE_MESSAGE_STREAMSTART", DC_FEATURE_MESSAGE_STREAMSTART)
 dc_feature_message_streamstart_text = config.get("DC_FEATURE_MESSAGE_STREAMSTART_TEXT", DC_FEATURE_MESSAGE_STREAMSTART_TEXT)
 
 hashtag_max_length = config.get("HASHTAG_MAX_LENGTH", HASHTAG_MAX_LENGTH)
@@ -104,12 +107,12 @@ app_settings = {
     "dc_available": False,
     "dc_feature_hashtag": False,
     "dc_feature_clips": False,
+    "dc_feature_start_message": False,
     "check_stream_interval": CHECK_STREAM_INTERVAL,
     "clips_fetch_time": clips_fetch_time,
     "database_synchronized": False,
     "start_bot_at_streamstart": start_bot_at_streamstart,
     "finish_bot_at_streamend": finish_bot_at_streamend,
-    "dc_feature_message_streamstart": dc_feature_message_streamstart,
     "log_level": log_level_env,
 }
 
@@ -138,6 +141,8 @@ discord_settings = {
     "discord_username_clip": discord_username_clip,
     "webhook_url_clip": webhook_url_clip,
     "clip_thank_you_text": clip_thank_you_text,
+    "dc_username_message_streamstart": dc_username_message_streamstart,
+    "webhook_url_message_streamstart": webhook_url_message_streamstart,
     "dc_feature_message_streamstart_text": dc_feature_message_streamstart_text,
 }
 
@@ -305,6 +310,14 @@ def discord_setting_verification() -> None:
             discord_settings["webhook_url_clip"],
         ):
             app_settings["dc_feature_clips"] = True
+    if dc_feature_message_streamstart is not None and dc_feature_message_streamstart.lower() in (
+        OPTIONS_POSITIVE_ARG
+    ):
+        if None not in (
+            discord_settings["dc_username_message_streamstart"],
+            discord_settings["webhook_url_message_streamstart"],
+        ):
+            app_settings["dc_feature_start_message"] = True
     if app_settings["dc_feature_clips"] or app_settings["dc_feature_hashtag"]:
         app_settings["dc_available"] = True
     app_settings["clips_fetch_time"] = (
