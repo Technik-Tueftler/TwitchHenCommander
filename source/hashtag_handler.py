@@ -33,7 +33,8 @@ async def delete_hashtags() -> None:
     Delete the hashtags
     :return: None
     """
-    app_data["tweets"] = []
+    async with lock:
+        app_data["tweets"] = []
 
 
 async def stream_start_message() -> None:

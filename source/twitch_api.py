@@ -115,6 +115,7 @@ async def check_stream_start(settings: dict, response: dict) -> None:
             and response["data"][0]["is_live"]
         ):
             await hashh.allow_collecting(True)
+            await hashh.set_stream_status(True)
             logger.debug("Automatic Stream-Start detected, collecting hashtags allowed.")
 
 
@@ -129,15 +130,17 @@ async def check_stream_end(settings: dict, response: dict) -> None:
         if not response["data"] and hashh.app_data["online"]:
             await hashh.allow_collecting(False)
             await hashh.tweet_hashtags()
+            await hashh.set_stream_status(False)
             logger.debug("Automatic Stream-End (1) detected, hashtags puplished.")
         elif (
             response["data"]
             and hashh.app_data["online"]
             and not response["data"][0]["is_live"]
         ):
-            logger.debug("Automatic Stream-End (2) detected, hashtags puplished.")
             await hashh.allow_collecting(False)
             await hashh.tweet_hashtags()
+            await hashh.set_stream_status(False)
+            logger.debug("Automatic Stream-End (2) detected, hashtags puplished.")
 
 
 async def streaming_handler(**settings) -> None:

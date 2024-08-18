@@ -6,6 +6,7 @@ WORKDIR $WORKING_DIR
 COPY requirements.txt ./
 
 RUN pip install -r requirements.txt
+# ToDo: weg machen?
 RUN pip install twitchio
 # RUN pip install sqlalchemy[asyncio] aiosqlite
 # RUN pip install requests
