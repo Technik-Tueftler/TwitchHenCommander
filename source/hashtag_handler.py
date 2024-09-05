@@ -9,6 +9,7 @@ from datetime import datetime, UTC
 import aiofiles
 from requests import post
 import twitchio
+from generic_functions import MyTemplate
 import environment_verification as env
 import db
 from watcher import logger
@@ -16,6 +17,7 @@ from constants import (
     HASHTAG_FILE_PATH,
     REQUEST_TIMEOUT,
     HASHTAG_BLACKLIST_FILE_PATH,
+    TWITCH_URL,
 )
 
 app_data = {
@@ -37,8 +39,27 @@ async def delete_hashtags() -> None:
         app_data["tweets"] = []
 
 
-async def stream_start_message() -> None:
+async def stream_start_message(response: dict) -> None:
     """Send a Stream-Start information in DC"""
+    try:
+        broadcaster = response["data"][0]["display_name"]
+        genre = response["data"][0]["game_name"]
+        link = TWITCH_URL + "/" + broadcaster
+        content = MyTemplate(
+            env.discord_settings["dc_feature_message_streamstart_text"]
+        ).substitute(broadcaster=broadcaster, genre=genre, link=link)
+        data = {
+            "content": content,
+            "username": env.discord_settings["dc_username_message_streamstart"],
+        }
+        post(
+            env.discord_settings["webhook_url_message_streamstart"],
+            data=data,
+            timeout=REQUEST_TIMEOUT,
+        )
+    except (KeyError, IndexError) as err:
+        logger.error(f"The twitch response doesn't have the required key. Message: {err}")
+
 
 
 async def tweet_hashtags() -> None:

@@ -107,7 +107,7 @@ app_settings = {
     "nickname": nickname,
     "broadcaster_id": broadcaster_id,
     "channels": None,
-    "dc_available": False,
+    "dc_available": False, #ToDo: dc available auch für streamstart?
     "dc_feature_hashtag": False,
     "dc_feature_clips": False,
     "dc_feature_start_message": False,

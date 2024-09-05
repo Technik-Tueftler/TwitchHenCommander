@@ -15,6 +15,7 @@ TWEET_END_STRING = "Thanks!"
 HASHTAG_ALL_LOWER_CASE = False
 TWITCH_WEBSOCKET_URL = "wss://eventsub.wss.twitch.tv/ws"
 TWITCH_SUBSCRIPTION_URL = "https://api.twitch.tv/helix/eventsub/subscriptions"
+TWITCH_URL = "https://www.twitch.tv"
 REQUEST_TIMEOUT = 10
 START_BOT_AT_STREAMSTART = False
 FINISH_BOT_AT_STREAMEND = False
