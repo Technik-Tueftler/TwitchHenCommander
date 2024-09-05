@@ -81,32 +81,37 @@ async def fetch_new_clips(settings) -> list:
 
 
 async def check_stream_start_message(settings: dict, response: dict) -> None:
-    """Check if feature active and call the right method for stream start message
+    """Check if feature active and call the method for stream start message
 
-        Args:
-        settings (dict): _description_
-        response (dict): _description_
+    Args:
+    settings (dict): App settings
+    response (dict): Response from API request
     """
-    if settings["dc_feature_start_message"] and not hashh.app_data["start_message_done"]:
-        if (
-            response["data"]
-            and response["data"][0]["is_live"]
-        ):
+    if (
+        settings["dc_feature_start_message"]
+        and not hashh.app_data["start_message_done"]
+    ):
+        if response["data"] and response["data"][0]["is_live"]:
             await hashh.stream_start_message()
             async with hashh.lock:
                 hashh.app_data["start_message_done"] = True
             logger.debug("Send Stream-Start Message to discord")
-    elif settings["dc_feature_start_message"] and hashh.app_data["start_message_done"]:
-        # ToDo: hier gehts weiter
-        ...
+    elif (
+        settings["dc_feature_start_message"]
+        and hashh.app_data["start_message_done"]
+        and not hashh.app_data["online"]
+    ):
+        async with hashh.lock:
+            hashh.app_data["start_message_done"] = False
+            logger.debug("Reset Stream-Start status")
 
 
 async def check_stream_start(settings: dict, response: dict) -> None:
-    """_summary_
+    """Function check if stream is started and allow the hashtag collection
 
     Args:
-        settings (dict): _description_
-        response (dict): _description_
+        settings (dict): App settings
+        response (dict): Response from API request
     """
     if settings["start_bot_at_streamstart"]:
         if (
@@ -116,15 +121,17 @@ async def check_stream_start(settings: dict, response: dict) -> None:
         ):
             await hashh.allow_collecting(True)
             await hashh.set_stream_status(True)
-            logger.debug("Automatic Stream-Start detected, collecting hashtags allowed.")
+            logger.debug(
+                "Automatic Stream-Start detected, collecting hashtags allowed."
+            )
 
 
 async def check_stream_end(settings: dict, response: dict) -> None:
-    """_summary_
+    """Function check if stream is ended and reject the hashtag collection
 
     Args:
-        settings (dict): _description_
-        response (dict): _description_
+        settings (dict): App settings
+        response (dict): Response from API request
     """
     if settings["finish_bot_at_streamend"]:
         if not response["data"] and hashh.app_data["online"]:
@@ -180,7 +187,10 @@ async def streaming_handler(**settings) -> None:
 
 
 async def new_clips_handler(**settings) -> None:
-    """Handling function to find new clips and then post them"""
+    """Handling function to find new clips and then post them
+    Args:
+        settings (dict): App settings
+    """
     if not settings["database_synchronized"]:
         await db.sync_db()
         settings["database_synchronized"] = True
