@@ -16,7 +16,7 @@ from generic_functions import generic_http_request, MyTemplate
 from watcher import logger
 
 
-def log_ratelimit(debug_level: str, response: requests.models.Response):
+def log_ratelimit(source_fct: str, debug_level: str, response: requests.models.Response):
     """Log ratelimits for twitch API
 
     Args:
@@ -29,6 +29,7 @@ def log_ratelimit(debug_level: str, response: requests.models.Response):
     remaining = response.headers.get("Ratelimit-Remaining")
     reset_time = response.headers.get("Ratelimit-Reset")
     logger.debug(
+        f"{source_fct}: / "
         f"Get online status with: Limit: {limit} / "
         f"Remaining: {remaining} / "
         f"Reset Time: {reset_time}"
@@ -64,7 +65,7 @@ async def fetch_new_clips(settings) -> list:
     response_temp = await generic_http_request(fetch_url, headers, logger=logger)
     if response_temp is None:
         return None
-    log_ratelimit(settings["log_level"], response_temp)
+    log_ratelimit("fetch_new_clips", settings["log_level"], response_temp)
     response = response_temp.json()
     return response["data"]
 
@@ -84,7 +85,7 @@ async def check_stream_start_message(settings: dict, response: dict) -> None:
             await hashh.stream_start_message(response)
             async with hashh.lock:
                 hashh.app_data["start_message_done"] = True
-            logger.debug("Send Stream-Start Message to discord")
+                logger.debug("Set Stream-Start status")
     elif (
         settings["dc_feature_start_message"]
         and hashh.app_data["start_message_done"]
@@ -168,7 +169,7 @@ async def streaming_handler(**settings) -> None:
     response_temp = await generic_http_request(is_live_url, headers, logger=logger)
     if response_temp is None:
         return
-    log_ratelimit(settings["log_level"], response_temp)
+    log_ratelimit("streaming_handler", settings["log_level"], response_temp)
     response = response_temp.json()
     check_stream_start_message(settings, response)
     check_stream_start(settings, response)

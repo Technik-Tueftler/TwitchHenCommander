@@ -57,6 +57,7 @@ async def stream_start_message(response: dict) -> None:
             data=data,
             timeout=REQUEST_TIMEOUT,
         )
+        logger.info(f"Send stream-start message: {content}")
     except (KeyError, IndexError) as err:
         logger.error(f"The twitch response doesn't have the required key. Message: {err}")
 
@@ -127,7 +128,7 @@ async def add_hashtag_blacklist(new_hashtags: set) -> None:
     """
     async with lock:
         app_data["blacklist"].update(hashtag.lower() for hashtag in new_hashtags)
-        logger.debug(f"Add hashtags to blacklist: {new_hashtags}")
+        logger.info(f"Add hashtags to blacklist: {new_hashtags}")
 
 
 async def separate_hash(message: twitchio.message.Message) -> set:
@@ -151,7 +152,7 @@ async def register_new_hashtags(new_hashtags: set) -> None:
     async with lock:
         merged_hashtags = set(app_data["tweets"]).union(set(new_hashtags))
         app_data["tweets"] = list(merged_hashtags)
-        logger.debug(f"Registered new hashtags: {new_hashtags}")
+        logger.info(f"Registered new hashtags: {new_hashtags}")
 
 
 async def review_hashtags(hashtags: set, author: str = None) -> set:
