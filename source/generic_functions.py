@@ -2,8 +2,10 @@
 """
 
 from __future__ import annotations
-import requests
+
 from string import Template
+
+import requests
 import watcher
 
 REQUEST_TIMEOUT_GENERIC = 20
