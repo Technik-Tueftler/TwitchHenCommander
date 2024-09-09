@@ -12,7 +12,7 @@ import environment_verification as env
 engine = create_async_engine("sqlite+aiosqlite:///../files/HenCommander.db", echo=False)
 
 
-class Base(DeclarativeBase):  # pylint: disable=too-few-public-methods
+class Base(DeclarativeBase):
     """Declarative base class
 
     Args:
@@ -20,7 +20,7 @@ class Base(DeclarativeBase):  # pylint: disable=too-few-public-methods
     """
 
 
-class User(Base):  # pylint: disable=too-few-public-methods
+class User(Base):
     """Class to be able to map the twitch user via an ORM
 
     Args:
@@ -37,7 +37,7 @@ class User(Base):  # pylint: disable=too-few-public-methods
         return f"User: {self.twitch_user_name}"
 
 
-class Clip(Base):  # pylint: disable=too-few-public-methods
+class Clip(Base):
     """Class to be able to map the twitch user clips via an ORM
 
     Args:
@@ -56,7 +56,7 @@ class Clip(Base):  # pylint: disable=too-few-public-methods
         return f"Clip: {self.clip_id}"
 
 
-class Stream(Base):  # pylint: disable=too-few-public-methods
+class Stream(Base):
     """Class to collect all stream related information
 
     Args:
