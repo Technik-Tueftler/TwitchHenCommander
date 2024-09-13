@@ -4,9 +4,15 @@ Der TwitchHenCommander ist ein Programm, der auf einen einstellbaren Twitchchat 
 [deutsche readme](https://github.com/Technik-Tueftler/TwitchHenCommander/blob/main/README.de.md)
  • [English readme](https://github.com/Technik-Tueftler/TwitchHenCommander/blob/main/README.md)
 
+## Zusammenfassung Funktionen
+1. Sammeln und posten von Hashtags
+2. Neue Clips posten
+3. Streamstart Nachricht posten
+
 ## Funktionen
 1. Sammelt Hashtags im Twitchchat des Broadcasters und posted diese am Ende des Streams oder beim ausführen eines Befehls in den konfigurierten Discord Channel. Es kann eingestellt werden, dass nur Hashtags gesammelt werden, die einen einstellbaren Rang haben (Vips, Mods, Broadcaster). Des Weiteren kann festgelegt werden, ob die Hashtag-Funktion mit dem Stream-Start bzw. Stream-Ende gestartet bzw. beendet werden soll und damit automatisch gepostet werden soll.
-2. Wird ein neuer Clip erstellt in eurem Stream, kann dieser auch auf dem Discord gepostet werden.
+2. Wird ein neuer Clip in eurem stream erstellt, kann dieser auch auf dem Discord Channel gepostet werden. 
+3. Wenn euer Stream startet, wird eine Nachricht in den Discord Channel gesendet. Diese Nachricht kann man anpassen und Parameter übergeben.
 
 ## Installation / Ausführung
 1. Führt das Programm lokal aus, indem es die Hauptdatei ausführt. Dazu wird einfach das Repository kopiert und `main.py` ausgeführt. Die Einstellungen müssen über die Umgebungsvariablen geladen werden. Dazu können die Variablen direkt im System hinterlegt sein oder man benutzt eine `.env` Datei. Hierzu kann die `template.env` Datei benutzt werden, indem man diese in `.env` umbenennt und in die benötigten Variablen den Wert schreibt. Das Programm wurde erstellt und getestet unter Python 3.11.
@@ -24,42 +30,46 @@ Nachfolgend werden alle Environment Variablen aufgelistet, welche für die jewei
 
 ### Twitch Chat
 Alle Variablen die benötigt werden um den Twitch Chat zu lesen.
-| Variable                 | Erklärung                                                            | Beispiel                                        |
-|--------------------------|----------------------------------------------------------------------|-------------------------------------------------|
-| TW_CLIENT_ID             | Twitch client ID vom Bot.                                            | edr33sdfvbnmwsxdcfrt55jkdedded                  |
-| TW_TOKEN                 | Twitch token vom Bot.                                                | hkedkodendoe343434gtgtdedexyde5667              |
-| TW_NICKNAME              | Anzeigename des Bots im Chat.                                        | Technik_Tueftler                                |
-| TW_INIT_CHANNELS         | Alle Kanäle, die beobachtet werden sollen, getrennt durch ein Komma. | technik_tueftler,thebrutzler                    |
-| TW_BROADCASTER_ID        | Die ID des Broadcasters, optional, wird auch automatisch ermittelt.  | 123456789                                       |
-| CHECK_STREAM_INTERVAL    | Zeit (s) in geschaut wird, ob der Stream online oder offline ist.    | 60                                              |
-| START_BOT_AT_STREAMSTART | Legt fest, ob der Bot beim Streamstart gestartet werden soll.        | `active` für aktiv oder nichts für inactiv      |
-| FINISH_BOT_AT_STREAMEND  | Legt fest, ob der Bot beim Streamende beendet werden soll.           | `active` für aktiv oder nichts für inactiv      |
+| Variable | Erklärung | Beispiel |
+|----------|-----------|----------|
+| TW_CLIENT_ID | Twitch client ID vom Bot. | edr33sdfvbnmwsxdcfrt55jkdedded |
+| TW_TOKEN | Twitch token vom Bot. | hkedkodendoe343434gtgtdedexyde5667 |
+| TW_NICKNAME | Anzeigename des Bots im Chat. | Technik_Tueftler |
+| TW_INIT_CHANNELS | Alle Kanäle, die beobachtet werden sollen, getrennt durch ein Komma. | technik_tueftler,thebrutzler |
+| TW_BROADCASTER_ID | Die ID des Broadcasters, optional, wird auch automatisch ermittelt.  | 123456789 |
+| CHECK_STREAM_INTERVAL | Zeit (s) in geschaut wird, ob der Stream online oder offline ist. | 60 |
+| LOG_LEVEL | Legt das Level der Log-Nachrichten fest und welche gespeichert werden sollen. | DEBUG, INFO, WARNING, ERROR, CRITICAL |
+| START_BOT_AT_STREAMSTART | Legt fest, ob der Bot beim Streamstart gestartet werden soll. | `active` für aktiv oder nichts für inactiv |
+| FINISH_BOT_AT_STREAMEND  | Legt fest, ob der Bot beim Streamende beendet werden soll. | `active` für aktiv oder nichts für inactiv |
 
 ### Hashtag Funktion
 Hier werden alle Variablen beschrieben, welche benötigt werden um Hashtags zu sammeln und am Ende im Discord zu posten.
-| Variable                     | Erklärung                                                             | Beispiel                                                  |
-|------------------------------|-----------------------------------------------------------------------|-----------------------------------------------------------|
-| DC_FEATURE_HASHTAG           | Legt fest, ob die Funktion aktiv sein soll oder nicht.                | `active` für aktiv oder nichts für inactiv                |
-| DC_USER_NAME_HASHTAG         | Username des WebHook im Discord.                                      | HashtagBot                                                |
-| DC_WEBHOOK_URL_HASHTAG       | WebHook-URL des WebHook im Discord.                                   | https://discord.com/api/webhooks/87364/oiehdied           |
-| HASHTAG_MAX_LENGTH           | Legt fest was die maximale Länge eines Hashtags ist.                  | 20                                                        |
-| HASHTAG_MIN_LENGTH           | Legt fest was die minimale Länge eines Hashtags ist.                  | 3                                                         |
-| TWEET_MAX_LENGTH             | Hat aktuell keine Funktion                                            | NA                                                        |
-| TWEET_START_STRING           | Legt einen Text fest, der vor den Hashtags geschrieben wird.          | Das waren die Hashtags aus dem Stream:                    |
-| TWEET_END_STRING             | Legt einen Text fest, der nach den Hashtags geschrieben wird.         | Danke, dass ihr dabei wart.                               |
-| HASHTAG_ALL_LOWER_CASE       | Legt fest, ob alle Hashtags in Kleinbuchstaben umgewandelt werden.    | `active` für aktiv oder nichts für inactiv                |
-| HASHTAG_AUTHENTICATION_LEVEL | Legt den minimalen Rang fest, welche Hashtags gepostet werden sollen. | Möglich sind: EVERYONE, SUBSCRIBER, VIP, MOD, BROADCASTER |
+| Variable | Erklärung | Beispiel |
+|----------|-----------|----------|
+| DC_FEATURE_HASHTAG | Legt fest, ob die Funktion aktiv sein soll oder nicht. | `active` für aktiv oder nichts für inactiv |
+| DC_USER_NAME_HASHTAG | Username des WebHook im Discord zum posten der Hashtags. | HashtagBot |
+| DC_WEBHOOK_URL_HASHTAG | WebHook-URL des WebHook im Discord zum posten der Hashtags. | https://discord.com/api/webhooks/87364/oiehdied |
+| HASHTAG_MAX_LENGTH | Legt fest was die maximale Länge eines Hashtags ist. | 20 |
+| HASHTAG_MIN_LENGTH | Legt fest was die minimale Länge eines Hashtags ist. | 3 |
+| TWEET_MAX_LENGTH | Hat aktuell keine Funktion | NA                                                        |
+| TWEET_START_STRING | Legt einen Text fest, der vor den Hashtags geschrieben wird. | Das waren die Hashtags aus dem Stream: |
+| TWEET_END_STRING | Legt einen Text fest, der nach den Hashtags geschrieben wird. | Danke, dass ihr dabei wart. |
+| HASHTAG_ALL_LOWER_CASE | Legt fest, ob alle Hashtags in Kleinbuchstaben umgewandelt werden. | `active` für aktiv oder nichts für inactiv |
+| HASHTAG_AUTHENTICATION_LEVEL | Legt die Rolle fest für das posten von Hashtags. | Möglich sind: EVERYONE, SUBSCRIBER, VIP, MOD, BROADCASTER |
 
 
 ### Clip Funktion
 Hier werden alle Variablen beschrieben, welche benötigt werden um Clips zu erkennen und im Discord zu posten.
-| Variable                    | Erklärung                                                                | Beispiel                                                  |
-|-----------------------------|--------------------------------------------------------------------------|-----------------------------------------------------------|
-| DC_FEATURE_CLIPS            | Legt fest, ob die Funktion aktiv sein soll oder nicht.                   | `active` für aktiv oder nichts für inactiv                |
-| DC_USER_NAME_CLIP           | Username des WebHook im Discord.                                         | ClipBot                                                   |
-| DC_WEBHOOK_URL_CLIP         | WebHook-URL des WebHook im Discord.                                      | https://discord.com/api/webhooks/87364/oiehttedied        |
-| CLIPS_FETCH_TIME            | Zeit (s) in geschaut wird, ob ein neuer Clip erstellt wurde.             | 60                                                        |
-| DEFAULT_CLIP_THANK_YOU_TEXT | Legt einen Starttext fest, der kommt, wenn ein neuer Clip gepostet wird. | Clip aus dem aktuellen Stream:                            |
+| Variable | Erklärung | Beispiel |
+|----------|-----------|----------|
+| DC_FEATURE_CLIPS | Legt fest, ob die Funktion aktiv sein soll oder nicht. | `active` für aktiv oder nichts für inactiv |
+| DC_USER_NAME_CLIP | Username des WebHook im Discord zum posten neuer Clips. | ClipBot |
+| DC_WEBHOOK_URL_CLIP | WebHook-URL des WebHook im Discord zum posten neuer Clips. | https://discord.com/api/webhooks/87364/oiehttedied |
+| CLIPS_FETCH_TIME | Zeit (s) in geschaut wird, ob ein neuer Clip erstellt wurde. | 60 |
+| DEFAULT_CLIP_THANK_YOU_TEXT | Legt einen Starttext fest, der kommt, wenn ein neuer Clip gepostet wird. | Siehe **Festlegen eines Textes** |
+
+#### Festlegen eines Textes
+Hier sind wir
 
 ### Befehle
 Wenn keine Befehle in den environment Variablen festgelegt werden, werden die Standardbefehle. Möchte man diese umbenennen, muss die entsprechende variable angepasst werden. Das Erkennunszeichen ist dabei immer das Ausrufezeichen.
