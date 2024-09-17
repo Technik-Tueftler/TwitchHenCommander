@@ -16,7 +16,9 @@ from generic_functions import generic_http_request, MyTemplate
 from watcher import logger
 
 
-def log_ratelimit(source_fct: str, debug_level: str, response: requests.models.Response):
+def log_ratelimit(
+    source_fct: str, debug_level: str, response: requests.models.Response
+):
     """Log ratelimits for twitch API
 
     Args:
@@ -86,6 +88,10 @@ async def check_stream_start_message(settings: dict, response: dict) -> None:
             async with hashh.lock:
                 hashh.app_data["start_message_done"] = True
                 logger.debug("Set Stream-Start status")
+        else:
+            logger.debug(
+                "Stream-start-message status is false, no stream start detected"
+            )
     elif (
         settings["dc_feature_start_message"]
         and hashh.app_data["start_message_done"]
@@ -114,6 +120,8 @@ async def check_stream_start(settings: dict, response: dict) -> None:
             logger.debug(
                 "Automatic Stream-Start detected, collecting hashtags allowed."
             )
+        else:
+            logger.debug("Stream-start status is false, no stream start detected")
 
 
 async def check_stream_end(settings: dict, response: dict) -> None:
@@ -138,6 +146,8 @@ async def check_stream_end(settings: dict, response: dict) -> None:
             await hashh.tweet_hashtags()
             await hashh.set_stream_status(False)
             logger.debug("Automatic Stream-End (2) detected, hashtags puplished.")
+        else:
+            logger.debug("Stream-end status is false, no stream ending detected")
 
 
 async def streaming_handler(**settings) -> None:
@@ -171,9 +181,9 @@ async def streaming_handler(**settings) -> None:
         return
     log_ratelimit("streaming_handler", settings["log_level"], response_temp)
     response = response_temp.json()
-    check_stream_start_message(settings, response)
-    check_stream_start(settings, response)
-    check_stream_end(settings, response)
+    await check_stream_start_message(settings, response)
+    await check_stream_start(settings, response)
+    await check_stream_end(settings, response)
 
 
 async def new_clips_handler(**settings) -> None:

@@ -336,9 +336,11 @@ def discord_setting_verification() -> None:
         ):
             app_settings["dc_feature_start_message"] = True
     if any(
-        app_settings["dc_feature_clips"],
-        app_settings["dc_feature_hashtag"],
-        app_settings["dc_feature_start_message"]
+        [
+            app_settings["dc_feature_clips"],
+            app_settings["dc_feature_hashtag"],
+            app_settings["dc_feature_start_message"],
+        ]
     ):
         app_settings["dc_available"] = True
     app_settings["clips_fetch_time"] = (
