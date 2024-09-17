@@ -14,6 +14,8 @@ The TwitchHenCommander is a program that listens to an adjustable Twitch chat an
 1. Collects hashtags in the broadcaster's Twitch chat and posts them to the configured Discord channel at the end of the stream or when a command is executed. It can be set that only hashtags with a configurable rank are collected (Vips, Mods, Broadcaster). You can also specify whether the hashtag function should be started or ended with the start or end of the stream and thus be posted automatically.
 2. If a new clip is created in your stream, it can also be posted on the Discord channel. 
 3. When your stream starts, a message is sent to the Discord channel. You can customize this message and pass parameters.
+4. Suppressing hashtags for the post via a blacklist and adding them via a command
+
 
 ## Installation / Execution
 1. Runs the program locally by executing the main file. To do this, simply copy the repository and execute `main.py`. The settings must be loaded via the environment variables. The variables can be stored directly in the system or you can use an `.env` file. The `template.env` file can be used for this by renaming it to `.env` and writing the value to the required variables. The program was tested and developed under Python 3.11.
@@ -68,7 +70,18 @@ All variables that are required to recognize clips and post them in the Discord 
 | DC_USER_NAME_CLIP | Username of WebHook in Discord to post new clips. | ClipBot |
 | DC_WEBHOOK_URL_CLIP | WebHook-URL of WebHook in Discord to post new clips. | https://discord.com/api/webhooks/87364/oiehttedied |
 | CLIPS_FETCH_TIME | Time (s) to check whether a new clip has been created. | 60 |
-| DEFAULT_CLIP_THANK_YOU_TEXT | Defines a start text that appears when a new clip is posted. | Clip from the current stream: |
+| CLIP_THANK_YOU_TEXT | Defines a text that appears when a new clip is posted. | See **Set own text** |
+
+
+### Stream-Start function
+All variables that are required to post a message at the beginning of a stream in the Discord are described here.
+| Variable | Explanation | Example |
+|----------|-------------|---------|
+| DC_FEATURE_MESSAGE_STREAMSTART | Determines whether the function should be active or not. | `active` for active or nothing for inactive |
+| DC_USER_NAME_MESSAGE_STREAMSTART | Username of WebHook in Discord to post message. | UpdateBot |
+| DC_WEBHOOK_URL_MESSAGE_STREAMSTART | WebHook-URL of WebHook in Discord to post message. | https://discord.com/api/webhooks/87364/oiehtt |
+| DC_FEATURE_MESSAGE_STREAMSTART_TEXT | Defines a start text that appears during stream start. | Siehe **Festlegen eigener Text** |
+
 
 ### Befehle
 If no commands are defined in the environment variables, the default commands are used. If you want to rename these, the corresponding variable must be adapted. The exclamation mark is always used as the identifier.
@@ -80,6 +93,25 @@ If no commands are defined in the environment variables, the default commands ar
 | !starthash        | Start collecting the hashtags.                                | BOT_HASHTAG_COMMAND_START  |
 | !finishhash       | Finish collecting and send the hashtags.                      | BOT_HASHTAG_COMMAND_FINISH |
 | !stophash         | Stop collecting and delete the hashtags.                      | BOT_HASHTAG_COMMAND_STOP   |
+| !hashblacklist    | Add hashtag to blacklist.                                     | BOT_HASHTAG_COMMAND_BANN   |
+
+
+## Set own text
+For some texts, it is possible to replace placeholders with your own variables and thus create a configurable text.  This means that the placeholders always remain the same and can be integrated into your own text.  
+|Placeholder|Variable|Meaning|
+|--------|-----------|---------|
+|#broadcaster|DC_FEATURE_MESSAGE_STREAMSTART_TEXT| Name of streamer|
+|#genre|DC_FEATURE_MESSAGE_STREAMSTART_TEXT|Genre of game|
+|#link|DC_FEATURE_MESSAGE_STREAMSTART_TEXT|Link to streamer channel|
+|#link|CLIP_THANK_YOU_TEXT|Link to the clip you just created|
+|#user|CLIP_THANK_YOU_TEXT|Chatter who created the clip|
+
+**Example:** A clip from the current stream #link Thanks to #user for clipping.
+
+
+## Suppressing hashtags
+There is the option of not registering hashtags for the post and adding them to a blacklist. All hashtags are in the file **blacklist.txt** and can be added there manually before the bot starts. While the bot is running, this is possible at any time via the chat command and is also entered in the text document.  
+
 
 ## Docker Compose Example
 ````commandline

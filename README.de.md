@@ -13,6 +13,8 @@ Der TwitchHenCommander ist ein Programm, der auf einen einstellbaren Twitchchat 
 1. Sammelt Hashtags im Twitchchat des Broadcasters und posted diese am Ende des Streams oder beim ausführen eines Befehls in den konfigurierten Discord Channel. Es kann eingestellt werden, dass nur Hashtags gesammelt werden, die einen einstellbaren Rang haben (Vips, Mods, Broadcaster). Des Weiteren kann festgelegt werden, ob die Hashtag-Funktion mit dem Stream-Start bzw. Stream-Ende gestartet bzw. beendet werden soll und damit automatisch gepostet werden soll.
 2. Wird ein neuer Clip in eurem stream erstellt, kann dieser auch auf dem Discord Channel gepostet werden. 
 3. Wenn euer Stream startet, wird eine Nachricht in den Discord Channel gesendet. Diese Nachricht kann man anpassen und Parameter übergeben.
+4. Unterdrücken von Hashtags für den Post über eine Blacklist und hinzufügen über einen Befehl
+
 
 ## Installation / Ausführung
 1. Führt das Programm lokal aus, indem es die Hauptdatei ausführt. Dazu wird einfach das Repository kopiert und `main.py` ausgeführt. Die Einstellungen müssen über die Umgebungsvariablen geladen werden. Dazu können die Variablen direkt im System hinterlegt sein oder man benutzt eine `.env` Datei. Hierzu kann die `template.env` Datei benutzt werden, indem man diese in `.env` umbenennt und in die benötigten Variablen den Wert schreibt. Das Programm wurde erstellt und getestet unter Python 3.11.
@@ -66,10 +68,16 @@ Hier werden alle Variablen beschrieben, welche benötigt werden um Clips zu erke
 | DC_USER_NAME_CLIP | Username des WebHook im Discord zum posten neuer Clips. | ClipBot |
 | DC_WEBHOOK_URL_CLIP | WebHook-URL des WebHook im Discord zum posten neuer Clips. | https://discord.com/api/webhooks/87364/oiehttedied |
 | CLIPS_FETCH_TIME | Zeit (s) in geschaut wird, ob ein neuer Clip erstellt wurde. | 60 |
-| DEFAULT_CLIP_THANK_YOU_TEXT | Legt einen Starttext fest, der kommt, wenn ein neuer Clip gepostet wird. | Siehe **Festlegen eines Textes** |
+| CLIP_THANK_YOU_TEXT | Legt einen Starttext fest, der kommt, wenn ein neuer Clip gepostet wird. | Siehe **Festlegen eigener Text** |
 
-#### Festlegen eines Textes
-Hier sind wir
+### Streamstart Nachricht Funktion
+Hier werden alle Variablen beschrieben, welche benötigt werden um eine Nachricht am Anfang eines Streams im Discord zu posten.
+| Variable | Erklärung | Beispiel |
+|----------|-----------|----------|
+| DC_FEATURE_MESSAGE_STREAMSTART | Legt fest, ob die Funktion aktiv sein soll oder nicht. | `active` für aktiv oder nichts für inactiv |
+| DC_USER_NAME_MESSAGE_STREAMSTART | Username des WebHook im Discord zum posten der Nachricht. | UpdateBot |
+| DC_WEBHOOK_URL_MESSAGE_STREAMSTART | WebHook-URL des WebHook im Discord. | https://discord.com/api/webhooks/87364/oiehttedied |
+| DC_FEATURE_MESSAGE_STREAMSTART_TEXT | Legt den Text fest, der bei Streamstart gepostet wird. | Siehe **Festlegen eigener Text** |
 
 ### Befehle
 Wenn keine Befehle in den environment Variablen festgelegt werden, werden die Standardbefehle. Möchte man diese umbenennen, muss die entsprechende variable angepasst werden. Das Erkennunszeichen ist dabei immer das Ausrufezeichen.
@@ -81,6 +89,25 @@ Wenn keine Befehle in den environment Variablen festgelegt werden, werden die St
 | !starthash       | Beginnt das sammeln der Hashtags.                           | BOT_HASHTAG_COMMAND_START  |
 | !finishhash      | Beendet das sammeln und sendet die Hashtags.                | BOT_HASHTAG_COMMAND_FINISH |
 | !stophash        | Beendet das sammeln und löscht die Hashtags.                | BOT_HASHTAG_COMMAND_STOP   |
+| !hashblacklist   | Hinzufügen von Hashtags zur Blacklist.                      | BOT_HASHTAG_COMMAND_BANN   |
+
+
+## Festlegen eigener Text
+Es gibt bei einigen Texten die Möglichkeit Platzhalter durch eigene Variablen zu ersetzen und so einen konfigurierbaren Text zu erstellen.  So bleiben die Platzhalter immer gleich und können in den eigenen Text eingebaut werden.  
+|Platzhalter|Variable|Bedeutung|
+|--------|-----------|---------|
+|#broadcaster|DC_FEATURE_MESSAGE_STREAMSTART_TEXT|Name des Streamers|
+|#genre|DC_FEATURE_MESSAGE_STREAMSTART_TEXT|Genre des Streams|
+|#link|DC_FEATURE_MESSAGE_STREAMSTART_TEXT|Link zum Kanal|
+|#link|CLIP_THANK_YOU_TEXT|Link zum gerade erstellten Clip|
+|#user|CLIP_THANK_YOU_TEXT|Chatter der den Clip erstellt hat|
+
+**Beispiel:** A clip from the current stream #link Thanks to #user for clipping.
+
+
+## Unterdrücken von Hashtags
+Es gibt die Möglichkeit Hashtags für den Post nicht zu Registrieren und diese auf eine Blacklist zu nehmen. Alle Hashtags stehen in der Datei **blacklist.txt** und können dort vor dem Botstart manuell hinzugefügt werden. Während der Bot läuft ist dies jederzeit über den Chat-Befehl möglich und werden auch in das Textdokument eingetragen.  
+
 
 ## Docker Compose Beispiel
 ````commandline
