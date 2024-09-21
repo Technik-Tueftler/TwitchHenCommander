@@ -2,10 +2,23 @@
 """
 
 from __future__ import annotations
+
+from string import Template
+
 import requests
 import watcher
 
 REQUEST_TIMEOUT_GENERIC = 20
+
+
+class MyTemplate(Template):
+    """This class allow the creation of a template with a user defined separator.
+    The package is there to define templates for texts and then substitute them with certain values.
+    Args:
+        Template (_type_): Basic class that is inherited
+    """
+
+    delimiter = "#"
 
 
 async def generic_http_request(

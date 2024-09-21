@@ -1,7 +1,8 @@
 """
 File contains all constants for easy central import and usage.
 """
-APP_VERSION = "v1.5.0"
+
+APP_VERSION = "v1.6.0"
 CONFIGURATION_FILE_PATH = "../files/config.json"
 CACHE_FILE_PATH = "../files/cache.json"
 HASHTAG_FILE_PATH = "../files/hashtags.txt"
@@ -15,6 +16,7 @@ TWEET_END_STRING = "Thanks!"
 HASHTAG_ALL_LOWER_CASE = False
 TWITCH_WEBSOCKET_URL = "wss://eventsub.wss.twitch.tv/ws"
 TWITCH_SUBSCRIPTION_URL = "https://api.twitch.tv/helix/eventsub/subscriptions"
+TWITCH_URL = "https://www.twitch.tv"
 REQUEST_TIMEOUT = 10
 START_BOT_AT_STREAMSTART = False
 FINISH_BOT_AT_STREAMEND = False
@@ -31,12 +33,18 @@ BOT_HASHTAG_COMMAND_HELP = "helphash"
 BOT_HASHTAG_COMMAND_BANN = "hashblacklist"
 START_BOT_AT_STREAMSTART = "off"
 FINISH_BOT_AT_STREAMEND = "off"
+DC_FEATURE_MESSAGE_STREAMSTART = "off"
+DC_FEATURE_MESSAGE_STREAMSTART_TEXT = (
+    "#broadcaster with #genre is online. It's amazing what's happen here: #link"
+)
 HASHTAG_AUTHENTICATION_LEVEL = "BROADCASTER"
 OPTIONS_POSITIVE_ARG = ("true", "on", "1", "t", "active")
 TIMESTAMP_PATTERN = "%Y-%m-%dT%H:%M:%SZ"
-DEFAULT_CLIP_THANK_YOU_TEXT = "A clip from the current stream #link Thanks to #user for clipping"
+CLIP_THANK_YOU_TEXT = (
+    "A clip from the current stream #link Thanks to #user for clipping"
+)
 CLIP_WAIT_TIME = 2
 CHECK_STREAM_INTERVAL = "60"
- # TRACE, DEBUG, INFO, SUCCESS, WARNING, ERROR, CRITICAL
+# TRACE, DEBUG, INFO, SUCCESS, WARNING, ERROR, CRITICAL
 OPTIONS_LOG_LEVEL = ("DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL")
 LOG_LEVEL = "INFO"

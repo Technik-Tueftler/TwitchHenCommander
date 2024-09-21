@@ -31,11 +31,13 @@ from constants import (
     DC_FEATURE_CLIPS,
     OPTIONS_POSITIVE_ARG,
     BOT_COMMAND_PATTERN,
-    DEFAULT_CLIP_THANK_YOU_TEXT,
+    CLIP_THANK_YOU_TEXT,
     UPDATE_INTERVAL_PUBLISH_NEW_CLIPS,
     CHECK_STREAM_INTERVAL,
     LOG_LEVEL,
     OPTIONS_LOG_LEVEL,
+    DC_FEATURE_MESSAGE_STREAMSTART,
+    DC_FEATURE_MESSAGE_STREAMSTART_TEXT,
 )
 
 
@@ -69,8 +71,19 @@ discord_username_clip = config.get("DC_USER_NAME_CLIP", None)
 webhook_url_clip = config.get("DC_WEBHOOK_URL_CLIP", None)
 dc_feature_hashtag = config.get("DC_FEATURE_HASHTAG", DC_FEATURE_HASHTAG)
 dc_feature_clips = config.get("DC_FEATURE_CLIPS", DC_FEATURE_CLIPS)
-clip_thank_you_text = config.get("CLIP_THANK_YOU_TEXT", DEFAULT_CLIP_THANK_YOU_TEXT)
+clip_thank_you_text = config.get("CLIP_THANK_YOU_TEXT", CLIP_THANK_YOU_TEXT)
 clips_fetch_time = config.get("CLIPS_FETCH_TIME", UPDATE_INTERVAL_PUBLISH_NEW_CLIPS)
+dc_feature_message_streamstart = config.get(
+    "DC_FEATURE_MESSAGE_STREAMSTART", DC_FEATURE_MESSAGE_STREAMSTART
+)
+dc_username_message_streamstart = config.get("DC_USER_NAME_MESSAGE_STREAMSTART", None)
+webhook_url_message_streamstart = config.get("DC_WEBHOOK_URL_MESSAGE_STREAMSTART", None)
+dc_feature_message_streamstart = config.get(
+    "DC_FEATURE_MESSAGE_STREAMSTART", DC_FEATURE_MESSAGE_STREAMSTART
+)
+dc_feature_message_streamstart_text = config.get(
+    "DC_FEATURE_MESSAGE_STREAMSTART_TEXT", DC_FEATURE_MESSAGE_STREAMSTART_TEXT
+)
 
 hashtag_max_length = config.get("HASHTAG_MAX_LENGTH", HASHTAG_MAX_LENGTH)
 hashtag_min_length = config.get("HASHTAG_MIN_LENGTH", HASHTAG_MIN_LENGTH)
@@ -82,12 +95,24 @@ hashtag_authentication_level = config.get("HASHTAG_AUTHENTICATION_LEVEL", None)
 
 start_bot_at_streamstart = config.get("START_BOT_AT_STREAMSTART", None)
 finish_bot_at_streamend = config.get("FINISH_BOT_AT_STREAMEND", None)
-start_hashtag_bot_command = config.get("BOT_HASHTAG_COMMAND_START", BOT_HASHTAG_COMMAND_START)
-finish_hashtag_bot_command = config.get("BOT_HASHTAG_COMMAND_FINISH", BOT_HASHTAG_COMMAND_FINISH)
-stop_hashtag_bot_command = config.get("BOT_HASHTAG_COMMAND_STOP", BOT_HASHTAG_COMMAND_STOP)
-help_hashtag_bot_command = config.get("BOT_HASHTAG_COMMAND_HELP", BOT_HASHTAG_COMMAND_HELP)
-status_hashtag_bot_command = config.get("BOT_HASHTAG_COMMAND_STATUS", BOT_HASHTAG_COMMAND_STATUS)
-blacklist_hashtag_bot_command = config.get("BOT_HASHTAG_COMMAND_BANN", BOT_HASHTAG_COMMAND_BANN)
+start_hashtag_bot_command = config.get(
+    "BOT_HASHTAG_COMMAND_START", BOT_HASHTAG_COMMAND_START
+)
+finish_hashtag_bot_command = config.get(
+    "BOT_HASHTAG_COMMAND_FINISH", BOT_HASHTAG_COMMAND_FINISH
+)
+stop_hashtag_bot_command = config.get(
+    "BOT_HASHTAG_COMMAND_STOP", BOT_HASHTAG_COMMAND_STOP
+)
+help_hashtag_bot_command = config.get(
+    "BOT_HASHTAG_COMMAND_HELP", BOT_HASHTAG_COMMAND_HELP
+)
+status_hashtag_bot_command = config.get(
+    "BOT_HASHTAG_COMMAND_STATUS", BOT_HASHTAG_COMMAND_STATUS
+)
+blacklist_hashtag_bot_command = config.get(
+    "BOT_HASHTAG_COMMAND_BANN", BOT_HASHTAG_COMMAND_BANN
+)
 
 bot_command_pattern = re.compile(BOT_COMMAND_PATTERN)
 
@@ -100,6 +125,7 @@ app_settings = {
     "dc_available": False,
     "dc_feature_hashtag": False,
     "dc_feature_clips": False,
+    "dc_feature_start_message": False,
     "check_stream_interval": CHECK_STREAM_INTERVAL,
     "clips_fetch_time": clips_fetch_time,
     "database_synchronized": False,
@@ -114,7 +140,7 @@ bot_hashtag_commands = {
     "stop_hashtag_bot_command": stop_hashtag_bot_command,
     "help_hashtag_bot_command": help_hashtag_bot_command,
     "status_hashtag_bot_command": status_hashtag_bot_command,
-    "blacklist_hashtag_bot_command": blacklist_hashtag_bot_command
+    "blacklist_hashtag_bot_command": blacklist_hashtag_bot_command,
 }
 
 tweet_settings = {
@@ -133,11 +159,14 @@ discord_settings = {
     "discord_username_clip": discord_username_clip,
     "webhook_url_clip": webhook_url_clip,
     "clip_thank_you_text": clip_thank_you_text,
+    "dc_username_message_streamstart": dc_username_message_streamstart,
+    "webhook_url_message_streamstart": webhook_url_message_streamstart,
+    "dc_feature_message_streamstart_text": dc_feature_message_streamstart_text,
 }
 
+
 def log_settings() -> None:
-    """Log all settings for user information
-    """
+    """Log all settings for user information"""
     log_level = app_settings["log_level"]
     streamstart = app_settings["start_bot_at_streamstart"]
     streamend = app_settings["finish_bot_at_streamend"]
@@ -145,15 +174,13 @@ def log_settings() -> None:
     dc_hashtags = app_settings["dc_feature_hashtag"]
     dc_clips = app_settings["dc_feature_clips"]
     logger.info(f"Log-Level: {log_level}")
-    logger.info(
-        f"Bot-Settings / Start: {streamstart} / "
-        f"End: {streamend}"
-        )
+    logger.info(f"Bot-Settings / Start: {streamstart} / " f"End: {streamend}")
     logger.info(
         f"DC-Settings / Active: {dc_active} / "
         f"Hashtags: {dc_hashtags} / "
         f"Clips: {dc_clips}"
-        )
+    )
+
 
 def bot_setting_verification() -> None:
     """
@@ -199,6 +226,11 @@ def bot_setting_verification() -> None:
         True
         if finish_bot_at_streamend.lower() in (OPTIONS_POSITIVE_ARG)
         else FINISH_BOT_AT_STREAMEND
+    )
+    app_settings["dc_feature_message_streamstart"] = (
+        True
+        if dc_feature_message_streamstart.lower() in (OPTIONS_POSITIVE_ARG)
+        else DC_FEATURE_MESSAGE_STREAMSTART
     )
 
 
@@ -294,7 +326,22 @@ def discord_setting_verification() -> None:
             discord_settings["webhook_url_clip"],
         ):
             app_settings["dc_feature_clips"] = True
-    if app_settings["dc_feature_clips"] or app_settings["dc_feature_hashtag"]:
+    if (
+        dc_feature_message_streamstart is not None
+        and dc_feature_message_streamstart.lower() in (OPTIONS_POSITIVE_ARG)
+    ):
+        if None not in (
+            discord_settings["dc_username_message_streamstart"],
+            discord_settings["webhook_url_message_streamstart"],
+        ):
+            app_settings["dc_feature_start_message"] = True
+    if any(
+        [
+            app_settings["dc_feature_clips"],
+            app_settings["dc_feature_hashtag"],
+            app_settings["dc_feature_start_message"],
+        ]
+    ):
         app_settings["dc_available"] = True
     app_settings["clips_fetch_time"] = (
         int(clips_fetch_time)

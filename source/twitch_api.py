@@ -2,7 +2,6 @@
 """
 
 from datetime import datetime, timedelta, UTC
-from string import Template
 
 import asyncio
 import requests
@@ -13,21 +12,13 @@ from constants import (
     CLIP_WAIT_TIME,
     TIMESTAMP_PATTERN,
 )
-from generic_functions import generic_http_request
+from generic_functions import generic_http_request, MyTemplate
 from watcher import logger
 
 
-class MyTemplate(Template):
-    """This class allow the creation of a template with a user defined separator.
-    The package is there to define templates for texts and then substitute them with certain values.
-    Args:
-        Template (_type_): Basic class that is inherited
-    """
-
-    delimiter = "#"
-
-
-def log_ratelimit(debug_level: str, response: requests.models.Response):
+def log_ratelimit(
+    source_fct: str, debug_level: str, response: requests.models.Response
+):
     """Log ratelimits for twitch API
 
     Args:
@@ -40,6 +31,7 @@ def log_ratelimit(debug_level: str, response: requests.models.Response):
     remaining = response.headers.get("Ratelimit-Remaining")
     reset_time = response.headers.get("Ratelimit-Reset")
     logger.debug(
+        f"{source_fct}: / "
         f"Get online status with: Limit: {limit} / "
         f"Remaining: {remaining} / "
         f"Reset Time: {reset_time}"
@@ -75,9 +67,87 @@ async def fetch_new_clips(settings) -> list:
     response_temp = await generic_http_request(fetch_url, headers, logger=logger)
     if response_temp is None:
         return None
-    log_ratelimit(settings["log_level"], response_temp)
+    log_ratelimit("fetch_new_clips", settings["log_level"], response_temp)
     response = response_temp.json()
     return response["data"]
+
+
+async def check_stream_start_message(settings: dict, response: dict) -> None:
+    """Check if feature active and call the method for stream start message
+
+    Args:
+    settings (dict): App settings
+    response (dict): Response from API request
+    """
+    if (
+        settings["dc_feature_start_message"]
+        and not hashh.app_data["start_message_done"]
+    ):
+        if response["data"] and response["data"][0]["is_live"]:
+            await hashh.stream_start_message(response)
+            async with hashh.lock:
+                hashh.app_data["start_message_done"] = True
+                logger.debug("Set Stream-Start status")
+        else:
+            logger.debug(
+                "Stream-start-message status is false, no stream start detected"
+            )
+    elif (
+        settings["dc_feature_start_message"]
+        and hashh.app_data["start_message_done"]
+        and not hashh.app_data["online"]
+    ):
+        async with hashh.lock:
+            hashh.app_data["start_message_done"] = False
+            logger.debug("Reset Stream-Start status")
+
+
+async def check_stream_start(settings: dict, response: dict) -> None:
+    """Function check if stream is started and allow the hashtag collection
+
+    Args:
+        settings (dict): App settings
+        response (dict): Response from API request
+    """
+    if settings["start_bot_at_streamstart"]:
+        if (
+            response["data"]
+            and not hashh.app_data["online"]
+            and response["data"][0]["is_live"]
+        ):
+            await hashh.allow_collecting(True)
+            await hashh.set_stream_status(True)
+            logger.debug(
+                "Automatic Stream-Start detected, collecting hashtags allowed."
+            )
+        else:
+            logger.debug("Stream-start status is false, no stream start detected")
+
+
+async def check_stream_end(settings: dict, response: dict) -> None:
+    """Function check if stream is ended and reject the hashtag collection
+
+    Args:
+        settings (dict): App settings
+        response (dict): Response from API request
+    """
+    if settings["finish_bot_at_streamend"]:
+        if not response["data"] and hashh.app_data["online"]:
+            await hashh.allow_collecting(False)
+            await hashh.tweet_hashtags()
+            await hashh.set_stream_status(False)
+            logger.debug("Automatic Stream-End (1) detected, hashtags puplished.")
+        elif (
+            response["data"]
+            and hashh.app_data["online"]
+            and not response["data"][0]["is_live"]
+        ):
+            await hashh.allow_collecting(False)
+            await hashh.tweet_hashtags()
+            await hashh.set_stream_status(False)
+            logger.debug("Automatic Stream-End (2) detected, hashtags puplished.")
+        else:
+            logger.debug("Stream-end status is false, no stream ending detected")
 
 
 async def streaming_handler(**settings) -> None:
@@ -109,33 +179,18 @@ async def streaming_handler(**settings) -> None:
     response_temp = await generic_http_request(is_live_url, headers, logger=logger)
     if response_temp is None:
         return
-    log_ratelimit(settings["log_level"], response_temp)
+    log_ratelimit("streaming_handler", settings["log_level"], response_temp)
     response = response_temp.json()
-    if settings["start_bot_at_streamstart"]:
-        if (
-            response["data"]
-            and not hashh.app_data["online"]
-            and response["data"][0]["is_live"]
-        ):
-            await hashh.allow_collecting(True)
-            logger.debug("Automatic Stream-Start detected, collecting hashtags allowed.")
-    if settings["finish_bot_at_streamend"]:
-        if not response["data"] and hashh.app_data["online"]:
-            await hashh.allow_collecting(False)
-            await hashh.tweet_hashtags()
-            logger.debug("Automatic Stream-End (1) detected, hashtags puplished.")
-        elif (
-            response["data"]
-            and hashh.app_data["online"]
-            and not response["data"][0]["is_live"]
-        ):
-            logger.debug("Automatic Stream-End (2) detected, hashtags puplished.")
-            await hashh.allow_collecting(False)
-            await hashh.tweet_hashtags()
+    await check_stream_start_message(settings, response)
+    await check_stream_start(settings, response)
+    await check_stream_end(settings, response)
 
 
 async def new_clips_handler(**settings) -> None:
-    """Handling function to find new clips and then post them"""
+    """Handling function to find new clips and then post them
+    Args:
+        settings (dict): App settings
+    """
     if not settings["database_synchronized"]:
         await db.sync_db()
         settings["database_synchronized"] = True

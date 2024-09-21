@@ -9,6 +9,7 @@ from datetime import datetime, UTC
 import aiofiles
 from requests import post
 import twitchio
+from generic_functions import MyTemplate
 import environment_verification as env
 import db
 from watcher import logger
@@ -16,9 +17,16 @@ from constants import (
     HASHTAG_FILE_PATH,
     REQUEST_TIMEOUT,
     HASHTAG_BLACKLIST_FILE_PATH,
+    TWITCH_URL,
 )
 
-app_data = {"online": False, "allowed": True, "tweets": [], "blacklist": set()}
+app_data = {
+    "online": False,
+    "allowed": True,
+    "tweets": [],
+    "blacklist": set(),
+    "start_message_done": False,
+}
 lock = asyncio.Lock()
 
 
@@ -27,7 +35,32 @@ async def delete_hashtags() -> None:
     Delete the hashtags
     :return: None
     """
-    app_data["tweets"] = []
+    async with lock:
+        app_data["tweets"] = []
+
+
+async def stream_start_message(response: dict) -> None:
+    """Send a Stream-Start information in DC"""
+    try:
+        broadcaster = response["data"][0]["display_name"]
+        genre = response["data"][0]["game_name"]
+        link = TWITCH_URL + "/" + broadcaster
+        content = MyTemplate(
+            env.discord_settings["dc_feature_message_streamstart_text"]
+        ).substitute(broadcaster=broadcaster, genre=genre, link=link)
+        data = {
+            "content": content,
+            "username": env.discord_settings["dc_username_message_streamstart"],
+        }
+        post(
+            env.discord_settings["webhook_url_message_streamstart"],
+            data=data,
+            timeout=REQUEST_TIMEOUT,
+        )
+        logger.info(f"Send stream-start message: {content}")
+    except (KeyError, IndexError) as err:
+        logger.error(f"The twitch response doesn't have the required key. Message: {err}")
+
 
 
 async def tweet_hashtags() -> None:
@@ -40,7 +73,7 @@ async def tweet_hashtags() -> None:
         timestamp=datetime.now(UTC), hashtags=" ".join(reviewed_hashtags)
     )
     await db.add_data(stream)
-    async with aiofiles.open(HASHTAG_FILE_PATH, mode='a', encoding="utf-8") as file:
+    async with aiofiles.open(HASHTAG_FILE_PATH, mode="a", encoding="utf-8") as file:
         await file.write(f"Hashtags ({datetime.now(UTC)} UTC): ")
         hashtags = " ".join(reviewed_hashtags)
         await file.write(f"{hashtags}\n")
@@ -95,7 +128,7 @@ async def add_hashtag_blacklist(new_hashtags: set) -> None:
     """
     async with lock:
         app_data["blacklist"].update(hashtag.lower() for hashtag in new_hashtags)
-        logger.debug(f"Add hashtags to blacklist: {new_hashtags}")
+        logger.info(f"Add hashtags to blacklist: {new_hashtags}")
 
 
 async def separate_hash(message: twitchio.message.Message) -> set:
@@ -119,7 +152,7 @@ async def register_new_hashtags(new_hashtags: set) -> None:
     async with lock:
         merged_hashtags = set(app_data["tweets"]).union(set(new_hashtags))
         app_data["tweets"] = list(merged_hashtags)
-        logger.debug(f"Registered new hashtags: {new_hashtags}")
+        logger.info(f"Registered new hashtags: {new_hashtags}")
 
 
 async def review_hashtags(hashtags: set, author: str = None) -> set:
@@ -131,6 +164,7 @@ async def review_hashtags(hashtags: set, author: str = None) -> set:
     Returns:
         set: reviewed hashtags
     """
+
     def check(hashtag: str):
         if hashtag.lower() not in app_data["blacklist"]:
             return True
@@ -154,9 +188,10 @@ def init_blacklist() -> None:
 
 
 async def write_blacklist() -> None:
-    """Write new banned hashtags in file
-    """
-    async with aiofiles.open(HASHTAG_BLACKLIST_FILE_PATH, mode='w', encoding="utf-8") as file:
+    """Write new banned hashtags in file"""
+    async with aiofiles.open(
+        HASHTAG_BLACKLIST_FILE_PATH, mode="w", encoding="utf-8"
+    ) as file:
         for string in app_data["blacklist"]:
             await file.write(string + "\n")
 

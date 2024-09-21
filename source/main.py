@@ -47,6 +47,7 @@ def main() -> None:
         [
             env.app_settings["start_bot_at_streamstart"],
             env.app_settings["finish_bot_at_streamend"],
+            env.app_settings["dc_feature_message_streamstart"],
         ]
     ):
         stream_handler = loop.create_task(
