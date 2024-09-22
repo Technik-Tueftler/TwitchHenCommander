@@ -7,3 +7,4 @@ greenlet==3.0.3
 SQLAlchemy==2.0.28
 typing-extensions==4.10.0
 loguru==0.7.2
+twitchio==2.7.0
