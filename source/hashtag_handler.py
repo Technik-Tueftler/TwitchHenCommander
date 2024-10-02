@@ -26,6 +26,7 @@ app_data = {
     "tweets": [],
     "blacklist": set(),
     "start_message_done": False,
+    "chatter": set()
 }
 lock = asyncio.Lock()
 
@@ -79,14 +80,15 @@ async def tweet_hashtags() -> None:
         await file.write(f"{hashtags}\n")
     if len(reviewed_hashtags) <= 0:
         return
+    chatter = list(app_data["chatter"])
+    content = MyTemplate(
+            env.tweet_settings["hashtag_chatter_thanks_text"]
+        ).substitute(hashtags=reviewed_hashtags,
+                     chatter_all=", ".join(chatter),
+                     chatter_except_last=", ".join(chatter[:-1]),
+                     chatter_last=chatter[-1]
+                     )
     if env.app_settings["dc_available"]:
-        content = (
-            env.tweet_settings["tweet_start_string"]
-            + " "
-            + hashtags
-            + " "
-            + env.tweet_settings["tweet_end_string"]
-        )
         data = {
             "content": content,
             "username": env.discord_settings["discord_username_hashtag"],
@@ -143,16 +145,18 @@ async def separate_hash(message: twitchio.message.Message) -> set:
     return env.tweet_settings["hashtag_pattern"].findall(converted_message)
 
 
-async def register_new_hashtags(new_hashtags: set) -> None:
+async def register_new_hashtags(display_name: str, new_hashtags: set) -> None:
     """
     Prevents duplications and add all new hashtags to app_data.
+    :display_name: Displayname of chatter
     :param new_hashtags: List of hashtags from a message
     :return: None
     """
     async with lock:
         merged_hashtags = set(app_data["tweets"]).union(set(new_hashtags))
         app_data["tweets"] = list(merged_hashtags)
-        logger.info(f"Registered new hashtags: {new_hashtags}")
+        app_data["chatter"].add(display_name)
+        logger.info(f"Registered new hashtags: {new_hashtags} from {display_name}")
 
 
 async def review_hashtags(hashtags: set, author: str = None) -> set:

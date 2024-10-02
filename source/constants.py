@@ -11,8 +11,14 @@ HASHTAG_BLACKLIST_FILE_PATH = "../files/blacklist.txt"
 HASHTAG_MAX_LENGTH = "10"
 HASHTAG_MIN_LENGTH = "3"
 TWEET_MAX_LENGTH = "280"
-TWEET_START_STRING = "Highlights: "
-TWEET_END_STRING = "Thanks!"
+# chatter_all = Chatter_1, Chatter_2, Chatter_3
+# chatter_except_last = Chatter_1, Chatter_2
+# chatter_last = Chatter_3
+HASHTAG_CHATTER_THANKS_TEXT = (
+    "Highlights from stream: #hashtags"
+    +
+    ", thanks to #chatter_except_last and #chatter_last for creating the highlights!"
+)
 HASHTAG_ALL_LOWER_CASE = False
 TWITCH_WEBSOCKET_URL = "wss://eventsub.wss.twitch.tv/ws"
 TWITCH_SUBSCRIPTION_URL = "https://api.twitch.tv/helix/eventsub/subscriptions"
@@ -37,6 +43,7 @@ DC_FEATURE_MESSAGE_STREAMSTART = "off"
 DC_FEATURE_MESSAGE_STREAMSTART_TEXT = (
     "#broadcaster with #genre is online. It's amazing what's happen here: #link"
 )
+# BROADCASTER, MOD, VIP, SUBSCRIBER, EVERYONE
 HASHTAG_AUTHENTICATION_LEVEL = "BROADCASTER"
 OPTIONS_POSITIVE_ARG = ("true", "on", "1", "t", "active")
 TIMESTAMP_PATTERN = "%Y-%m-%dT%H:%M:%SZ"

@@ -14,8 +14,6 @@ from constants import (
     HASHTAG_MAX_LENGTH,
     HASHTAG_MIN_LENGTH,
     TWEET_MAX_LENGTH,
-    TWEET_START_STRING,
-    TWEET_END_STRING,
     HASHTAG_ALL_LOWER_CASE,
     REQUEST_TIMEOUT,
     BOT_HASHTAG_COMMAND_START,
@@ -38,6 +36,7 @@ from constants import (
     OPTIONS_LOG_LEVEL,
     DC_FEATURE_MESSAGE_STREAMSTART,
     DC_FEATURE_MESSAGE_STREAMSTART_TEXT,
+    HASHTAG_CHATTER_THANKS_TEXT,
 )
 
 
@@ -88,11 +87,9 @@ dc_feature_message_streamstart_text = config.get(
 hashtag_max_length = config.get("HASHTAG_MAX_LENGTH", HASHTAG_MAX_LENGTH)
 hashtag_min_length = config.get("HASHTAG_MIN_LENGTH", HASHTAG_MIN_LENGTH)
 tweet_max_length = config.get("TWEET_MAX_LENGTH", TWEET_MAX_LENGTH)
-tweet_start_string = config.get("TWEET_START_STRING", TWEET_START_STRING)
-tweet_end_string = config.get("TWEET_END_STRING", TWEET_END_STRING)
 hashtag_all_lower_case = config.get("HASHTAG_ALL_LOWER_CASE", None)
 hashtag_authentication_level = config.get("HASHTAG_AUTHENTICATION_LEVEL", None)
-
+hashtag_chatter_thanks_text = config.get("HASHTAG_CHATTER_THANKS_TEXT", HASHTAG_CHATTER_THANKS_TEXT)
 start_bot_at_streamstart = config.get("START_BOT_AT_STREAMSTART", None)
 finish_bot_at_streamend = config.get("FINISH_BOT_AT_STREAMEND", None)
 start_hashtag_bot_command = config.get(
@@ -146,11 +143,10 @@ bot_hashtag_commands = {
 tweet_settings = {
     "hashtag_max_length": HASHTAG_MAX_LENGTH,
     "hashtag_min_length": HASHTAG_MIN_LENGTH,
-    "tweet_start_string": tweet_start_string,
-    "tweet_end_string": tweet_end_string,
     "hashtag_all_lower_case": HASHTAG_ALL_LOWER_CASE,
     "hashtag_authentication_level": AuthenticationLevel[HASHTAG_AUTHENTICATION_LEVEL],
     "hashtag_pattern": None,
+    "hashtag_chatter_thanks_text": HASHTAG_CHATTER_THANKS_TEXT,
 }
 
 discord_settings = {
