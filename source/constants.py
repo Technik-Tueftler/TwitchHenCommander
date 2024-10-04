@@ -2,7 +2,7 @@
 File contains all constants for easy central import and usage.
 """
 
-APP_VERSION = "v1.6.0"
+APP_VERSION = "v1.7.0"
 CONFIGURATION_FILE_PATH = "../files/config.json"
 CACHE_FILE_PATH = "../files/cache.json"
 HASHTAG_FILE_PATH = "../files/hashtags.txt"
@@ -11,9 +11,6 @@ HASHTAG_BLACKLIST_FILE_PATH = "../files/blacklist.txt"
 HASHTAG_MAX_LENGTH = "10"
 HASHTAG_MIN_LENGTH = "3"
 TWEET_MAX_LENGTH = "280"
-# chatter_all = Chatter_1, Chatter_2, Chatter_3
-# chatter_except_last = Chatter_1, Chatter_2
-# chatter_last = Chatter_3
 HASHTAG_CHATTER_THANKS_TEXT = (
     "Highlights from stream: #hashtags"
     +
