@@ -90,8 +90,12 @@ hashtag_min_length = config.get("HASHTAG_MIN_LENGTH", HASHTAG_MIN_LENGTH)
 tweet_max_length = config.get("TWEET_MAX_LENGTH", TWEET_MAX_LENGTH)
 hashtag_all_lower_case = config.get("HASHTAG_ALL_LOWER_CASE", None)
 hashtag_authentication_level = config.get("HASHTAG_AUTHENTICATION_LEVEL", None)
-hashtag_chatter_thanks_text = config.get("HASHTAG_CHATTER_THANKS_TEXT", HASHTAG_CHATTER_THANKS_TEXT)
-hashtag_from_stream_tags = config.get("HASHTAG_FROM_STREAM_TAGS", HASHTAG_FROM_STREAM_TAGS)
+hashtag_chatter_thanks_text = config.get(
+    "HASHTAG_CHATTER_THANKS_TEXT", HASHTAG_CHATTER_THANKS_TEXT
+)
+hashtag_from_stream_tags = config.get(
+    "HASHTAG_FROM_STREAM_TAGS", HASHTAG_FROM_STREAM_TAGS
+)
 start_bot_at_streamstart = config.get("START_BOT_AT_STREAMSTART", None)
 finish_bot_at_streamend = config.get("FINISH_BOT_AT_STREAMEND", None)
 start_hashtag_bot_command = config.get(
@@ -216,20 +220,14 @@ def bot_setting_verification() -> None:
         if re.match(bot_command_pattern, blacklist_hashtag_bot_command)
         else BOT_HASHTAG_COMMAND_BANN
     )
-    app_settings["start_bot_at_streamstart"] = (
-        True
-        if start_bot_at_streamstart.lower() in (OPTIONS_POSITIVE_ARG)
-        else START_BOT_AT_STREAMSTART
+    app_settings["start_bot_at_streamstart"] = start_bot_at_streamstart.lower() in (
+        OPTIONS_POSITIVE_ARG
     )
-    app_settings["finish_bot_at_streamend"] = (
-        True
-        if finish_bot_at_streamend.lower() in (OPTIONS_POSITIVE_ARG)
-        else FINISH_BOT_AT_STREAMEND
+    app_settings["finish_bot_at_streamend"] = finish_bot_at_streamend.lower() in (
+        OPTIONS_POSITIVE_ARG
     )
     app_settings["dc_feature_message_streamstart"] = (
-        True
-        if dc_feature_message_streamstart.lower() in (OPTIONS_POSITIVE_ARG)
-        else DC_FEATURE_MESSAGE_STREAMSTART
+        dc_feature_message_streamstart.lower() in (OPTIONS_POSITIVE_ARG)
     )
 
 
