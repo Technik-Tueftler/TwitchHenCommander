@@ -149,7 +149,7 @@ async def separate_hash(message: twitchio.message.Message) -> set:
     return env.tweet_settings["hashtag_pattern"].findall(converted_message)
 
 
-async def register_new_hashtags(display_name: str, new_hashtags: set) -> None:
+async def register_new_hashtags(display_name: str|None, new_hashtags: set) -> None:
     """
     Prevents duplications and add all new hashtags to app_data.
     :display_name: Displayname of chatter
@@ -159,8 +159,11 @@ async def register_new_hashtags(display_name: str, new_hashtags: set) -> None:
     async with lock:
         merged_hashtags = set(app_data["tweets"]).union(set(new_hashtags))
         app_data["tweets"] = list(merged_hashtags)
-        app_data["chatter"].add(display_name)
-        logger.info(f"Registered new hashtags: {new_hashtags} from {display_name}")
+        if display_name is not None:
+            app_data["chatter"].add(display_name)
+            logger.info(f"Registered new hashtags: {new_hashtags} from {display_name}")
+        else:
+            logger.info(f"Registered new hashtags from stream tags: {new_hashtags}")
 
 
 async def review_hashtags(hashtags: set, author: str = None) -> set:
