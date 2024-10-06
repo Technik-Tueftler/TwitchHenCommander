@@ -117,10 +117,11 @@ async def check_stream_start(settings: dict, response: dict) -> None:
         ):
             await hashh.allow_collecting(True)
             await hashh.set_stream_status(True)
-            await hashh.register_new_hashtags(None, set(response["data"][0]["tags"]))
-            logger.debug(
-                "Automatic Stream-Start detected, collecting hashtags allowed."
-            )
+            if settings["hashtag_from_stream_tags"]:
+                await hashh.register_new_hashtags(None, set(response["data"][0]["tags"]))
+                logger.debug(
+                    "Automatic Stream-Start detected, collecting hashtags allowed."
+                )
         else:
             logger.debug("Stream-start status is false, no stream start detected")
 
