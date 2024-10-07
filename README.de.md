@@ -57,6 +57,7 @@ Hier werden alle Variablen beschrieben, welche benötigt werden um Hashtags zu s
 | HASHTAG_CHATTER_THANKS_TEXT | Legt den Text fest, der kommt, wenn der Stream beendet wird. | Siehe **Festlegen eigener Text** |
 | HASHTAG_ALL_LOWER_CASE | Legt fest, ob alle Hashtags in Kleinbuchstaben umgewandelt werden. | `active` für aktiv oder nichts für inactiv |
 | HASHTAG_AUTHENTICATION_LEVEL | Legt die Rolle fest für das posten von Hashtags. | Möglich sind: EVERYONE, SUBSCRIBER, VIP, MOD, BROADCASTER |
+| HASHTAG_FEATURE_FROM_STREAM_TAGS|Legt fest ob die Stream-Tags in die Hashtagliste eingetragen werden sollen beim Streamstart|`active` für aktiv oder nichts für inactiv|
 
 
 ### Clip Funktion

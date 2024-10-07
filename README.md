@@ -59,6 +59,7 @@ All variables are described here, which are required to collect hashtags and pos
 | HASHTAG_CHATTER_THANKS_TEXT | Defines the text that appears when the stream ends | See **Set own text** |
 | HASHTAG_ALL_LOWER_CASE | Determines whether all hashtags are converted to lowercase letters. | `active` for active or nothing for inactive |
 | HASHTAG_AUTHENTICATION_LEVEL | Defines minimum rank which hashtags should be posted. | Possible: EVERYONE, SUBSCRIBER, VIP, MOD, BROADCASTER |
+| HASHTAG_FEATURE_FROM_STREAM_TAGS|Determines whether the stream tags should be added in the hashtag list when the stream starts|`active` for active or nothing for inactive|
 
 
 ### Clip function
