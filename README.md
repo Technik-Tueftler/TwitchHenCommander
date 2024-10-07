@@ -56,10 +56,10 @@ All variables are described here, which are required to collect hashtags and pos
 | HASHTAG_MAX_LENGTH | Defines the maximum length of a hashtag. | 20 |
 | HASHTAG_MIN_LENGTH | Defines the minimum length of a hashtag. | 3  |
 | TWEET_MAX_LENGTH | Currently has no function | NA |
-| TWEET_START_STRING | Defines a text that is written before the hashtags. | These were the hashtags from the stream: |
-| TWEET_END_STRING | Defines a text that is written after the hashtags. | Thank you for being there.                                |
+| HASHTAG_CHATTER_THANKS_TEXT | Defines the text that appears when the stream ends | See **Set own text** |
 | HASHTAG_ALL_LOWER_CASE | Determines whether all hashtags are converted to lowercase letters. | `active` for active or nothing for inactive |
 | HASHTAG_AUTHENTICATION_LEVEL | Defines minimum rank which hashtags should be posted. | Possible: EVERYONE, SUBSCRIBER, VIP, MOD, BROADCASTER |
+| HASHTAG_FEATURE_FROM_STREAM_TAGS|Determines whether the stream tags should be added in the hashtag list when the stream starts|`active` for active or nothing for inactive|
 
 
 ### Clip function
@@ -105,9 +105,13 @@ For some texts, it is possible to replace placeholders with your own variables a
 |#link|DC_FEATURE_MESSAGE_STREAMSTART_TEXT|Link to streamer channel|
 |#link|CLIP_THANK_YOU_TEXT|Link to the clip you just created|
 |#user|CLIP_THANK_YOU_TEXT|Chatter who created the clip|
+|#chatter_all|HASHTAG_CHATTER_THANKS_TEXT|All chatters who had posted a hashtag|
+|#chatter_except_last|HASHTAG_CHATTER_THANKS_TEXT|All chatters who had posted a hashtag except the last one on the list|
+|#chatter_last|HASHTAG_CHATTER_THANKS_TEXT|The last chatter from the list who had posted a hashtag|
 
-**Example:** A clip from the current stream #link Thanks to #user for clipping.
-
+**Example clip:** A clip from the current stream #link Thanks to #user for clipping.
+**Example hashtag:** Highlights from stream: #hashtags, thanks to #chatter_except_last and #chatter_last for creating the highlights!"
+**Example stream-start-message:** #broadcaster with #genre is online. It's amazing what's happen here: #link
 
 ## Suppressing hashtags
 There is the option of not registering hashtags for the post and adding them to a blacklist. All hashtags are in the file **blacklist.txt** and can be added there manually before the bot starts. While the bot is running, this is possible at any time via the chat command and is also entered in the text document.  

@@ -54,10 +54,10 @@ Hier werden alle Variablen beschrieben, welche benötigt werden um Hashtags zu s
 | HASHTAG_MAX_LENGTH | Legt fest was die maximale Länge eines Hashtags ist. | 20 |
 | HASHTAG_MIN_LENGTH | Legt fest was die minimale Länge eines Hashtags ist. | 3 |
 | TWEET_MAX_LENGTH | Hat aktuell keine Funktion | NA                                                        |
-| TWEET_START_STRING | Legt einen Text fest, der vor den Hashtags geschrieben wird. | Das waren die Hashtags aus dem Stream: |
-| TWEET_END_STRING | Legt einen Text fest, der nach den Hashtags geschrieben wird. | Danke, dass ihr dabei wart. |
+| HASHTAG_CHATTER_THANKS_TEXT | Legt den Text fest, der kommt, wenn der Stream beendet wird. | Siehe **Festlegen eigener Text** |
 | HASHTAG_ALL_LOWER_CASE | Legt fest, ob alle Hashtags in Kleinbuchstaben umgewandelt werden. | `active` für aktiv oder nichts für inactiv |
 | HASHTAG_AUTHENTICATION_LEVEL | Legt die Rolle fest für das posten von Hashtags. | Möglich sind: EVERYONE, SUBSCRIBER, VIP, MOD, BROADCASTER |
+| HASHTAG_FEATURE_FROM_STREAM_TAGS|Legt fest ob die Stream-Tags in die Hashtagliste eingetragen werden sollen beim Streamstart|`active` für aktiv oder nichts für inactiv|
 
 
 ### Clip Funktion
@@ -101,9 +101,13 @@ Es gibt bei einigen Texten die Möglichkeit Platzhalter durch eigene Variablen z
 |#link|DC_FEATURE_MESSAGE_STREAMSTART_TEXT|Link zum Kanal|
 |#link|CLIP_THANK_YOU_TEXT|Link zum gerade erstellten Clip|
 |#user|CLIP_THANK_YOU_TEXT|Chatter der den Clip erstellt hat|
+|#chatter_all|HASHTAG_CHATTER_THANKS_TEXT|Alle Chatter die einen Hashtag gepostet hatten|
+|#chatter_except_last|HASHTAG_CHATTER_THANKS_TEXT|Alle Chatter die einen Hashtag gepostet hatten außer den letzten aus der Liste|
+|#chatter_last|HASHTAG_CHATTER_THANKS_TEXT|Der letzte Chatter aus der Liste der einen Hashtag gepostet hat|
 
-**Beispiel:** A clip from the current stream #link Thanks to #user for clipping.
-
+**Beispiel Clip:** A clip from the current stream #link Thanks to #user for clipping.
+**Beispiel Hashtag:** Highlights from stream: #hashtags, thanks to #chatter_except_last and #chatter_last for creating the highlights!"
+**Beispiel Stream-Start-Nachricht:** #broadcaster with #genre is online. It's amazing what's happen here: #link
 
 ## Unterdrücken von Hashtags
 Es gibt die Möglichkeit Hashtags für den Post nicht zu Registrieren und diese auf eine Blacklist zu nehmen. Alle Hashtags stehen in der Datei **blacklist.txt** und können dort vor dem Botstart manuell hinzugefügt werden. Während der Bot läuft ist dies jederzeit über den Chat-Befehl möglich und werden auch in das Textdokument eingetragen.  

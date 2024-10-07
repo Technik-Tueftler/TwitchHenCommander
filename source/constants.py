@@ -2,7 +2,7 @@
 File contains all constants for easy central import and usage.
 """
 
-APP_VERSION = "v1.6.0"
+APP_VERSION = "v1.7.0"
 CONFIGURATION_FILE_PATH = "../files/config.json"
 CACHE_FILE_PATH = "../files/cache.json"
 HASHTAG_FILE_PATH = "../files/hashtags.txt"
@@ -11,8 +11,11 @@ HASHTAG_BLACKLIST_FILE_PATH = "../files/blacklist.txt"
 HASHTAG_MAX_LENGTH = "10"
 HASHTAG_MIN_LENGTH = "3"
 TWEET_MAX_LENGTH = "280"
-TWEET_START_STRING = "Highlights: "
-TWEET_END_STRING = "Thanks!"
+HASHTAG_CHATTER_THANKS_TEXT = (
+    "Highlights from stream: #hashtags"
+    +
+    ", thanks to #chatter_except_last and #chatter_last for creating the highlights!"
+)
 HASHTAG_ALL_LOWER_CASE = False
 TWITCH_WEBSOCKET_URL = "wss://eventsub.wss.twitch.tv/ws"
 TWITCH_SUBSCRIPTION_URL = "https://api.twitch.tv/helix/eventsub/subscriptions"
@@ -34,9 +37,11 @@ BOT_HASHTAG_COMMAND_BANN = "hashblacklist"
 START_BOT_AT_STREAMSTART = "off"
 FINISH_BOT_AT_STREAMEND = "off"
 DC_FEATURE_MESSAGE_STREAMSTART = "off"
+HASHTAG_FEATURE_FROM_STREAM_TAGS = "off"
 DC_FEATURE_MESSAGE_STREAMSTART_TEXT = (
     "#broadcaster with #genre is online. It's amazing what's happen here: #link"
 )
+# BROADCASTER, MOD, VIP, SUBSCRIBER, EVERYONE
 HASHTAG_AUTHENTICATION_LEVEL = "BROADCASTER"
 OPTIONS_POSITIVE_ARG = ("true", "on", "1", "t", "active")
 TIMESTAMP_PATTERN = "%Y-%m-%dT%H:%M:%SZ"

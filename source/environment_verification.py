@@ -14,8 +14,6 @@ from constants import (
     HASHTAG_MAX_LENGTH,
     HASHTAG_MIN_LENGTH,
     TWEET_MAX_LENGTH,
-    TWEET_START_STRING,
-    TWEET_END_STRING,
     HASHTAG_ALL_LOWER_CASE,
     REQUEST_TIMEOUT,
     BOT_HASHTAG_COMMAND_START,
@@ -24,8 +22,6 @@ from constants import (
     BOT_HASHTAG_COMMAND_HELP,
     BOT_HASHTAG_COMMAND_STATUS,
     BOT_HASHTAG_COMMAND_BANN,
-    START_BOT_AT_STREAMSTART,
-    FINISH_BOT_AT_STREAMEND,
     HASHTAG_AUTHENTICATION_LEVEL,
     DC_FEATURE_HASHTAG,
     DC_FEATURE_CLIPS,
@@ -38,6 +34,8 @@ from constants import (
     OPTIONS_LOG_LEVEL,
     DC_FEATURE_MESSAGE_STREAMSTART,
     DC_FEATURE_MESSAGE_STREAMSTART_TEXT,
+    HASHTAG_CHATTER_THANKS_TEXT,
+    HASHTAG_FEATURE_FROM_STREAM_TAGS,
 )
 
 
@@ -88,11 +86,14 @@ dc_feature_message_streamstart_text = config.get(
 hashtag_max_length = config.get("HASHTAG_MAX_LENGTH", HASHTAG_MAX_LENGTH)
 hashtag_min_length = config.get("HASHTAG_MIN_LENGTH", HASHTAG_MIN_LENGTH)
 tweet_max_length = config.get("TWEET_MAX_LENGTH", TWEET_MAX_LENGTH)
-tweet_start_string = config.get("TWEET_START_STRING", TWEET_START_STRING)
-tweet_end_string = config.get("TWEET_END_STRING", TWEET_END_STRING)
 hashtag_all_lower_case = config.get("HASHTAG_ALL_LOWER_CASE", None)
 hashtag_authentication_level = config.get("HASHTAG_AUTHENTICATION_LEVEL", None)
-
+hashtag_chatter_thanks_text = config.get(
+    "HASHTAG_CHATTER_THANKS_TEXT", HASHTAG_CHATTER_THANKS_TEXT
+)
+hashtag_from_stream_tags = config.get(
+    "HASHTAG_FROM_STREAM_TAGS", HASHTAG_FEATURE_FROM_STREAM_TAGS
+)
 start_bot_at_streamstart = config.get("START_BOT_AT_STREAMSTART", None)
 finish_bot_at_streamend = config.get("FINISH_BOT_AT_STREAMEND", None)
 start_hashtag_bot_command = config.get(
@@ -146,11 +147,11 @@ bot_hashtag_commands = {
 tweet_settings = {
     "hashtag_max_length": HASHTAG_MAX_LENGTH,
     "hashtag_min_length": HASHTAG_MIN_LENGTH,
-    "tweet_start_string": tweet_start_string,
-    "tweet_end_string": tweet_end_string,
     "hashtag_all_lower_case": HASHTAG_ALL_LOWER_CASE,
     "hashtag_authentication_level": AuthenticationLevel[HASHTAG_AUTHENTICATION_LEVEL],
     "hashtag_pattern": None,
+    "hashtag_chatter_thanks_text": HASHTAG_CHATTER_THANKS_TEXT,
+    "hashtag_from_stream_tags": HASHTAG_FEATURE_FROM_STREAM_TAGS,
 }
 
 discord_settings = {
@@ -217,20 +218,14 @@ def bot_setting_verification() -> None:
         if re.match(bot_command_pattern, blacklist_hashtag_bot_command)
         else BOT_HASHTAG_COMMAND_BANN
     )
-    app_settings["start_bot_at_streamstart"] = (
-        True
-        if start_bot_at_streamstart.lower() in (OPTIONS_POSITIVE_ARG)
-        else START_BOT_AT_STREAMSTART
+    app_settings["start_bot_at_streamstart"] = start_bot_at_streamstart.lower() in (
+        OPTIONS_POSITIVE_ARG
     )
-    app_settings["finish_bot_at_streamend"] = (
-        True
-        if finish_bot_at_streamend.lower() in (OPTIONS_POSITIVE_ARG)
-        else FINISH_BOT_AT_STREAMEND
+    app_settings["finish_bot_at_streamend"] = finish_bot_at_streamend.lower() in (
+        OPTIONS_POSITIVE_ARG
     )
     app_settings["dc_feature_message_streamstart"] = (
-        True
-        if dc_feature_message_streamstart.lower() in (OPTIONS_POSITIVE_ARG)
-        else DC_FEATURE_MESSAGE_STREAMSTART
+        dc_feature_message_streamstart.lower() in (OPTIONS_POSITIVE_ARG)
     )
 
 
@@ -253,6 +248,9 @@ def check_tweet_settings():
         int(tweet_max_length) if tweet_max_length.isdecimal() else int(TWEET_MAX_LENGTH)
     )
     tweet_settings["hashtag_all_lower_case"] = hashtag_all_lower_case.lower() in (
+        OPTIONS_POSITIVE_ARG
+    )
+    tweet_settings["hashtag_from_stream_tags"] = hashtag_from_stream_tags.lower() in (
         OPTIONS_POSITIVE_ARG
     )
     tweet_settings["hashtag_authentication_level"] = (

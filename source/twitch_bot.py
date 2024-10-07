@@ -75,15 +75,15 @@ class Bot(commands.Bot):
                         new_hashtags, message.author.display_name
                     )
                     if len(reviewed_hashtags) > 0:
-                        await hashh.register_new_hashtags(reviewed_hashtags)
+                        await hashh.register_new_hashtags(
+                            message.author.display_name, reviewed_hashtags
+                        )
 
         await self.handle_commands(message)
-
 
     async def event_command_error(self, context: commands.Context, error: Exception):
         if isinstance(error, commands.CommandNotFound):
             return
-
 
     @commands.command(name=env.bot_hashtag_commands["finish_hashtag_bot_command"])
     async def finish_hash(self, ctx: commands.Context):
@@ -141,7 +141,6 @@ class Bot(commands.Bot):
         if not hashh.app_data["allowed"]:
             await hashh.allow_collecting(True)
             await ctx.send("Hashtag-Bot is running.")
-
 
     @commands.command(name=env.bot_hashtag_commands["status_hashtag_bot_command"])
     async def status_hash(self, ctx: commands.Context) -> None:
