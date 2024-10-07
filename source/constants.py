@@ -37,7 +37,7 @@ BOT_HASHTAG_COMMAND_BANN = "hashblacklist"
 START_BOT_AT_STREAMSTART = "off"
 FINISH_BOT_AT_STREAMEND = "off"
 DC_FEATURE_MESSAGE_STREAMSTART = "off"
-HASHTAG_FROM_STREAM_TAGS = "off"
+HASHTAG_FEATURE_FROM_STREAM_TAGS = "off"
 DC_FEATURE_MESSAGE_STREAMSTART_TEXT = (
     "#broadcaster with #genre is online. It's amazing what's happen here: #link"
 )

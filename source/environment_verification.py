@@ -35,7 +35,7 @@ from constants import (
     DC_FEATURE_MESSAGE_STREAMSTART,
     DC_FEATURE_MESSAGE_STREAMSTART_TEXT,
     HASHTAG_CHATTER_THANKS_TEXT,
-    HASHTAG_FROM_STREAM_TAGS,
+    HASHTAG_FEATURE_FROM_STREAM_TAGS,
 )
 
 
@@ -92,7 +92,7 @@ hashtag_chatter_thanks_text = config.get(
     "HASHTAG_CHATTER_THANKS_TEXT", HASHTAG_CHATTER_THANKS_TEXT
 )
 hashtag_from_stream_tags = config.get(
-    "HASHTAG_FROM_STREAM_TAGS", HASHTAG_FROM_STREAM_TAGS
+    "HASHTAG_FROM_STREAM_TAGS", HASHTAG_FEATURE_FROM_STREAM_TAGS
 )
 start_bot_at_streamstart = config.get("START_BOT_AT_STREAMSTART", None)
 finish_bot_at_streamend = config.get("FINISH_BOT_AT_STREAMEND", None)
@@ -151,7 +151,7 @@ tweet_settings = {
     "hashtag_authentication_level": AuthenticationLevel[HASHTAG_AUTHENTICATION_LEVEL],
     "hashtag_pattern": None,
     "hashtag_chatter_thanks_text": HASHTAG_CHATTER_THANKS_TEXT,
-    "hashtag_from_stream_tags": HASHTAG_FROM_STREAM_TAGS,
+    "hashtag_from_stream_tags": HASHTAG_FEATURE_FROM_STREAM_TAGS,
 }
 
 discord_settings = {
