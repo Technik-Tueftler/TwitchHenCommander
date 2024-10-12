@@ -7,6 +7,7 @@ import asyncio
 import requests
 import db
 import hashtag_handler as hashh
+import environment_verification as env
 from constants import (
     REQUEST_TIMEOUT,
     CLIP_WAIT_TIME,
@@ -117,7 +118,7 @@ async def check_stream_start(settings: dict, response: dict) -> None:
         ):
             await hashh.allow_collecting(True)
             await hashh.set_stream_status(True)
-            if settings["hashtag_from_stream_tags"]:
+            if env.tweet_settings["hashtag_from_stream_tags"]:
                 await hashh.register_new_hashtags(None, set(response["data"][0]["tags"]))
                 logger.debug(
                     "Automatic Stream-Start detected, collecting hashtags allowed."
