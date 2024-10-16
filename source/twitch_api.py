@@ -84,7 +84,7 @@ async def check_stream_start_message(settings: dict, response: dict) -> None:
         settings["dc_feature_start_message"]
         and not hashh.app_data["start_message_done"]
     ):
-        if response["data"] and response["data"][0]["is_live"]:
+        if response["data"] and response["data"][0]["is_live"] and check_streamstart_allowed():
             await hashh.stream_start_message(response)
             async with hashh.lock:
                 hashh.app_data["start_message_done"] = True

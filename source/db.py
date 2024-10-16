@@ -70,6 +70,16 @@ class Stream(Base):
     chatter: Mapped[str] = mapped_column(nullable=True)
 
 
+class TempStreamData(Base):
+    """Save temporary data from stream to 
+
+    Args:
+        Base (_type_): Basic class that is inherited
+    """
+    __tablename__ = "temp_stream_data"
+    id: Mapped[int] = mapped_column(primary_key=True)
+    ts_streamstart: Mapped[datetime] = mapped_column(nullable=False)
+
 session = async_sessionmaker(bind=engine, expire_on_commit=False)
 
 
