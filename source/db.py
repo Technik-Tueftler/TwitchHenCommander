@@ -67,6 +67,7 @@ class Stream(Base):
     id: Mapped[int] = mapped_column(primary_key=True)
     timestamp: Mapped[datetime] = mapped_column(nullable=False)
     hashtags: Mapped[str] = mapped_column(nullable=True)
+    chatter: Mapped[str] = mapped_column(nullable=True)
 
 
 session = async_sessionmaker(bind=engine, expire_on_commit=False)

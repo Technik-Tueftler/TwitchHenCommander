@@ -27,7 +27,7 @@ app_data = {
     "tweets": [],
     "blacklist": set(),
     "start_message_done": False,
-    "chatter": set()
+    "chatter": set(),
 }
 lock = asyncio.Lock()
 
@@ -61,8 +61,9 @@ async def stream_start_message(response: dict) -> None:
         )
         logger.info(f"Send stream-start message: {content}")
     except (KeyError, IndexError) as err:
-        logger.error(f"The twitch response doesn't have the required key. Message: {err}")
-
+        logger.error(
+            f"The twitch response doesn't have the required key. Message: {err}"
+        )
 
 
 async def tweet_hashtags() -> None:
@@ -72,24 +73,21 @@ async def tweet_hashtags() -> None:
     """
     reviewed_hashtags = await review_hashtags(app_data["tweets"])
     start_timestamp = app_data["timestamp_start"]
+    chatter = ", ".join(app_data["chatter"])
     stream = db.Stream(
-        timestamp=start_timestamp, hashtags=" ".join(reviewed_hashtags)
+        timestamp=start_timestamp, hashtags=" ".join(reviewed_hashtags), chatter=chatter
     )
+    hashtags = ", ".join(reviewed_hashtags)
     await db.add_data(stream)
     async with aiofiles.open(HASHTAG_FILE_PATH, mode="a", encoding="utf-8") as file:
         await file.write(f"Hashtags ({start_timestamp} UTC): ")
-        hashtags = " ".join(reviewed_hashtags)
         await file.write(f"{hashtags}\n")
     if len(reviewed_hashtags) <= 0:
         return
-    chatter = list(app_data["chatter"])
-    content = MyTemplate(
-            env.tweet_settings["hashtag_chatter_thanks_text"]
-        ).substitute(hashtags=reviewed_hashtags,
-                     chatter_all=", ".join(chatter),
-                     chatter_except_last=", ".join(chatter[:-1]),
-                     chatter_last=chatter[-1]
-                     )
+    content = MyTemplate(env.tweet_settings["hashtag_chatter_thanks_text"]).substitute(
+        hashtags=reviewed_hashtags,
+        chatter=chatter,
+    )
     if env.app_settings["dc_available"]:
         data = {
             "content": content,
@@ -149,7 +147,7 @@ async def separate_hash(message: twitchio.message.Message) -> set:
     return env.tweet_settings["hashtag_pattern"].findall(converted_message)
 
 
-async def register_new_hashtags(display_name: str|None, new_hashtags: set) -> None:
+async def register_new_hashtags(display_name: str | None, new_hashtags: set) -> None:
     """
     Prevents duplications and add all new hashtags to app_data.
     :display_name: Displayname of chatter
