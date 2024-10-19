@@ -71,14 +71,16 @@ class Stream(Base):
 
 
 class TempStreamData(Base):
-    """Save temporary data from stream to 
+    """Save temporary data from stream to
 
     Args:
         Base (_type_): Basic class that is inherited
     """
+
     __tablename__ = "temp_stream_data"
     id: Mapped[int] = mapped_column(primary_key=True)
     ts_streamstart: Mapped[datetime] = mapped_column(nullable=False)
+
 
 session = async_sessionmaker(bind=engine, expire_on_commit=False)
 
@@ -102,6 +104,21 @@ async def get_twitch_user(user_id: str) -> User:
         statement = select(User).where(User.twitch_user_id == user_id)
         result = await sess.execute(statement)
     return result.scalar_one_or_none()
+
+
+async def get_last_temp_stream_data() -> TempStreamData:
+    """Function searches in DB for latest stream
+
+    Returns:
+        TempStreamData: TempStreamData mapped object
+    """
+    async with session() as sess:
+        latest_stream = (
+            sess.query(TempStreamData)
+            .order_by(TempStreamData.ts_streamstart.desc())
+            .first()
+        )
+    return latest_stream
 
 
 async def add_new_user(twitch_user_id: str, twitch_user_name: str) -> User:

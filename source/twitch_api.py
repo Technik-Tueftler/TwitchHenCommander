@@ -73,6 +73,10 @@ async def fetch_new_clips(settings) -> list:
     return response["data"]
 
 
+async def check_streamstart_message_allowed() -> None:
+    result = await db.get_last_temp_stream_data()
+    # Todo: hier weiter
+
 async def check_stream_start_message(settings: dict, response: dict) -> None:
     """Check if feature active and call the method for stream start message
 
@@ -84,7 +88,11 @@ async def check_stream_start_message(settings: dict, response: dict) -> None:
         settings["dc_feature_start_message"]
         and not hashh.app_data["start_message_done"]
     ):
-        if response["data"] and response["data"][0]["is_live"] and check_streamstart_allowed():
+        if (
+            response["data"]
+            and response["data"][0]["is_live"]
+            and await check_streamstart_message_allowed()
+        ):
             await hashh.stream_start_message(response)
             async with hashh.lock:
                 hashh.app_data["start_message_done"] = True
@@ -119,7 +127,9 @@ async def check_stream_start(settings: dict, response: dict) -> None:
             await hashh.allow_collecting(True)
             await hashh.set_stream_status(True)
             if env.tweet_settings["hashtag_from_stream_tags"]:
-                await hashh.register_new_hashtags(None, set(response["data"][0]["tags"]))
+                await hashh.register_new_hashtags(
+                    None, set(response["data"][0]["tags"])
+                )
                 logger.debug(
                     "Automatic Stream-Start detected, collecting hashtags allowed."
                 )
