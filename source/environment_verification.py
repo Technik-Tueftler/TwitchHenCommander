@@ -36,6 +36,8 @@ from constants import (
     DC_FEATURE_MESSAGE_STREAMSTART_TEXT,
     HASHTAG_CHATTER_THANKS_TEXT,
     HASHTAG_FEATURE_FROM_STREAM_TAGS,
+    START_BOT_AT_STREAMSTART,
+    FINISH_BOT_AT_STREAMEND,
 )
 
 
@@ -86,16 +88,16 @@ dc_feature_message_streamstart_text = config.get(
 hashtag_max_length = config.get("HASHTAG_MAX_LENGTH", HASHTAG_MAX_LENGTH)
 hashtag_min_length = config.get("HASHTAG_MIN_LENGTH", HASHTAG_MIN_LENGTH)
 tweet_max_length = config.get("TWEET_MAX_LENGTH", TWEET_MAX_LENGTH)
-hashtag_all_lower_case = config.get("HASHTAG_ALL_LOWER_CASE", None)
-hashtag_authentication_level = config.get("HASHTAG_AUTHENTICATION_LEVEL", None)
+hashtag_all_lower_case = config.get("HASHTAG_ALL_LOWER_CASE", HASHTAG_ALL_LOWER_CASE)
+hashtag_authentication_level = config.get("HASHTAG_AUTHENTICATION_LEVEL", HASHTAG_AUTHENTICATION_LEVEL)
 hashtag_chatter_thanks_text = config.get(
     "HASHTAG_CHATTER_THANKS_TEXT", HASHTAG_CHATTER_THANKS_TEXT
 )
 hashtag_from_stream_tags = config.get(
     "HASHTAG_FEATURE_FROM_STREAM_TAGS", HASHTAG_FEATURE_FROM_STREAM_TAGS
 )
-start_bot_at_streamstart = config.get("START_BOT_AT_STREAMSTART", None)
-finish_bot_at_streamend = config.get("FINISH_BOT_AT_STREAMEND", None)
+start_bot_at_streamstart = config.get("START_BOT_AT_STREAMSTART", START_BOT_AT_STREAMSTART)
+finish_bot_at_streamend = config.get("FINISH_BOT_AT_STREAMEND", FINISH_BOT_AT_STREAMEND)
 start_hashtag_bot_command = config.get(
     "BOT_HASHTAG_COMMAND_START", BOT_HASHTAG_COMMAND_START
 )
