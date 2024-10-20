@@ -5,10 +5,11 @@ Main function for starting app and bot
 """
 import asyncio
 import environment_verification as env
+from constants import APP_VERSION
 from twitch_bot import Bot
-from twitch_api_websocket import websocket_listener
-from hashtag_handler import app_started
-from twitch_api import new_clips_handler
+from twitch_api import new_clips_handler, streaming_handler
+from watcher import logger
+import hashtag_handler as hashh
 
 
 async def every(__seconds: float, func, *args, **kwargs):
@@ -34,20 +35,29 @@ def main() -> None:
     env.discord_setting_verification()
     env.bot_setting_verification()
     env.clip_collection_setting_verification()
-    app_started()
+    env.log_settings()
+    hashh.init_blacklist()
     bot = Bot(env.app_settings)
     loop = asyncio.get_event_loop()
     tasks_to_start = []
     bot_task = loop.create_task(bot.start())
     tasks_to_start.append(bot_task)
+    logger.info(f"App started in version: {APP_VERSION}")
     if any(
         [
             env.app_settings["start_bot_at_streamstart"],
             env.app_settings["finish_bot_at_streamend"],
+            env.app_settings["dc_feature_message_streamstart"],
         ]
     ):
-        twitch_websocket = loop.create_task(websocket_listener(env.app_settings))
-        tasks_to_start.append(twitch_websocket)
+        stream_handler = loop.create_task(
+            every(
+                env.app_settings["check_stream_interval"],
+                streaming_handler,
+                **env.app_settings
+            )
+        )
+        tasks_to_start.append(stream_handler)
     if env.app_settings["dc_feature_clips"]:
         new_clips = loop.create_task(
             every(

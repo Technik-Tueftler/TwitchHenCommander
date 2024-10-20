@@ -1,11 +1,24 @@
 # TwitchHenCommander
-TwitchHenCommander is a bot that listens to configured twitch channel and collects hashtags from broadcaster, mod or vip in the chat. Finally, the broadcaster can post them on various platforms. Currently only post is supported on the DC.
+The TwitchHenCommander is a program that listens to an adjustable Twitch chat and saves various things there and reacts to events. The exact functions are described in more detail under the heading `Functions`. The bot can be started locally in a Python environment or as a Docker container. More details under the heading `Installation / Execution`.
 
 [English readme](https://github.com/Technik-Tueftler/TwitchHenCommander/blob/main/README.md)
  • [deutsche readme](https://github.com/Technik-Tueftler/TwitchHenCommander/blob/main/README.de.md)
 
+
+## Summary Feature
+1. Collect and post hashtags
+2. Post new clips
+3. Stream start message
+
+## Feature
+1. Collects hashtags in the broadcaster's Twitch chat and posts them to the configured Discord channel at the end of the stream or when a command is executed. It can be set that only hashtags with a configurable rank are collected (Vips, Mods, Broadcaster). You can also specify whether the hashtag function should be started or ended with the start or end of the stream and thus be posted automatically.
+2. If a new clip is created in your stream, it can also be posted on the Discord channel. 
+3. When your stream starts, a message is sent to the Discord channel. You can customize this message and pass parameters.
+4. Suppressing hashtags for the post via a blacklist and adding them via a command
+
+
 ## Installation / Execution
-1. locally runs the program by executing the main file. To do this, simply copy the repository and run `main.py`. Currently, first environment variables must be loaded into the IDE or environment. The login information can also be stored in ``/files/config.json``. The program was tested and developed under Python 3.11.
+1. Runs the program locally by executing the main file. To do this, simply copy the repository and execute `main.py`. The settings must be loaded via the environment variables. The variables can be stored directly in the system or you can use an `.env` file. The `template.env` file can be used for this by renaming it to `.env` and writing the value to the required variables. The program was tested and developed under Python 3.11.
 2. via a Docker container. Example see point ``Docker Compose Example`` below.
 
 ## What else is needed
@@ -13,63 +26,96 @@ TwitchHenCommander is a bot that listens to configured twitch channel and collec
 - Discord WebHook connection, check `Supported platforms to broadcast`
 
 ## Supported platforms to broadcast
-Currently only Discord is supported via WebHook. To do this, a new WebHook must be created in the server settings under Integration. Here you can also set the channel on which the notification should be sent.
+Currently only Discord is supported via WebHook. To do this, a new WebHook must be created in the server settings under `Integration`. Here you can also set the channel on which the notification should be sent.
 
 ## Environment variables
-| Variable         | Explanation                                                    | Example                                         |
-|------------------|----------------------------------------------------------------|-------------------------------------------------|
-| TW_CLIENT_ID     | Twitch client ID for the bot.                                  | edr33sdfvbnmwsxdcfrt55jkdedded                  |
-| TW_TOKEN         | Twitch token for the bot.                                      | hkedkodendoe343434gtgtdedexyde5667              |
-| TW_NICKNAME      | Nickname of the bot as it is displayed in the chat.            | Technik_Tueftler                                |
-| TW_INIT_CHANNELS | All channels that are to be observed, separated via a comma.   | technik_tueftler,thebrutzler                    |
-| DC_USER_NAME     | User name of the WebHook in Discord.                           | HashtagBot                                      |
-| DC_WEBHOOK_URL   | WebHook-URL from WebHook in Discord.                           | https://discord.com/api/webhooks/87364/oiehdied |
+All environment variables required for the respective function are listed below.
 
-It is possible to start the bot without the environment variables. To do this, all the variables listed must be set in the configuration file. See the chapter Configuration file.  
+### Twitch Chat
+All variables needed to read the Twitch chat.
 
-## Commands
-If nothing is set in config file, the standard commands are used:
+| Variable | Explanation | Example |
+|----------|-------------|---------|
+| TW_CLIENT_ID | Twitch client ID of Bot. | edr33sdfvbnmwsxdcfrt55jkdedded |
+| TW_TOKEN | Twitch token of Bot. | hkedkodendoe343434gtgtdedexyde5667 |
+| TW_NICKNAME | Display name of the bot in the chat. | Technik_Tueftler |
+| TW_INIT_CHANNELS | All channels to be monitored, separated by a comma. | technik_tueftler,thebrutzler |
+| TW_BROADCASTER_ID | The ID of the broadcaster, optional, is also determined automatically. | 123456789 |
+| CHECK_STREAM_INTERVAL | Time (s) in whether the stream is online or offline. | 60                                              |
+| LOG_LEVEL | Defines the level of log messages and which are to be output and saved. | DEBUG, INFO, WARNING, ERROR, CRITICAL |
+| START_BOT_AT_STREAMSTART | Defines whether the bot should be started when stream starts. | `active` for active or nothing for inactive |
+| FINISH_BOT_AT_STREAMEND | Defines whether the bot should be terminated at the end of stream. | `active` for active or nothing for inactive |
 
-| Command     | Explanation                                 |
-|-------------|---------------------------------------------|
-| !helphash   | List all commands for the Hashtag-Bot.      |
-| !statushash | Get status of the bot if running or paused. |
-| !starthash  | Start collecting hashtags.                  |
-| !finishhash | Finish collecting hashtags and send them.   |
-| !stophash   | Stop collecting and delete hashtags.        |
+### Hashtag function
+All variables are described here, which are required to collect hashtags and post them in the Discord at the end.
+| Variable | Explanation | Example |
+|----------|-------------|---------|
+| DC_FEATURE_HASHTAG | Determines whether the function should be active or not. | `active` for active or nothing for inactive |
+| DC_USER_NAME_HASHTAG | Username of WebHook in Discord for posting Hashtags. | HashtagBot |
+| DC_WEBHOOK_URL_HASHTAG | WebHook-URL of WebHook ii Discord for posting Hashtags. | https://discord.com/api/webhooks/87364/oiehdied |
+| HASHTAG_MAX_LENGTH | Defines the maximum length of a hashtag. | 20 |
+| HASHTAG_MIN_LENGTH | Defines the minimum length of a hashtag. | 3  |
+| TWEET_MAX_LENGTH | Currently has no function | NA |
+| HASHTAG_CHATTER_THANKS_TEXT | Defines the text that appears when the stream ends | See **Set own text** |
+| HASHTAG_ALL_LOWER_CASE | Determines whether all hashtags are converted to lowercase letters. | `active` for active or nothing for inactive |
+| HASHTAG_AUTHENTICATION_LEVEL | Defines minimum rank which hashtags should be posted. | Possible: EVERYONE, SUBSCRIBER, VIP, MOD, BROADCASTER |
+| HASHTAG_FEATURE_FROM_STREAM_TAGS|Determines whether the stream tags should be added in the hashtag list when the stream starts|`active` for active or nothing for inactive|
 
-It's possible to replace the names of the commands via the configuration file.
 
-## Additional feature
-| Feature                   | Explanation                                | Setting                |
-|---------------------------|--------------------------------------------|------------------------|
-| Start bot by stream start | Starts collecting hashtags at stream start | Via configuration file |
-| Lowercase hashtags        | Convert all hashtags to lowercase          | Via configuration file |
+### Clip function
+All variables that are required to recognize clips and post them in the Discord are described here.
+| Variable | Explanation | Example |
+|----------|-------------|---------|
+| DC_FEATURE_CLIPS | Determines whether the function should be active or not. | `active` for active or nothing for inactive |
+| DC_USER_NAME_CLIP | Username of WebHook in Discord to post new clips. | ClipBot |
+| DC_WEBHOOK_URL_CLIP | WebHook-URL of WebHook in Discord to post new clips. | https://discord.com/api/webhooks/87364/oiehttedied |
+| CLIPS_FETCH_TIME | Time (s) to check whether a new clip has been created. | 60 |
+| CLIP_THANK_YOU_TEXT | Defines a text that appears when a new clip is posted. | See **Set own text** |
 
-## Configuration file
-the configuration file must be copied to the /files directory. You can use the example from the repository for this. The file is only necessary if you need the additional functionalities. The overview is in the list:
-If nothing is set in config file, the standard commands are used:
 
-| Variable                 | Explanation                                                               | Option                                 | value  |
-|--------------------------|---------------------------------------------------------------------------|----------------------------------------|--------|
-| client_id                | Twitch client ID for the bot.                                             | Optional, only if not via env variable | String |
-| token                    | Twitch token for the bot.                                                 | Optional, only if not via env variable | String |
-| nickname                 | Nickname of the bot as it is displayed in the chat.                       | Optional, only if not via env variable | String |
-| init_channels            | All channels that are to be observed, separated via a comma.              | Optional, only if not via env variable | String |
-| broadcaster_id           | Broadcaster ID of the bot                                                 | Optional, is fetched via nickname      | String |
-| start_bot_at_streamstart | Starts collecting hashtags at stream start                                | Optional, only if needed               | bool   |
-| start_bot_command        | Alternative command name to start the bot                                 | Optional, only if other desired        | String |
-| finish_bot_command       | Alternative command name to finish the bot                                | Optional, only if other desired        | String |
-| stop_bot_command         | Alternative command name to stop the bot                                  | Optional, only if other desired        | String |
-| status_bot_command       | Alternative command name to get status of the bot                         | Optional, only if other desired        | String |
-| help_bot_command         | Alternative command name to get help for the bot                          | Optional, only if other desired        | String |
-| hashtag_max_length       | Maximum number of characters for a hashtag                                | optional, standard is 10 chars         | Int    |
-| hashtag_min_length       | Maximum number of characters for a hashtag                                | optional, standard is 3 chars          | Int    |
-| tweet_start_string       | Alternative text in front of the collected hashtags in the message        | Optional, standard is: Highlights:     | String |
-| tweet_end_string         | Alternative text that appears after the collected hashtags in the message | Optional, standard is: Thanks!         | String |
-| hashtag_all_lower_case   | All characters in the hashtag are converted to lowercase letters          | Optional, standard is false            | bool   |
-| discord_username         | User name of the WebHook in Discord.                                      | Optional, only if not via env variable | String |
-| webhook_url              | WebHook-URL from WebHook from Discord.                                    | Optional, only if not via env variable | String |
+### Stream-Start function
+All variables that are required to post a message at the beginning of a stream in the Discord are described here.
+| Variable | Explanation | Example |
+|----------|-------------|---------|
+| DC_FEATURE_MESSAGE_STREAMSTART | Determines whether the function should be active or not. | `active` for active or nothing for inactive |
+| DC_USER_NAME_MESSAGE_STREAMSTART | Username of WebHook in Discord to post message. | UpdateBot |
+| DC_WEBHOOK_URL_MESSAGE_STREAMSTART | WebHook-URL of WebHook in Discord to post message. | https://discord.com/api/webhooks/87364/oiehtt |
+| DC_FEATURE_MESSAGE_STREAMSTART_TEXT | Defines a start text that appears during stream start. | Siehe **Festlegen eigener Text** |
+
+
+### Befehle
+If no commands are defined in the environment variables, the default commands are used. If you want to rename these, the corresponding variable must be adapted. The exclamation mark is always used as the identifier.
+
+| Default command   | Explanation                                                   | environment variable       |
+|-------------------|---------------------------------------------------------------|----------------------------|
+| !helphash         | Lists all commands of the hashtag bot.                        | BOT_HASHTAG_COMMAND_HELP   |
+| !statushash       | Shows the status of the bot, whether it is running or paused. | BOT_HASHTAG_COMMAND_STATUS |
+| !starthash        | Start collecting the hashtags.                                | BOT_HASHTAG_COMMAND_START  |
+| !finishhash       | Finish collecting and send the hashtags.                      | BOT_HASHTAG_COMMAND_FINISH |
+| !stophash         | Stop collecting and delete the hashtags.                      | BOT_HASHTAG_COMMAND_STOP   |
+| !hashblacklist    | Add hashtag to blacklist.                                     | BOT_HASHTAG_COMMAND_BANN   |
+
+
+## Set own text
+For some texts, it is possible to replace placeholders with your own variables and thus create a configurable text.  This means that the placeholders always remain the same and can be integrated into your own text.  
+|Placeholder|Variable|Meaning|
+|--------|-----------|---------|
+|#broadcaster|DC_FEATURE_MESSAGE_STREAMSTART_TEXT| Name of streamer|
+|#genre|DC_FEATURE_MESSAGE_STREAMSTART_TEXT|Genre of game|
+|#link|DC_FEATURE_MESSAGE_STREAMSTART_TEXT|Link to streamer channel|
+|#link|CLIP_THANK_YOU_TEXT|Link to the clip you just created|
+|#user|CLIP_THANK_YOU_TEXT|Chatter who created the clip|
+|#chatter_all|HASHTAG_CHATTER_THANKS_TEXT|All chatters who had posted a hashtag|
+|#chatter_except_last|HASHTAG_CHATTER_THANKS_TEXT|All chatters who had posted a hashtag except the last one on the list|
+|#chatter_last|HASHTAG_CHATTER_THANKS_TEXT|The last chatter from the list who had posted a hashtag|
+
+**Example clip:** A clip from the current stream #link Thanks to #user for clipping.
+**Example hashtag:** Highlights from stream: #hashtags, thanks to #chatter_except_last and #chatter_last for creating the highlights!"
+**Example stream-start-message:** #broadcaster with #genre is online. It's amazing what's happen here: #link
+
+## Suppressing hashtags
+There is the option of not registering hashtags for the post and adding them to a blacklist. All hashtags are in the file **blacklist.txt** and can be added there manually before the bot starts. While the bot is running, this is possible at any time via the chat command and is also entered in the text document.  
+
 
 ## Docker Compose Example
 ````commandline

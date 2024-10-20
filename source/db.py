@@ -7,12 +7,12 @@ from typing import List
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship
 from sqlalchemy import ForeignKey, select
 from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker
-from constants import UPDATE_INTERVAL_PUBLISH_NEW_CLIPS
+import environment_verification as env
 
-engine = create_async_engine("sqlite+aiosqlite:///../files/sample.db", echo=False)
+engine = create_async_engine("sqlite+aiosqlite:///../files/HenCommander.db", echo=False)
 
 
-class Base(DeclarativeBase): # pylint: disable=too-few-public-methods
+class Base(DeclarativeBase):
     """Declarative base class
 
     Args:
@@ -20,12 +20,13 @@ class Base(DeclarativeBase): # pylint: disable=too-few-public-methods
     """
 
 
-class User(Base): # pylint: disable=too-few-public-methods
+class User(Base):
     """Class to be able to map the twitch user via an ORM
 
     Args:
         Base (_type_): Basic class that is inherited
     """
+
     __tablename__ = "users"
     id: Mapped[int] = mapped_column(primary_key=True)
     twitch_user_id: Mapped[str] = mapped_column(nullable=False)
@@ -36,12 +37,13 @@ class User(Base): # pylint: disable=too-few-public-methods
         return f"User: {self.twitch_user_name}"
 
 
-class Clip(Base): # pylint: disable=too-few-public-methods
+class Clip(Base):
     """Class to be able to map the twitch user clips via an ORM
 
     Args:
         Base (_type_): Basic class that is inherited
     """
+
     __tablename__ = "clips"
     id: Mapped[int] = mapped_column(primary_key=True)
     clip_id: Mapped[str] = mapped_column(nullable=False)
@@ -54,12 +56,24 @@ class Clip(Base): # pylint: disable=too-few-public-methods
         return f"Clip: {self.clip_id}"
 
 
+class Stream(Base):
+    """Class to collect all stream related information
+
+    Args:
+        Base (_type_): Basic class that is inherited
+    """
+
+    __tablename__ = "streams"
+    id: Mapped[int] = mapped_column(primary_key=True)
+    timestamp: Mapped[datetime] = mapped_column(nullable=False)
+    hashtags: Mapped[str] = mapped_column(nullable=True)
+
+
 session = async_sessionmaker(bind=engine, expire_on_commit=False)
 
 
 async def sync_db():
-    """Function to run the sync command and create all DB dependencies and tables
-    """
+    """Function to run the sync command and create all DB dependencies and tables"""
     async with engine.begin() as conn:
         await conn.run_sync(Base.metadata.create_all)
 
@@ -97,13 +111,13 @@ async def add_new_user(twitch_user_id: str, twitch_user_name: str) -> User:
 
 
 async def fetch_last_clip_ids() -> List[int]:
-    """Function gets all the clips in the last time period 
+    """Function gets all the clips in the last time period
 
     Returns:
         List[int]: List of clip IDs
     """
     timestamp = datetime.now(UTC)
-    seconds = UPDATE_INTERVAL_PUBLISH_NEW_CLIPS
+    seconds = env.app_settings["clips_fetch_time"]
     start_timestamp = (timestamp - timedelta(seconds=seconds)).strftime(
         "%Y-%m-%dT%H:%M:%SZ"
     )
@@ -114,20 +128,19 @@ async def fetch_last_clip_ids() -> List[int]:
     return [clip.clip_id for clip in all_clips]
 
 
-async def add_user_clip(clip: Clip) -> None:
-    """Add user clip to DB
+async def add_data(data: Stream | Clip) -> None:
+    """Add data object to db
 
     Args:
-        clip (Clip): Clip mapped object with necessary 
+        stream (Stream): Stream mapped object with necessary
     """
     async with session() as sess:
-        sess.add(clip)
+        sess.add(data)
         await sess.commit()
 
 
 async def async_main():
-    """Scheduling function for regular call.
-    """
+    """Scheduling function for regular call."""
     await sync_db()
     # await fetch_last_clip_ids()
     # await get_twitch_user("1234")
@@ -141,22 +154,22 @@ async def async_main():
         sess.add(user)
         await sess.commit()
     print(user.id)
-        # statement = select(User).where(User.twitch_user_id == temp.twitch_user_id)
-        # result = await sess.execute(statement)
-        # checked_user = result.scalar_one()
-        # checked_user.twitch_user_name = "MrZ"
-        # sess.add(
-        #     Clip(
-        #         user_id=checked_user.id,
-        #         clip_id="fuuuu",
-        #         timestamp=datetime.now(UTC),
-        #         title="Super cooles Fliegerhuhn",
-        #     )
-        # )
-        # await sess.commit()
+    # statement = select(User).where(User.twitch_user_id == temp.twitch_user_id)
+    # result = await sess.execute(statement)
+    # checked_user = result.scalar_one()
+    # checked_user.twitch_user_name = "MrZ"
+    # sess.add(
+    #     Clip(
+    #         user_id=checked_user.id,
+    #         clip_id="fuuuu",
+    #         timestamp=datetime.now(UTC),
+    #         title="Super cooles Fliegerhuhn",
+    #     )
+    # )
+    # await sess.commit()
 
-        # temp.twitch_user_name = "MrY"
-        # await sess.commit()
+    # temp.twitch_user_name = "MrY"
+    # await sess.commit()
 
 
 if __name__ == "__main__":
