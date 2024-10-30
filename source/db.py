@@ -65,21 +65,10 @@ class Stream(Base):
 
     __tablename__ = "streams"
     id: Mapped[int] = mapped_column(primary_key=True)
-    timestamp: Mapped[datetime] = mapped_column(nullable=False)
+    timestamp_start: Mapped[datetime] = mapped_column(nullable=False)
+    timestamp_end: Mapped[datetime] = mapped_column(nullable=True)
     hashtags: Mapped[str] = mapped_column(nullable=True)
     chatter: Mapped[str] = mapped_column(nullable=True)
-
-
-class TempStreamData(Base):
-    """Save temporary data from stream to
-
-    Args:
-        Base (_type_): Basic class that is inherited
-    """
-
-    __tablename__ = "temp_stream_data"
-    id: Mapped[int] = mapped_column(primary_key=True)
-    ts_streamstart: Mapped[datetime] = mapped_column(nullable=False)
 
 
 session = async_sessionmaker(bind=engine, expire_on_commit=False)
@@ -91,7 +80,7 @@ async def sync_db():
         await conn.run_sync(Base.metadata.create_all)
 
 
-async def get_twitch_user(user_id: str) -> User:
+async def get_twitch_user(user_id: str) -> User | None:
     """Function searches in DB for twitch user ID and returns the mapped user
 
     Args:
@@ -106,19 +95,36 @@ async def get_twitch_user(user_id: str) -> User:
     return result.scalar_one_or_none()
 
 
-async def get_last_temp_stream_data() -> TempStreamData:
-    """Function searches in DB for latest stream
+async def get_stream(stream_id: int) -> Stream:
+    """Function searches in DB for Stream ID and returns the mapped user
+
+    Args:
+        stream_id (int): Stream ID
 
     Returns:
-        TempStreamData: TempStreamData mapped object
+        Stream: Stream mapped object
     """
     async with session() as sess:
-        latest_stream = (
-            sess.query(TempStreamData)
-            .order_by(TempStreamData.ts_streamstart.desc())
-            .first()
-        )
-    return latest_stream
+        statement = select(Stream).where(Stream.id == stream_id)
+        result = await sess.execute(statement)
+    return result.scalar_one_or_none()
+
+
+async def update_stream(stream_id: int, stream_data: dict) -> None:
+    """Function update all transfered stream data
+
+    Args:
+        stream_id (int): Stream id to update object
+        stream_data (dict): Stream data for update
+    """
+    async with session() as sess:
+        stream = (
+            await sess.execute(select(Stream).where(Stream.id == stream_id))
+        ).scalar_one_or_none()
+        for key, value in stream_data.items():
+            if hasattr(stream, key):
+                setattr(stream, key, value)
+        await sess.commit()
 
 
 async def add_new_user(twitch_user_id: str, twitch_user_name: str) -> User:
@@ -156,15 +162,19 @@ async def fetch_last_clip_ids() -> List[int]:
     return [clip.clip_id for clip in all_clips]
 
 
-async def add_data(data: Stream | Clip) -> None:
+async def add_data(data: Stream | Clip) -> int:
     """Add data object to db
 
     Args:
         stream (Stream): Stream mapped object with necessary
+
+    Returns:
+        int: ID from commited object
     """
     async with session() as sess:
         sess.add(data)
         await sess.commit()
+        return data.id
 
 
 async def async_main():
@@ -175,13 +185,13 @@ async def async_main():
     # await get_twitch_user("123333334")
     # user = await add_new_user("77890", "MrT")
     # print(user)
-    temp = await get_twitch_user("77890")
-    print(f"geladener User: {temp}")
-    async with session() as sess:
-        user = User(twitch_user_id="jhedej", twitch_user_name="Jojo")
-        sess.add(user)
-        await sess.commit()
-    print(user.id)
+    # temp = await get_twitch_user("77890")
+    # print(f"geladener User: {temp}")
+    # async with session() as sess:
+    #     user = User(twitch_user_id="jhedej", twitch_user_name="Jojo")
+    #     sess.add(user)
+    #     await sess.commit()
+    # print(user.id)
     # statement = select(User).where(User.twitch_user_id == temp.twitch_user_id)
     # result = await sess.execute(statement)
     # checked_user = result.scalar_one()
@@ -198,6 +208,13 @@ async def async_main():
 
     # temp.twitch_user_name = "MrY"
     # await sess.commit()
+    stream = Stream(timestamp_start=datetime.now(UTC))
+    temp = await add_data(stream)
+    async with session() as sess:
+        statement = select(Stream).where(Stream.id == temp)
+        stream = (await sess.execute(statement)).scalar_one_or_none()
+        stream.chatter = "TeTue"
+        await sess.commit()
 
 
 if __name__ == "__main__":

@@ -22,7 +22,7 @@ from constants import (
 
 app_data = {
     "online": False,
-    "timestamp_start": None,
+    "stream_id": None,
     "allowed": True,
     "tweets": [],
     "blacklist": set(),
@@ -72,16 +72,14 @@ async def tweet_hashtags() -> None:
     :return: None
     """
     reviewed_hashtags = await review_hashtags(app_data["tweets"])
-    start_timestamp = app_data["timestamp_start"]
     chatter = ", ".join(app_data["chatter"])
-    stream = db.Stream(
-        timestamp=start_timestamp, hashtags=" ".join(reviewed_hashtags), chatter=chatter
-    )
-    hashtags = ", ".join(reviewed_hashtags)
-    await db.add_data(stream)
-    async with aiofiles.open(HASHTAG_FILE_PATH, mode="a", encoding="utf-8") as file:
-        await file.write(f"Hashtags ({start_timestamp} UTC): ")
-        await file.write(f"{hashtags}\n")
+    stream_data = {
+        "timestamp_end": datetime.now(UTC),
+        "hashtags": " ".join(reviewed_hashtags),
+        "chatter": chatter,
+    }
+    await db.update_stream(app_data["stream_id"], stream_data)
+
     if len(reviewed_hashtags) <= 0:
         return
     content = MyTemplate(env.tweet_settings["hashtag_chatter_thanks_text"]).substitute(
@@ -120,8 +118,6 @@ async def set_stream_status(status: bool) -> None:
     """
     async with lock:
         app_data["online"] = status
-        if status:
-            app_data["timestamp_start"] = datetime.now(UTC)
 
 
 async def add_hashtag_blacklist(new_hashtags: set) -> None:

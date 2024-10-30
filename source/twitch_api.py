@@ -77,6 +77,7 @@ async def check_streamstart_message_allowed() -> None:
     result = await db.get_last_temp_stream_data()
     # Todo: hier weiter
 
+
 async def check_stream_start_message(settings: dict, response: dict) -> None:
     """Check if feature active and call the method for stream start message
 
@@ -126,13 +127,17 @@ async def check_stream_start(settings: dict, response: dict) -> None:
         ):
             await hashh.allow_collecting(True)
             await hashh.set_stream_status(True)
+            stream = db.Stream(timestamp_start=datetime.now(UTC))
+            async with hashh.lock:
+                hashh.app_data["stream_id"] = await db.add_data(stream)
+
             if env.tweet_settings["hashtag_from_stream_tags"]:
                 await hashh.register_new_hashtags(
                     None, set(response["data"][0]["tags"])
                 )
-                logger.debug(
-                    "Automatic Stream-Start detected, collecting hashtags allowed."
-                )
+            logger.debug(
+                "Automatic Stream-Start detected, collecting hashtags allowed."
+            )
         else:
             logger.debug("Stream-start status is false, no stream start detected")
 
@@ -224,7 +229,7 @@ async def new_clips_handler(**settings) -> None:
             timestamp=datetime.strptime(clip["created_at"], TIMESTAMP_PATTERN),
             title=clip["title"],
         )
-        await db.add_data(db_clip)
+        _ = await db.add_data(db_clip)
 
         content = MyTemplate(settings["clip_thank_you_text"]).substitute(
             link=clip["url"], user=clip["creator_name"]
