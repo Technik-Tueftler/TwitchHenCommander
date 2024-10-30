@@ -14,7 +14,6 @@ import environment_verification as env
 import db
 from watcher import logger
 from constants import (
-    HASHTAG_FILE_PATH,
     REQUEST_TIMEOUT,
     HASHTAG_BLACKLIST_FILE_PATH,
     TWITCH_URL,

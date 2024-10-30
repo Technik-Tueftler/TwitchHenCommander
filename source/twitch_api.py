@@ -73,9 +73,14 @@ async def fetch_new_clips(settings) -> list:
     return response["data"]
 
 
-async def check_streamstart_message_allowed() -> None:
-    result = await db.get_last_temp_stream_data()
-    # Todo: hier weiter
+async def check_streamstart_message_allowed() -> bool:
+    """Function checks if time difference between the last stream and 
+    current exceeds value to send a new stream start message
+
+    Returns:
+        bool: New stream message is allowed
+    """
+    return False
 
 
 async def check_stream_start_message(settings: dict, response: dict) -> None:
