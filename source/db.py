@@ -71,6 +71,13 @@ class Stream(Base):
     chatter: Mapped[str] = mapped_column(nullable=True)
 
 
+class StreamValidation:
+    def __init__(self, curr, last):
+        self.curr_stream = curr
+        self.last_stream = last
+        self.no_first_stream = self.last_stream is None
+
+
 session = async_sessionmaker(bind=engine, expire_on_commit=False)
 
 
@@ -177,6 +184,17 @@ async def add_data(data: Stream | Clip) -> int:
         return data.id
 
 
+async def last_streams_for_validation_stream_start() -> StreamValidation:
+    async with session() as sess:
+        statement = select(Stream).order_by(Stream.timestamp_start.desc())
+        streams = (await sess.execute(statement)).scalars().all()
+        if len(streams) < 2:
+            return StreamValidation(None, None)
+        curr_stream = streams[0]
+        last_stream = streams[1]
+        return StreamValidation(curr_stream, last_stream)
+
+
 async def async_main():
     """Scheduling function for regular call."""
     await sync_db()
@@ -208,13 +226,24 @@ async def async_main():
 
     # temp.twitch_user_name = "MrY"
     # await sess.commit()
-    stream = Stream(timestamp_start=datetime.now(UTC))
-    temp = await add_data(stream)
     async with session() as sess:
-        statement = select(Stream).where(Stream.id == temp)
-        stream = (await sess.execute(statement)).scalar_one_or_none()
-        stream.chatter = "TeTue"
-        await sess.commit()
+        statement = select(Stream).order_by(Stream.timestamp_start.desc())
+        streams = (await sess.execute(statement)).scalars().all()
+        curr_stream = streams[0]
+        last_stream = streams[1]
+        refer_stream = streams[1]
+        print(f"start id: {curr_stream.id}")
+        print(f"last id: {last_stream.id}")
+        #print(last_stream.timestamp_end)
+        print(f"Anzahl: {len(streams)}")
+        if last_stream.timestamp_end is None:
+            for stream in streams[2:]:
+                #print(stream.timestamp_end)
+                if stream.timestamp_end is not None:
+                    refer_stream = stream
+                    break
+                #print(stream.id, stream.timestamp_start, stream.timestamp_end)
+        print(f"ref id: {refer_stream.id}")
 
 
 if __name__ == "__main__":

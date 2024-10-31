@@ -36,6 +36,7 @@ from constants import (
     DC_FEATURE_MESSAGE_STREAMSTART_TEXT,
     HASHTAG_CHATTER_THANKS_TEXT,
     HASHTAG_FEATURE_FROM_STREAM_TAGS,
+    STREAM_START_TIME_DIFFERENCE
 )
 
 
@@ -73,6 +74,9 @@ clip_thank_you_text = config.get("CLIP_THANK_YOU_TEXT", CLIP_THANK_YOU_TEXT)
 clips_fetch_time = config.get("CLIPS_FETCH_TIME", UPDATE_INTERVAL_PUBLISH_NEW_CLIPS)
 dc_feature_message_streamstart = config.get(
     "DC_FEATURE_MESSAGE_STREAMSTART", DC_FEATURE_MESSAGE_STREAMSTART
+)
+dc_feature_message_streamstart_time_diff = config.get(
+    "STREAM_START_TIME_DIFFERENCE", STREAM_START_TIME_DIFFERENCE
 )
 dc_username_message_streamstart = config.get("DC_USER_NAME_MESSAGE_STREAMSTART", None)
 webhook_url_message_streamstart = config.get("DC_WEBHOOK_URL_MESSAGE_STREAMSTART", None)
@@ -163,6 +167,7 @@ discord_settings = {
     "dc_username_message_streamstart": dc_username_message_streamstart,
     "webhook_url_message_streamstart": webhook_url_message_streamstart,
     "dc_feature_message_streamstart_text": dc_feature_message_streamstart_text,
+    "dc_feature_message_streamstart_time_diff": dc_feature_message_streamstart_time_diff,
 }
 
 
@@ -227,6 +232,7 @@ def bot_setting_verification() -> None:
     app_settings["dc_feature_message_streamstart"] = (
         dc_feature_message_streamstart.lower() in (OPTIONS_POSITIVE_ARG)
     )
+    
 
 
 def check_tweet_settings():
@@ -345,6 +351,11 @@ def discord_setting_verification() -> None:
         int(clips_fetch_time)
         if clips_fetch_time.isdecimal()
         else int(UPDATE_INTERVAL_PUBLISH_NEW_CLIPS)
+    )
+    discord_settings["dc_feature_message_streamstart_time_diff"] = (
+        int(dc_feature_message_streamstart_time_diff)
+        if dc_feature_message_streamstart_time_diff.isdecimal()
+        else int(STREAM_START_TIME_DIFFERENCE)
     )
 
 

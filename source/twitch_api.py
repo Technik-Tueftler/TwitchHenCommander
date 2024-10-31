@@ -74,12 +74,24 @@ async def fetch_new_clips(settings) -> list:
 
 
 async def check_streamstart_message_allowed() -> bool:
-    """Function checks if time difference between the last stream and 
+    """Function checks if time difference between the last stream and
     current exceeds value to send a new stream start message
 
     Returns:
         bool: New stream message is allowed
     """
+    streams = await db.last_streams_for_validation_stream_start()
+    if streams.no_first_stream:
+        return True
+    if streams.last_stream.timestamp_end is not None:
+        time_diff_s = (
+            streams.curr_stream.timestamp_start - streams.last_stream.timestamp_end
+        ).total_seconds()
+    time_diff_s = (
+        streams.curr_stream.timestamp_start - streams.last_stream.timestamp_start
+    ).total_seconds()
+    if time_diff_s > env.discord_settings["dc_feature_message_streamstart_time_diff"]:
+        return True
     return False
 
 
@@ -204,6 +216,7 @@ async def streaming_handler(**settings) -> None:
         return
     log_ratelimit("streaming_handler", settings["log_level"], response_temp)
     response = response_temp.json()
+    print(settings)
     await check_stream_start_message(settings, response)
     await check_stream_start(settings, response)
     await check_stream_end(settings, response)
