@@ -2,7 +2,7 @@
 File contains all constants for easy central import and usage.
 """
 
-APP_VERSION = "v1.7.1"
+APP_VERSION = "v1.7.2"
 CONFIGURATION_FILE_PATH = "../files/config.json"
 CACHE_FILE_PATH = "../files/cache.json"
 LOG_FILE_PATH = "../files/log.txt"

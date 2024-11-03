@@ -81,8 +81,8 @@ async def check_streamstart_message_allowed() -> bool:
         bool: New stream message is allowed
     """
     streams = await db.last_streams_for_validation_stream_start()
-    logger.debug(f"Last two streams for stream start message logic. S1-ID: {streams.curr_stream.id} "
-                 + "and S2-ID: {streams.last_stream.id}")
+    logger.debug("Last two streams for stream start message logic. S1-ID: "
+                 + f"{streams.curr_stream.id} and S2-ID: {streams.last_stream.id}")
     if streams.no_first_stream:
         return True
     if streams.last_stream.timestamp_end is not None:

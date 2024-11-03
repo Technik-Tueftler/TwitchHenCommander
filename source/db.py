@@ -72,6 +72,8 @@ class Stream(Base):
 
 
 class StreamValidation:
+    """Helper class to verify the last streams if a stream message is allowed
+    """
     def __init__(self, curr, last):
         self.curr_stream = curr
         self.last_stream = last
@@ -185,6 +187,12 @@ async def add_data(data: Stream | Clip) -> int:
 
 
 async def last_streams_for_validation_stream_start() -> StreamValidation:
+    """Helper function to get the last valid streams. This is for validation 
+    if a new stream message is allowed.
+
+    Returns:
+        StreamValidation: Stream validation class with information if last streams
+    """
     async with session() as sess:
         statement = select(Stream).order_by(Stream.timestamp_start.desc())
         streams = (await sess.execute(statement)).scalars().all()
