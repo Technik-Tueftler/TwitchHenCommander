@@ -65,8 +65,19 @@ class Stream(Base):
 
     __tablename__ = "streams"
     id: Mapped[int] = mapped_column(primary_key=True)
-    timestamp: Mapped[datetime] = mapped_column(nullable=False)
+    timestamp_start: Mapped[datetime] = mapped_column(nullable=False)
+    timestamp_end: Mapped[datetime] = mapped_column(nullable=True)
     hashtags: Mapped[str] = mapped_column(nullable=True)
+    chatter: Mapped[str] = mapped_column(nullable=True)
+
+
+class StreamValidation:
+    """Helper class to verify the last streams if a stream message is allowed
+    """
+    def __init__(self, curr, last):
+        self.curr_stream = curr
+        self.last_stream = last
+        self.no_first_stream = self.last_stream is None
 
 
 session = async_sessionmaker(bind=engine, expire_on_commit=False)
@@ -78,7 +89,7 @@ async def sync_db():
         await conn.run_sync(Base.metadata.create_all)
 
 
-async def get_twitch_user(user_id: str) -> User:
+async def get_twitch_user(user_id: str) -> User | None:
     """Function searches in DB for twitch user ID and returns the mapped user
 
     Args:
@@ -91,6 +102,38 @@ async def get_twitch_user(user_id: str) -> User:
         statement = select(User).where(User.twitch_user_id == user_id)
         result = await sess.execute(statement)
     return result.scalar_one_or_none()
+
+
+async def get_stream(stream_id: int) -> Stream:
+    """Function searches in DB for Stream ID and returns the mapped user
+
+    Args:
+        stream_id (int): Stream ID
+
+    Returns:
+        Stream: Stream mapped object
+    """
+    async with session() as sess:
+        statement = select(Stream).where(Stream.id == stream_id)
+        result = await sess.execute(statement)
+    return result.scalar_one_or_none()
+
+
+async def update_stream(stream_id: int, stream_data: dict) -> None:
+    """Function update all transfered stream data
+
+    Args:
+        stream_id (int): Stream id to update object
+        stream_data (dict): Stream data for update
+    """
+    async with session() as sess:
+        stream = (
+            await sess.execute(select(Stream).where(Stream.id == stream_id))
+        ).scalar_one_or_none()
+        for key, value in stream_data.items():
+            if hasattr(stream, key):
+                setattr(stream, key, value)
+        await sess.commit()
 
 
 async def add_new_user(twitch_user_id: str, twitch_user_name: str) -> User:
@@ -128,15 +171,36 @@ async def fetch_last_clip_ids() -> List[int]:
     return [clip.clip_id for clip in all_clips]
 
 
-async def add_data(data: Stream | Clip) -> None:
+async def add_data(data: Stream | Clip) -> int:
     """Add data object to db
 
     Args:
         stream (Stream): Stream mapped object with necessary
+
+    Returns:
+        int: ID from commited object
     """
     async with session() as sess:
         sess.add(data)
         await sess.commit()
+        return data.id
+
+
+async def last_streams_for_validation_stream_start() -> StreamValidation:
+    """Helper function to get the last valid streams. This is for validation 
+    if a new stream message is allowed.
+
+    Returns:
+        StreamValidation: Stream validation class with information if last streams
+    """
+    async with session() as sess:
+        statement = select(Stream).order_by(Stream.timestamp_start.desc())
+        streams = (await sess.execute(statement)).scalars().all()
+        if len(streams) < 2:
+            return StreamValidation(None, None)
+        curr_stream = streams[0]
+        last_stream = streams[1]
+    return StreamValidation(curr_stream, last_stream)
 
 
 async def async_main():
@@ -147,13 +211,13 @@ async def async_main():
     # await get_twitch_user("123333334")
     # user = await add_new_user("77890", "MrT")
     # print(user)
-    temp = await get_twitch_user("77890")
-    print(f"geladener User: {temp}")
-    async with session() as sess:
-        user = User(twitch_user_id="jhedej", twitch_user_name="Jojo")
-        sess.add(user)
-        await sess.commit()
-    print(user.id)
+    # temp = await get_twitch_user("77890")
+    # print(f"geladener User: {temp}")
+    # async with session() as sess:
+    #     user = User(twitch_user_id="jhedej", twitch_user_name="Jojo")
+    #     sess.add(user)
+    #     await sess.commit()
+    # print(user.id)
     # statement = select(User).where(User.twitch_user_id == temp.twitch_user_id)
     # result = await sess.execute(statement)
     # checked_user = result.scalar_one()
@@ -170,6 +234,24 @@ async def async_main():
 
     # temp.twitch_user_name = "MrY"
     # await sess.commit()
+    async with session() as sess:
+        statement = select(Stream).order_by(Stream.timestamp_start.desc())
+        streams = (await sess.execute(statement)).scalars().all()
+        curr_stream = streams[0]
+        last_stream = streams[1]
+        refer_stream = streams[1]
+        print(f"start id: {curr_stream.id}")
+        print(f"last id: {last_stream.id}")
+        #print(last_stream.timestamp_end)
+        print(f"Anzahl: {len(streams)}")
+        if last_stream.timestamp_end is None:
+            for stream in streams[2:]:
+                #print(stream.timestamp_end)
+                if stream.timestamp_end is not None:
+                    refer_stream = stream
+                    break
+                #print(stream.id, stream.timestamp_start, stream.timestamp_end)
+        print(f"ref id: {refer_stream.id}")
 
 
 if __name__ == "__main__":

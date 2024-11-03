@@ -2,10 +2,9 @@
 File contains all constants for easy central import and usage.
 """
 
-APP_VERSION = "v1.7.1"
+APP_VERSION = "v1.7.2"
 CONFIGURATION_FILE_PATH = "../files/config.json"
 CACHE_FILE_PATH = "../files/cache.json"
-HASHTAG_FILE_PATH = "../files/hashtags.txt"
 LOG_FILE_PATH = "../files/log.txt"
 HASHTAG_BLACKLIST_FILE_PATH = "../files/blacklist.txt"
 HASHTAG_MAX_LENGTH = "10"
@@ -14,7 +13,7 @@ TWEET_MAX_LENGTH = "280"
 HASHTAG_CHATTER_THANKS_TEXT = (
     "Highlights from stream: #hashtags"
     +
-    ", thanks to #chatter_except_last and #chatter_last for creating the highlights!"
+    ", thanks to #chatter for creating the highlights!"
 )
 HASHTAG_ALL_LOWER_CASE = False
 TWITCH_WEBSOCKET_URL = "wss://eventsub.wss.twitch.tv/ws"
@@ -34,13 +33,12 @@ BOT_HASHTAG_COMMAND_STOP = "stophash"
 BOT_HASHTAG_COMMAND_STATUS = "statushash"
 BOT_HASHTAG_COMMAND_HELP = "helphash"
 BOT_HASHTAG_COMMAND_BANN = "hashblacklist"
-START_BOT_AT_STREAMSTART = "off"
-FINISH_BOT_AT_STREAMEND = "off"
 DC_FEATURE_MESSAGE_STREAMSTART = "off"
 HASHTAG_FEATURE_FROM_STREAM_TAGS = "off"
 DC_FEATURE_MESSAGE_STREAMSTART_TEXT = (
     "#broadcaster with #genre is online. It's amazing what's happen here: #link"
 )
+
 # BROADCASTER, MOD, VIP, SUBSCRIBER, EVERYONE
 HASHTAG_AUTHENTICATION_LEVEL = "BROADCASTER"
 OPTIONS_POSITIVE_ARG = ("true", "on", "1", "t", "active")
@@ -53,3 +51,4 @@ CHECK_STREAM_INTERVAL = "60"
 # TRACE, DEBUG, INFO, SUCCESS, WARNING, ERROR, CRITICAL
 OPTIONS_LOG_LEVEL = ("DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL")
 LOG_LEVEL = "INFO"
+STREAM_START_TIME_DIFFERENCE = "720"

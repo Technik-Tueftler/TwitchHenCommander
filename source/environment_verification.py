@@ -36,6 +36,7 @@ from constants import (
     DC_FEATURE_MESSAGE_STREAMSTART_TEXT,
     HASHTAG_CHATTER_THANKS_TEXT,
     HASHTAG_FEATURE_FROM_STREAM_TAGS,
+    STREAM_START_TIME_DIFFERENCE,
     START_BOT_AT_STREAMSTART,
     FINISH_BOT_AT_STREAMEND,
 )
@@ -77,10 +78,11 @@ clips_fetch_time = config.get(
 dc_feature_message_streamstart = config.get(
     "DC_FEATURE_MESSAGE_STREAMSTART", DC_FEATURE_MESSAGE_STREAMSTART
 )
-dc_username_message_streamstart = config.get(
-    "DC_USER_NAME_MESSAGE_STREAMSTART", None)
-webhook_url_message_streamstart = config.get(
-    "DC_WEBHOOK_URL_MESSAGE_STREAMSTART", None)
+dc_feature_message_streamstart_time_diff = config.get(
+    "STREAM_START_TIME_DIFFERENCE", STREAM_START_TIME_DIFFERENCE
+)
+dc_username_message_streamstart = config.get("DC_USER_NAME_MESSAGE_STREAMSTART", None)
+webhook_url_message_streamstart = config.get("DC_WEBHOOK_URL_MESSAGE_STREAMSTART", None)
 dc_feature_message_streamstart = config.get(
     "DC_FEATURE_MESSAGE_STREAMSTART", DC_FEATURE_MESSAGE_STREAMSTART
 )
@@ -101,10 +103,8 @@ hashtag_chatter_thanks_text = config.get(
 hashtag_from_stream_tags = config.get(
     "HASHTAG_FEATURE_FROM_STREAM_TAGS", HASHTAG_FEATURE_FROM_STREAM_TAGS
 )
-start_bot_at_streamstart = config.get(
-    "START_BOT_AT_STREAMSTART", START_BOT_AT_STREAMSTART)
-finish_bot_at_streamend = config.get(
-    "FINISH_BOT_AT_STREAMEND", FINISH_BOT_AT_STREAMEND)
+start_bot_at_streamstart = config.get("START_BOT_AT_STREAMSTART", START_BOT_AT_STREAMSTART)
+finish_bot_at_streamend = config.get("FINISH_BOT_AT_STREAMEND", FINISH_BOT_AT_STREAMEND)
 start_hashtag_bot_command = config.get(
     "BOT_HASHTAG_COMMAND_START", BOT_HASHTAG_COMMAND_START
 )
@@ -171,6 +171,7 @@ discord_settings = {
     "dc_username_message_streamstart": dc_username_message_streamstart,
     "webhook_url_message_streamstart": webhook_url_message_streamstart,
     "dc_feature_message_streamstart_text": dc_feature_message_streamstart_text,
+    "dc_feature_message_streamstart_time_diff": dc_feature_message_streamstart_time_diff,
 }
 
 
@@ -355,6 +356,11 @@ def discord_setting_verification() -> None:
         int(clips_fetch_time)
         if clips_fetch_time.isdecimal()
         else int(UPDATE_INTERVAL_PUBLISH_NEW_CLIPS)
+    )
+    discord_settings["dc_feature_message_streamstart_time_diff"] = (
+        int(dc_feature_message_streamstart_time_diff)
+        if dc_feature_message_streamstart_time_diff.isdecimal()
+        else int(STREAM_START_TIME_DIFFERENCE)
     )
 
 

@@ -14,7 +14,6 @@ import environment_verification as env
 import db
 from watcher import logger
 from constants import (
-    HASHTAG_FILE_PATH,
     REQUEST_TIMEOUT,
     HASHTAG_BLACKLIST_FILE_PATH,
     TWITCH_URL,
@@ -22,12 +21,12 @@ from constants import (
 
 app_data = {
     "online": False,
-    "timestamp_start": None,
+    "stream_id": None,
     "allowed": True,
     "tweets": [],
     "blacklist": set(),
     "start_message_done": False,
-    "chatter": set()
+    "chatter": set(),
 }
 lock = asyncio.Lock()
 
@@ -61,8 +60,9 @@ async def stream_start_message(response: dict) -> None:
         )
         logger.info(f"Send stream-start message: {content}")
     except (KeyError, IndexError) as err:
-        logger.error(f"The twitch response doesn't have the required key. Message: {err}")
-
+        logger.error(
+            f"The twitch response doesn't have the required key. Message: {err}"
+        )
 
 
 async def tweet_hashtags() -> None:
@@ -71,25 +71,22 @@ async def tweet_hashtags() -> None:
     :return: None
     """
     reviewed_hashtags = await review_hashtags(app_data["tweets"])
-    start_timestamp = app_data["timestamp_start"]
-    stream = db.Stream(
-        timestamp=start_timestamp, hashtags=" ".join(reviewed_hashtags)
-    )
-    await db.add_data(stream)
-    async with aiofiles.open(HASHTAG_FILE_PATH, mode="a", encoding="utf-8") as file:
-        await file.write(f"Hashtags ({start_timestamp} UTC): ")
-        hashtags = " ".join(reviewed_hashtags)
-        await file.write(f"{hashtags}\n")
+    chatter = ", ".join(app_data["chatter"])
+    stream_data = {
+        "timestamp_end": datetime.now(UTC),
+        "hashtags": " ".join(reviewed_hashtags),
+        "chatter": chatter,
+    }
+    stream_id = app_data["stream_id"]
+    await db.update_stream(stream_id, stream_data)
+    logger.debug(f"Stream data is updated in DB with ID: {stream_id}")
+
     if len(reviewed_hashtags) <= 0:
         return
-    chatter = list(app_data["chatter"])
-    content = MyTemplate(
-            env.tweet_settings["hashtag_chatter_thanks_text"]
-        ).substitute(hashtags=reviewed_hashtags,
-                     chatter_all=", ".join(chatter),
-                     chatter_except_last=", ".join(chatter[:-1]),
-                     chatter_last=chatter[-1]
-                     )
+    content = MyTemplate(env.tweet_settings["hashtag_chatter_thanks_text"]).substitute(
+        hashtags=", ".join(reviewed_hashtags),
+        chatter=chatter,
+    )
     if env.app_settings["dc_available"]:
         data = {
             "content": content,
@@ -122,8 +119,6 @@ async def set_stream_status(status: bool) -> None:
     """
     async with lock:
         app_data["online"] = status
-        if status:
-            app_data["timestamp_start"] = datetime.now(UTC)
 
 
 async def add_hashtag_blacklist(new_hashtags: set) -> None:
@@ -149,7 +144,7 @@ async def separate_hash(message: twitchio.message.Message) -> set:
     return env.tweet_settings["hashtag_pattern"].findall(converted_message)
 
 
-async def register_new_hashtags(display_name: str|None, new_hashtags: set) -> None:
+async def register_new_hashtags(display_name: str | None, new_hashtags: set) -> None:
     """
     Prevents duplications and add all new hashtags to app_data.
     :display_name: Displayname of chatter
