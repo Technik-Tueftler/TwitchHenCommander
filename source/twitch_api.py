@@ -81,6 +81,8 @@ async def check_streamstart_message_allowed() -> bool:
         bool: New stream message is allowed
     """
     streams = await db.last_streams_for_validation_stream_start()
+    logger.debug(f"Last two streams for stream start message logic. S1-ID: {streams.curr_stream.id} "
+                 + "and S2-ID: {streams.last_stream.id}")
     if streams.no_first_stream:
         return True
     if streams.last_stream.timestamp_end is not None:
@@ -92,6 +94,11 @@ async def check_streamstart_message_allowed() -> bool:
     ).total_seconds()
     if time_diff_s > env.discord_settings["dc_feature_message_streamstart_time_diff"]:
         return True
+    req_time_diff = env.discord_settings["dc_feature_message_streamstart_time_diff"]
+    logger.info(
+        f"message is not allowed because the minimum time {req_time_diff} has "
+        + "not been reached. Current: {time_diff_s}"
+    )
     return False
 
 
@@ -146,7 +153,9 @@ async def check_stream_start(settings: dict, response: dict) -> None:
             await hashh.set_stream_status(True)
             stream = db.Stream(timestamp_start=datetime.now(UTC))
             async with hashh.lock:
-                hashh.app_data["stream_id"] = await db.add_data(stream)
+                stream_id = await db.add_data(stream)
+                hashh.app_data["stream_id"] = stream_id
+                logger.debug(f"Current stream ID in database: {stream_id}")
 
             if env.tweet_settings["hashtag_from_stream_tags"]:
                 await hashh.register_new_hashtags(
@@ -216,7 +225,6 @@ async def streaming_handler(**settings) -> None:
         return
     log_ratelimit("streaming_handler", settings["log_level"], response_temp)
     response = response_temp.json()
-    print(settings)
     await check_stream_start_message(settings, response)
     await check_stream_start(settings, response)
     await check_stream_end(settings, response)

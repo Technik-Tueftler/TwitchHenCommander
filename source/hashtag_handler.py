@@ -77,7 +77,9 @@ async def tweet_hashtags() -> None:
         "hashtags": " ".join(reviewed_hashtags),
         "chatter": chatter,
     }
-    await db.update_stream(app_data["stream_id"], stream_data)
+    stream_id = app_data["stream_id"]
+    await db.update_stream(stream_id, stream_data)
+    logger.debug(f"Stream data is updated in DB with ID: {stream_id}")
 
     if len(reviewed_hashtags) <= 0:
         return

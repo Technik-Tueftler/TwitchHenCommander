@@ -192,7 +192,7 @@ async def last_streams_for_validation_stream_start() -> StreamValidation:
             return StreamValidation(None, None)
         curr_stream = streams[0]
         last_stream = streams[1]
-        return StreamValidation(curr_stream, last_stream)
+    return StreamValidation(curr_stream, last_stream)
 
 
 async def async_main():

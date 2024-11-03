@@ -232,7 +232,6 @@ def bot_setting_verification() -> None:
     app_settings["dc_feature_message_streamstart"] = (
         dc_feature_message_streamstart.lower() in (OPTIONS_POSITIVE_ARG)
     )
-    
 
 
 def check_tweet_settings():
