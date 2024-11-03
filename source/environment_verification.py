@@ -63,9 +63,9 @@ token = config.get("TW_TOKEN", None)
 nickname = config.get("TW_NICKNAME", None)
 init_channels = config.get("TW_INIT_CHANNELS", None)
 broadcaster_id = config.get("TW_BROADCASTER_ID", None)
-check_stream_interval = config.get("CHECK_STREAM_INTERVAL", CHECK_STREAM_INTERVAL)
+check_stream_interval = config.get(
+    "CHECK_STREAM_INTERVAL", CHECK_STREAM_INTERVAL)
 log_level_env = config.get("LOG_LEVEL", LOG_LEVEL)
-
 discord_username_hashtag = config.get("DC_USER_NAME_HASHTAG", None)
 webhook_url_hashtag = config.get("DC_WEBHOOK_URL_HASHTAG", None)
 discord_username_clip = config.get("DC_USER_NAME_CLIP", None)
@@ -73,7 +73,8 @@ webhook_url_clip = config.get("DC_WEBHOOK_URL_CLIP", None)
 dc_feature_hashtag = config.get("DC_FEATURE_HASHTAG", DC_FEATURE_HASHTAG)
 dc_feature_clips = config.get("DC_FEATURE_CLIPS", DC_FEATURE_CLIPS)
 clip_thank_you_text = config.get("CLIP_THANK_YOU_TEXT", CLIP_THANK_YOU_TEXT)
-clips_fetch_time = config.get("CLIPS_FETCH_TIME", UPDATE_INTERVAL_PUBLISH_NEW_CLIPS)
+clips_fetch_time = config.get(
+    "CLIPS_FETCH_TIME", UPDATE_INTERVAL_PUBLISH_NEW_CLIPS)
 dc_feature_message_streamstart = config.get(
     "DC_FEATURE_MESSAGE_STREAMSTART", DC_FEATURE_MESSAGE_STREAMSTART
 )
@@ -88,12 +89,14 @@ dc_feature_message_streamstart = config.get(
 dc_feature_message_streamstart_text = config.get(
     "DC_FEATURE_MESSAGE_STREAMSTART_TEXT", DC_FEATURE_MESSAGE_STREAMSTART_TEXT
 )
-
 hashtag_max_length = config.get("HASHTAG_MAX_LENGTH", HASHTAG_MAX_LENGTH)
 hashtag_min_length = config.get("HASHTAG_MIN_LENGTH", HASHTAG_MIN_LENGTH)
 tweet_max_length = config.get("TWEET_MAX_LENGTH", TWEET_MAX_LENGTH)
-hashtag_all_lower_case = config.get("HASHTAG_ALL_LOWER_CASE", None)
-hashtag_authentication_level = config.get("HASHTAG_AUTHENTICATION_LEVEL", None)
+hashtag_all_lower_case = config.get(
+    "HASHTAG_ALL_LOWER_CASE", HASHTAG_ALL_LOWER_CASE)
+hashtag_authentication_level = config.get(
+    "HASHTAG_AUTHENTICATION_LEVEL", HASHTAG_AUTHENTICATION_LEVEL
+)
 hashtag_chatter_thanks_text = config.get(
     "HASHTAG_CHATTER_THANKS_TEXT", HASHTAG_CHATTER_THANKS_TEXT
 )
@@ -120,7 +123,6 @@ status_hashtag_bot_command = config.get(
 blacklist_hashtag_bot_command = config.get(
     "BOT_HASHTAG_COMMAND_BANN", BOT_HASHTAG_COMMAND_BANN
 )
-
 bot_command_pattern = re.compile(BOT_COMMAND_PATTERN)
 
 app_settings = {
@@ -252,7 +254,8 @@ def check_tweet_settings():
         else int(HASHTAG_MIN_LENGTH)
     )
     tweet_settings["tweet_max_length"] = (
-        int(tweet_max_length) if tweet_max_length.isdecimal() else int(TWEET_MAX_LENGTH)
+        int(tweet_max_length) if tweet_max_length.isdecimal() else int(
+            TWEET_MAX_LENGTH)
     )
     tweet_settings["hashtag_all_lower_case"] = hashtag_all_lower_case.lower() in (
         OPTIONS_POSITIVE_ARG
@@ -305,7 +308,8 @@ def twitch_setting_verification() -> bool:
         app_settings["channels"] = init_channels.split(",")
         url = f"https://api.twitch.tv/helix/users?login={app_settings['nickname']}"
         headers = {"Client-ID": client_id, "Authorization": f"Bearer {token}"}
-        response = requests.get(url, headers=headers, timeout=REQUEST_TIMEOUT).json()
+        response = requests.get(url, headers=headers,
+                                timeout=REQUEST_TIMEOUT).json()
         app_settings["broadcaster_id"] = response["data"][0]["id"]
         return True
     logger.error("The login data for twitch is missing or incomplete.")
