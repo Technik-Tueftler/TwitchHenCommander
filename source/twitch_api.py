@@ -81,8 +81,10 @@ async def check_streamstart_message_allowed() -> bool:
         bool: New stream message is allowed
     """
     streams = await db.last_streams_for_validation_stream_start()
-    logger.debug("Last two streams for stream start message logic. S1-ID: "
-                 + f"{streams.curr_stream.id} and S2-ID: {streams.last_stream.id}")
+    logger.debug(
+        "Last two streams for stream start message logic. S1-ID: "
+        + f"{streams.curr_stream.id} and S2-ID: {streams.last_stream.id}"
+    )
     if streams.no_first_stream:
         return True
     if streams.last_stream.timestamp_end is not None:
@@ -158,9 +160,10 @@ async def check_stream_start(settings: dict, response: dict) -> None:
                 logger.debug(f"Current stream ID in database: {stream_id}")
 
             if env.tweet_settings["hashtag_from_stream_tags"]:
-                await hashh.register_new_hashtags(
-                    None, set(response["data"][0]["tags"])
-                )
+                streamhashtags = [
+                    "#" + hashtag for hashtag in response["data"][0]["tags"]
+                ]
+                await hashh.register_new_hashtags(None, set(streamhashtags))
             logger.debug(
                 "Automatic Stream-Start detected, collecting hashtags allowed."
             )

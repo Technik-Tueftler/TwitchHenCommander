@@ -84,7 +84,7 @@ async def tweet_hashtags() -> None:
     if len(reviewed_hashtags) <= 0:
         return
     content = MyTemplate(env.tweet_settings["hashtag_chatter_thanks_text"]).substitute(
-        hashtags=reviewed_hashtags,
+        hashtags=", ".join(reviewed_hashtags),
         chatter=chatter,
     )
     if env.app_settings["dc_available"]:
