@@ -39,6 +39,7 @@ from constants import (
     STREAM_START_TIME_DIFFERENCE,
     START_BOT_AT_STREAMSTART,
     FINISH_BOT_AT_STREAMEND,
+    YT_VIDEO_FETCH_TIME,
 )
 
 
@@ -123,6 +124,10 @@ status_hashtag_bot_command = config.get(
 blacklist_hashtag_bot_command = config.get(
     "BOT_HASHTAG_COMMAND_BANN", BOT_HASHTAG_COMMAND_BANN
 )
+youtube_token = config.get("YT_TOKEN", None)
+youtube_channel_id = config.get("YT_CHANNEL_ID", None)
+yt_new_video_fetch_time = config.get("YT_VIDEO_FETCH_TIME", YT_VIDEO_FETCH_TIME)
+
 bot_command_pattern = re.compile(BOT_COMMAND_PATTERN)
 
 app_settings = {
@@ -141,6 +146,8 @@ app_settings = {
     "start_bot_at_streamstart": start_bot_at_streamstart,
     "finish_bot_at_streamend": finish_bot_at_streamend,
     "log_level": log_level_env,
+    "yt_feature_new_video": False,
+    "yt_new_video_fetch_time": YT_VIDEO_FETCH_TIME,
 }
 
 bot_hashtag_commands = {
@@ -172,6 +179,11 @@ discord_settings = {
     "webhook_url_message_streamstart": webhook_url_message_streamstart,
     "dc_feature_message_streamstart_text": dc_feature_message_streamstart_text,
     "dc_feature_message_streamstart_time_diff": dc_feature_message_streamstart_time_diff,
+}
+
+youtube_settings = {
+    "youtube_token": youtube_token, 
+    "youtube_channel_id": youtube_channel_id, 
 }
 
 
@@ -371,6 +383,18 @@ def clip_collection_setting_verification() -> None:
     """
     app_settings["dc_feature_clips"] = dc_feature_clips.lower() in (
         OPTIONS_POSITIVE_ARG
+    )
+
+
+def youtube_setting_verification() -> None:
+    """
+    Check if settings are available for youtube configurations
+    """
+    app_settings["yt_feature_new_video"] = None not in (youtube_token, youtube_channel_id)
+    app_settings["yt_new_video_fetch_time"] = (
+        int(yt_new_video_fetch_time)
+        if yt_new_video_fetch_time.isdecimal()
+        else int(YT_VIDEO_FETCH_TIME)
     )
 
 

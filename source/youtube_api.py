@@ -38,6 +38,11 @@ for video in latest_videos:
     print(f"Published At: {video['publishedAt']}")
     print(f"URL: {video['url']}\n")
 
+
+async def new_yt_video_handler(**settings) -> None:
+
+    #if not settings["database_synchronized"]:
+
 def main() -> None:
     """
     Scheduling function for regular call.

@@ -8,6 +8,7 @@ import environment_verification as env
 from constants import APP_VERSION
 from twitch_bot import Bot
 from twitch_api import new_clips_handler, streaming_handler
+from youtube_api import new_yt_video_handler
 from watcher import logger
 import hashtag_handler as hashh
 
@@ -35,6 +36,7 @@ def main() -> None:
     env.discord_setting_verification()
     env.bot_setting_verification()
     env.clip_collection_setting_verification()
+    env.youtube_setting_verification()
     env.log_settings()
     hashh.init_blacklist()
     bot = Bot(env.app_settings)
@@ -68,6 +70,16 @@ def main() -> None:
             )
         )
         tasks_to_start.append(new_clips)
+    if env.app_settings["yt_feature_new_video"]:
+        new_yt_videos = loop.create_task(
+            every(
+                env.app_settings["yt_new_video_fetch_time"],
+                new_yt_video_handler,
+                **env.app_settings,
+                **env.youtube_settings
+            )
+        )
+        tasks_to_start.append(new_yt_videos)
     loop.run_until_complete(asyncio.gather(*tasks_to_start))
 
 
