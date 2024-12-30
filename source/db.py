@@ -234,7 +234,7 @@ async def last_video(portal: str) -> Video:
     """
     async with session() as sess:
         statement = select(Video).filter(Video.portal == portal).order_by(Video.timestamp.desc())
-        video = (await sess.execute(statement)).scalars().first
+        video = (await sess.execute(statement)).scalar_one_or_none()
     return video
 
 

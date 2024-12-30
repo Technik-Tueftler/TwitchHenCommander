@@ -65,7 +65,9 @@ async def new_yt_video_handler(**settings: dict) -> None:
         )
     )[0]
     latest_stored_video = await db.last_video("youtube")
-    if latest_video.video_id == latest_stored_video.video_id:
+    if (latest_stored_video is not None) and (
+        latest_video.video_id == latest_stored_video.video_id
+    ):
         return
     _ = await db.add_data(latest_video)
 
