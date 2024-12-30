@@ -1,15 +1,12 @@
 import asyncio
 from datetime import datetime
-from collections import namedtuple
 from googleapiclient.discovery import build
+import db
 
-Video = namedtuple("Video", ["title", "video_id", "published_at", "url"])
 
-# API-Schlüssel hier einfügen
-API_KEY = "AIzaSyCfe8Lb8CKG1y03M8K3HaTzYvRHw6jKIKQ"
-CHANNEL_ID = "UCehPIrjonwcDm2gNyWws1Jw"
-
-async def get_latest_videos(api_key: str, channel_id: str, max_results:int = 1) -> list[Video]:
+async def get_latest_yt_videos(
+    api_key: str, channel_id: str, max_results: int = 1
+) -> list[db.Video]:
     """
     Function fetches the latest videos from youtube and sorts them by the most new.
 
@@ -23,13 +20,17 @@ async def get_latest_videos(api_key: str, channel_id: str, max_results:int = 1) 
     """
     youtube = build("youtube", "v3", developerKey=api_key)
 
-    response = youtube.search().list(
-        part="snippet",
-        channelId=channel_id,
-        maxResults=max_results,
-        order="date",
-        type="video"   # No playlists or livestreams
-    ).execute()
+    response = (
+        youtube.search()
+        .list(
+            part="snippet",
+            channelId=channel_id,
+            maxResults=max_results,
+            order="date",
+            type="video",  # No playlists or livestreams
+        )
+        .execute()
+    )
 
     videos = []
     for item in response["items"]:
@@ -37,7 +38,13 @@ async def get_latest_videos(api_key: str, channel_id: str, max_results:int = 1) 
         video_id = item["id"]["videoId"]
         published_at = item["snippet"]["publishedAt"]
         url = f'https://www.youtube.com/watch?v={item["id"]["videoId"]}'
-        video = Video(title=title, video_id=video_id, published_at=published_at, url=url)
+        video = db.Video(
+            video_id=video_id,
+            portal="youtube",
+            timestamp=datetime.strptime(published_at, "%Y-%m-%dT%H:%M:%SZ"),
+            title=title,
+            url=url,
+        )
         videos.append(video)
     return videos
 
@@ -45,18 +52,26 @@ async def get_latest_videos(api_key: str, channel_id: str, max_results:int = 1) 
 async def new_yt_video_handler(**settings: dict) -> None:
     """
     Handling function to find new youtube videos and post them
-    
+
     Args:
         settings (dict): App settings
     """
-    latest_video = (await get_latest_videos(API_KEY, CHANNEL_ID))[0]
-    print(latest_video.title)
-    date_object = datetime.strptime(latest_video.published_at, "%Y-%m-%dT%H:%M:%SZ")
-    print(date_object)
-    print(type(date_object))
+    if not settings["database_synchronized"]:
+        await db.sync_db()
+        settings["database_synchronized"] = True
+    latest_video = (
+        await get_latest_yt_videos(
+            settings["youtube_token"], settings["youtube_channel_id"]
+        )
+    )[0]
+    latest_stored_video = await db.last_video("youtube")
+    if latest_video.video_id == latest_stored_video.video_id:
+        return
+    _ = await db.add_data(latest_video)
 
 
 async def async_main():
+    """Scheduling function for regular call."""
     await new_yt_video_handler()
 
 
