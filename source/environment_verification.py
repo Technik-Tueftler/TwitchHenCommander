@@ -40,6 +40,7 @@ from constants import (
     START_BOT_AT_STREAMSTART,
     FINISH_BOT_AT_STREAMEND,
     YT_VIDEO_FETCH_TIME,
+    YT_POST_TEXT,
 )
 
 
@@ -127,6 +128,9 @@ blacklist_hashtag_bot_command = config.get(
 youtube_token = config.get("YT_TOKEN", None)
 youtube_channel_id = config.get("YT_CHANNEL_ID", None)
 yt_new_video_fetch_time = config.get("YT_VIDEO_FETCH_TIME", YT_VIDEO_FETCH_TIME)
+discord_username_video = config.get("DC_USER_NAME_YT", None)
+webhook_url_video = config.get("DC_WEBHOOK_URL_YT", None)
+yt_post_text = config.get("YT_POST_TEXT", YT_POST_TEXT)
 
 bot_command_pattern = re.compile(BOT_COMMAND_PATTERN)
 
@@ -179,11 +183,15 @@ discord_settings = {
     "webhook_url_message_streamstart": webhook_url_message_streamstart,
     "dc_feature_message_streamstart_text": dc_feature_message_streamstart_text,
     "dc_feature_message_streamstart_time_diff": dc_feature_message_streamstart_time_diff,
+    "discord_username_video": discord_username_video,
+    "webhook_url_video": webhook_url_video,
+
 }
 
 youtube_settings = {
     "youtube_token": youtube_token, 
-    "youtube_channel_id": youtube_channel_id, 
+    "youtube_channel_id": youtube_channel_id,
+    "yt_post_text": yt_post_text,
 }
 
 

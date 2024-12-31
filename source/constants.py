@@ -12,8 +12,7 @@ HASHTAG_MIN_LENGTH = "3"
 TWEET_MAX_LENGTH = "280"
 HASHTAG_CHATTER_THANKS_TEXT = (
     "Highlights from stream: #hashtags"
-    +
-    ", thanks to #chatter for creating the highlights!"
+    + ", thanks to #chatter for creating the highlights!"
 )
 HASHTAG_ALL_LOWER_CASE = False
 TWITCH_WEBSOCKET_URL = "wss://eventsub.wss.twitch.tv/ws"
@@ -39,7 +38,11 @@ DC_FEATURE_MESSAGE_STREAMSTART_TEXT = (
     "#broadcaster with #genre is online. It's amazing what's happen here: #link"
 )
 YT_VIDEO_FETCH_TIME = "600"
-
+YT_POST_TEXT = (
+    "A new video has been published on #portal. "
+    "It's a great video. Take a look right now: #link "
+    "and don't forget to comment."
+)
 # BROADCASTER, MOD, VIP, SUBSCRIBER, EVERYONE
 HASHTAG_AUTHENTICATION_LEVEL = "BROADCASTER"
 OPTIONS_POSITIVE_ARG = ("true", "on", "1", "t", "active")

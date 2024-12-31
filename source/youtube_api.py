@@ -1,7 +1,12 @@
 import asyncio
+import requests
 from datetime import datetime
 from googleapiclient.discovery import build
 import db
+from generic_functions import MyTemplate
+from constants import (
+    REQUEST_TIMEOUT,
+)
 
 
 async def get_latest_yt_videos(
@@ -69,7 +74,24 @@ async def new_yt_video_handler(**settings: dict) -> None:
         latest_video.video_id == latest_stored_video.video_id
     ):
         return
+    
     _ = await db.add_data(latest_video)
+    content = MyTemplate(settings["yt_post_text"]).substitute(
+            portal=latest_video.portal, link=latest_video.url
+        )
+    await post_video(settings, content)
+    # await asyncio.sleep(CLIP_WAIT_TIME)
+
+
+async def post_video(settings: dict, content: str) -> None:
+    """Post video in discord with all information
+
+    Args:
+        settings (dict): Settings to get access to descord webhook
+        content (str): Video link with user information
+    """
+    data = {"content": content, "username": settings["discord_username_video"]}
+    requests.post(settings["webhook_url_video"], data=data, timeout=REQUEST_TIMEOUT)
 
 
 async def async_main():

@@ -76,7 +76,8 @@ def main() -> None:
                 env.app_settings["yt_new_video_fetch_time"],
                 new_yt_video_handler,
                 **env.app_settings,
-                **env.youtube_settings
+                **env.youtube_settings,
+                **env.discord_settings
             )
         )
         tasks_to_start.append(new_yt_videos)
