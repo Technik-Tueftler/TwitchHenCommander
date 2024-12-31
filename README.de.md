@@ -23,6 +23,7 @@ Der TwitchHenCommander ist ein Programm, der auf einen einstellbaren Twitchchat 
 ## Was sonst noch benötigt wird
 - Ein Twitch-Bot muss erstellt werden über: https://dev.twitch.tv/console
 - Discord WebHook Verbindungen, siehe `Unterstützte Plattformen für die Übertragung`
+- Schlüssel zur Youtube API über https://developers.google.com/youtube/v3/getting-started?hl=de
 
 ## Unterstützte Plattformen für die Übertragung
 Derzeit wird nur Discord über WebHook unterstützt. Dazu muss in den Servereinstellungen unter `Integration` ein neuer WebHook angelegt werden. Hier können Sie auch den Kanal einstellen, auf dem die Benachrichtigung gesendet werden soll.

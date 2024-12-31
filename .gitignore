@@ -161,3 +161,4 @@ cython_debug/
 
 # Log and Data
 *.db
+blacklist.txt

@@ -18,7 +18,7 @@ from watcher import logger
 
 
 def log_ratelimit(
-    source_fct: str, debug_level: str, response: requests.models.Response
+    source_fct: str, response: requests.models.Response
 ):
     """Log ratelimits for twitch API
 
@@ -26,12 +26,10 @@ def log_ratelimit(
         debug_level (str): log level from settings
         response (requests.models.Response): response from request
     """
-    if debug_level != "DEBUG":
-        return
     limit = response.headers.get("Ratelimit-Limit", "NA")
     remaining = response.headers.get("Ratelimit-Remaining")
     reset_time = response.headers.get("Ratelimit-Reset")
-    logger.debug(
+    logger.extdebug(
         f"{source_fct}: / "
         f"Get online status with: Limit: {limit} / "
         f"Remaining: {remaining} / "
@@ -68,7 +66,7 @@ async def fetch_new_clips(settings) -> list:
     response_temp = await generic_http_request(fetch_url, headers, logger=logger)
     if response_temp is None:
         return None
-    log_ratelimit("fetch_new_clips", settings["log_level"], response_temp)
+    log_ratelimit("fetch_new_clips", response_temp)
     response = response_temp.json()
     return response["data"]
 
@@ -226,7 +224,7 @@ async def streaming_handler(**settings) -> None:
     response_temp = await generic_http_request(is_live_url, headers, logger=logger)
     if response_temp is None:
         return
-    log_ratelimit("streaming_handler", settings["log_level"], response_temp)
+    log_ratelimit("streaming_handler", response_temp)
     response = response_temp.json()
     await check_stream_start_message(settings, response)
     await check_stream_start(settings, response)

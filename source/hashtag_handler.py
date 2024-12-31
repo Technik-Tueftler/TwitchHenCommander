@@ -83,6 +83,8 @@ async def tweet_hashtags() -> None:
 
     if len(reviewed_hashtags) <= 0:
         return
+    if len(app_data["chatter"]) <= 0:
+        app_data["chatter"].add("all")
     content = MyTemplate(env.tweet_settings["hashtag_chatter_thanks_text"]).substitute(
         hashtags=", ".join(reviewed_hashtags),
         chatter=chatter,
@@ -98,6 +100,8 @@ async def tweet_hashtags() -> None:
             timeout=REQUEST_TIMEOUT,
         )
     app_data["tweets"] = []
+    app_data["chatter"].clear()
+    logger.debug(f'Clear chatter and hashtags lists: {app_data["tweets"]} / {app_data["chatter"]}')
 
 
 async def allow_collecting(allowance: bool) -> None:

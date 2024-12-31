@@ -56,6 +56,25 @@ class Clip(Base):
         return f"Clip: {self.clip_id}"
 
 
+class Video(Base):
+    """Class to be able to map the videos via an ORM
+
+    Args:
+        Base (_type_): Basic class that is inherited
+    """
+
+    __tablename__ = "videos"
+    id: Mapped[int] = mapped_column(primary_key=True)
+    video_id: Mapped[str] = mapped_column(nullable=False)
+    portal: Mapped[str] = mapped_column(nullable=False)
+    timestamp: Mapped[datetime] = mapped_column(nullable=False)
+    title: Mapped[str] = mapped_column(nullable=False)
+    url: Mapped[str] = mapped_column(nullable=False)
+
+    def __repr__(self) -> str:
+        return f"Video: {self.video_id}"
+
+
 class Stream(Base):
     """Class to collect all stream related information
 
@@ -171,7 +190,7 @@ async def fetch_last_clip_ids() -> List[int]:
     return [clip.clip_id for clip in all_clips]
 
 
-async def add_data(data: Stream | Clip) -> int:
+async def add_data(data: Stream | Clip | Video) -> int:
     """Add data object to db
 
     Args:
@@ -201,6 +220,22 @@ async def last_streams_for_validation_stream_start() -> StreamValidation:
         curr_stream = streams[0]
         last_stream = streams[1]
     return StreamValidation(curr_stream, last_stream)
+
+
+async def last_video(portal: str) -> Video:
+    """
+    Function return the last stored video.
+
+    Args:
+        portal (str): The portal to be searched
+
+    Returns:
+        Video: ID from the last video
+    """
+    async with session() as sess:
+        statement = select(Video).filter(Video.portal == portal).order_by(Video.timestamp.desc())
+        video = (await sess.execute(statement)).scalar_one_or_none()
+    return video
 
 
 async def async_main():
