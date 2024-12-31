@@ -98,6 +98,8 @@ async def tweet_hashtags() -> None:
             timeout=REQUEST_TIMEOUT,
         )
     app_data["tweets"] = []
+    app_data["chatter"].clear()
+    logger.debug(f'Clear chatter and hashtags lists: {app_data["tweets"]} / {app_data["chatter"]}')
 
 
 async def allow_collecting(allowance: bool) -> None:
