@@ -1,6 +1,8 @@
+"""All functions and features that work with the help of the youtube api
+"""
 import asyncio
-import requests
 from datetime import datetime
+import requests
 from googleapiclient.discovery import build
 import db
 from generic_functions import MyTemplate
@@ -26,7 +28,7 @@ async def get_latest_yt_videos(
     youtube = build("youtube", "v3", developerKey=api_key)
 
     response = (
-        youtube.search()
+        youtube.search() # pylint: disable=no-member
         .list(
             part="snippet",
             channelId=channel_id,
@@ -74,7 +76,7 @@ async def new_yt_video_handler(**settings: dict) -> None:
         latest_video.video_id == latest_stored_video.video_id
     ):
         return
-    
+
     _ = await db.add_data(latest_video)
     content = MyTemplate(settings["yt_post_text"]).substitute(
             portal=latest_video.portal, link=latest_video.url
