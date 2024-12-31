@@ -6,6 +6,7 @@ import requests
 from googleapiclient.discovery import build
 import db
 from generic_functions import MyTemplate
+from watcher import logger
 from constants import (
     REQUEST_TIMEOUT,
 )
@@ -76,7 +77,7 @@ async def new_yt_video_handler(**settings: dict) -> None:
         latest_video.video_id == latest_stored_video.video_id
     ):
         return
-
+    logger.debug(f'New Youtube video detected: {latest_video.title}')
     _ = await db.add_data(latest_video)
     content = MyTemplate(settings["yt_post_text"]).substitute(
             portal=latest_video.portal, link=latest_video.url
