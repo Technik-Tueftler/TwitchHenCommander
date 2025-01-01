@@ -41,6 +41,7 @@ from constants import (
     FINISH_BOT_AT_STREAMEND,
     YT_VIDEO_FETCH_TIME,
     YT_POST_TEXT,
+    DC_FEATURE_LINKS,
 )
 
 
@@ -74,6 +75,9 @@ discord_username_clip = config.get("DC_USER_NAME_CLIP", None)
 webhook_url_clip = config.get("DC_WEBHOOK_URL_CLIP", None)
 dc_feature_hashtag = config.get("DC_FEATURE_HASHTAG", DC_FEATURE_HASHTAG)
 dc_feature_clips = config.get("DC_FEATURE_CLIPS", DC_FEATURE_CLIPS)
+discord_username_links = config.get("", )
+webhook_url_links = config.get("", )
+dc_feature_links = config.get("DC_FEATURE_LINKS", DC_FEATURE_LINKS)
 clip_thank_you_text = config.get("CLIP_THANK_YOU_TEXT", CLIP_THANK_YOU_TEXT)
 clips_fetch_time = config.get(
     "CLIPS_FETCH_TIME", UPDATE_INTERVAL_PUBLISH_NEW_CLIPS)
@@ -143,6 +147,7 @@ app_settings = {
     "dc_available": False,
     "dc_feature_hashtag": False,
     "dc_feature_clips": False,
+    "dc_feature_links": False,
     "dc_feature_start_message": False,
     "check_stream_interval": CHECK_STREAM_INTERVAL,
     "clips_fetch_time": clips_fetch_time,
@@ -185,6 +190,8 @@ discord_settings = {
     "dc_feature_message_streamstart_time_diff": dc_feature_message_streamstart_time_diff,
     "discord_username_video": discord_username_video,
     "webhook_url_video": webhook_url_video,
+    "discord_username_links": discord_username_links,
+    "webhook_url_links": webhook_url_links,
 
 }
 
@@ -382,6 +389,14 @@ def discord_setting_verification() -> None:
         if dc_feature_message_streamstart_time_diff.isdecimal()
         else int(STREAM_START_TIME_DIFFERENCE)
     )
+    if dc_feature_links is not None and dc_feature_links.lower() in (
+        OPTIONS_POSITIVE_ARG
+    ):
+        if None not in (
+            discord_settings["discord_username_links"],
+            discord_settings["webhook_url_links"],
+        ):
+            app_settings["dc_feature_links"] = True
 
 
 def clip_collection_setting_verification() -> None:
