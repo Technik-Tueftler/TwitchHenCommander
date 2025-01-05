@@ -44,7 +44,6 @@ def main() -> None:
     tasks_to_start = []
     bot_task = loop.create_task(bot.start())
     tasks_to_start.append(bot_task)
-    logger.info(f"App started in version: {APP_VERSION}")
     if any(
         [
             env.app_settings["start_bot_at_streamstart"],

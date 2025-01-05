@@ -43,6 +43,7 @@ from constants import (
     YT_POST_TEXT,
     DC_FEATURE_LINKS,
     YT_API_MAX_REQUESTS_S,
+    APP_VERSION
 )
 
 
@@ -160,7 +161,7 @@ app_settings = {
     "finish_bot_at_streamend": finish_bot_at_streamend,
     "log_level": log_level_env,
     "yt_feature_new_video": False,
-    "yt_new_video_fetch_time": YT_VIDEO_FETCH_TIME,
+    "yt_new_video_fetch_time": yt_new_video_fetch_time,
 }
 
 bot_hashtag_commands = {
@@ -210,16 +211,36 @@ def log_settings() -> None:
     log_level = app_settings["log_level"]
     streamstart = app_settings["start_bot_at_streamstart"]
     streamend = app_settings["finish_bot_at_streamend"]
-    dc_active = app_settings["dc_available"]
     dc_hashtags = app_settings["dc_feature_hashtag"]
     dc_clips = app_settings["dc_feature_clips"]
+    dc_yt = app_settings["yt_feature_new_video"]
+    logger.info("=" *25)
+    logger.info(" Settings")
+    logger.info("=" * 25)
+    logger.info("*" * 25)
+    logger.info(" Hen Commander")
+    logger.info("*" * 25)
+    logger.info(f"Version:   {APP_VERSION}")
     logger.info(f"Log-Level: {log_level}")
-    logger.info(f"Bot-Settings / Start: {streamstart} / " f"End: {streamend}")
-    logger.info(
-        f"DC-Settings / Active: {dc_active} / "
-        f"Hashtags: {dc_hashtags} / "
-        f"Clips: {dc_clips}"
-    )
+    logger.info("*" * 25)
+    logger.info("*" * 25)
+    logger.info(" Hashtag-Feature")
+    logger.info("*" * 25)
+    logger.info(f"#-Collection active: {dc_hashtags}")
+    logger.info(f"Automatik Start:     {streamstart}")
+    logger.info(f"Automatik End:       {streamend}")
+    logger.info("*" * 25)
+    logger.info("*" * 25)
+    logger.info(" Clip-Feature")
+    logger.info("*" * 25)
+    logger.info(f"Clip-Fetch active: {dc_clips}")
+    logger.info("*" * 25)
+    logger.info("*" * 25)
+    logger.info(" Video-Feature")
+    logger.info(f"Video-Fetch active: {dc_yt}")
+    logger.info("*" * 25)
+    logger.info("*" * 25)
+    logger.info("=" * 25)
 
 
 def bot_setting_verification() -> None:
@@ -420,7 +441,7 @@ def youtube_setting_verification() -> None:
     )
     if (
         not yt_new_video_fetch_time.isdecimal()
-        or yt_new_video_fetch_time.isdecimal() < YT_API_MAX_REQUESTS_S
+        or int(yt_new_video_fetch_time) < YT_API_MAX_REQUESTS_S
     ):
         app_settings["yt_new_video_fetch_time"] = int(YT_VIDEO_FETCH_TIME)
         logger.info(
@@ -430,7 +451,7 @@ def youtube_setting_verification() -> None:
         )
         app_settings["yt_new_video_fetch_time"] = YT_API_MAX_REQUESTS_S
         return
-    app_settings["yt_new_video_fetch_time"] = yt_new_video_fetch_time.isdecimal()
+    app_settings["yt_new_video_fetch_time"] = int(yt_new_video_fetch_time)
 
 
 def main() -> None:
