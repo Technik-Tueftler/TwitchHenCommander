@@ -36,6 +36,7 @@ async def get_latest_yt_videos(
             maxResults=max_results,
             order="date",
             type="video",  # No playlists or livestreams
+            fields="items(id,snippet(title,publishedAt))"
         )
         .execute()
     )
@@ -64,6 +65,7 @@ async def new_yt_video_handler(**settings: dict) -> None:
     Args:
         settings (dict): App settings
     """
+    logger.debug("Check if new youtube video is available.")
     if not settings["database_synchronized"]:
         await db.sync_db()
         settings["database_synchronized"] = True

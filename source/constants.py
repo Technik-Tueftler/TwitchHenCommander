@@ -39,7 +39,9 @@ HASHTAG_FEATURE_FROM_STREAM_TAGS = "off"
 DC_FEATURE_MESSAGE_STREAMSTART_TEXT = (
     "#broadcaster with #genre is online. It's amazing what's happen here: #link"
 )
-YT_VIDEO_FETCH_TIME = "600"
+# (hours * minutes * seconds) / (max yt api requests per day)
+YT_API_MAX_REQUESTS_S = (24*60*60)/(100)
+YT_VIDEO_FETCH_TIME = "1200"
 YT_POST_TEXT = (
     "A new video has been published on #portal. "
     "It's a great video. Take a look right now: #link "
