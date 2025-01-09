@@ -3,17 +3,12 @@
 """
 Functions and classes for the twitch bot with all allowed commands
 """
-import re
 import twitchio
 from twitchio.ext import commands
 import hashtag_handler as hashh
+import links
 import environment_verification as env
 from watcher import logger
-from constants import (
-    BOT_LINK_PATTERN,
-)
-
-bot_link_pattern = re.compile(BOT_LINK_PATTERN)
 
 
 async def check_if_command_authorized(ctx: commands.Context) -> bool:
@@ -86,8 +81,13 @@ class Bot(commands.Bot):
                         )
         if hashh.app_data["dc_feature_links"]:
             if await check_if_hash_authorized(message):
-                urls = re.findall(BOT_LINK_PATTERN, message.content)
-
+                new_links = await links.separate_links(message)
+                if len(new_links) > 0:
+                    reviewed_links = await links.review_links(
+                        new_links, message.author.display_name
+                    )
+                    if len(reviewed_links) > 0:
+                        await links.register_new_links(message.author, reviewed_links)
 
         await self.handle_commands(message)
 

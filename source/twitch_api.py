@@ -247,9 +247,7 @@ async def new_clips_handler(**settings) -> None:
     if not new_clips:
         return
     for clip in new_clips:
-        user = await db.get_twitch_user(clip["creator_id"])
-        if user is None:
-            user = await db.add_new_user(clip["creator_id"], clip["creator_name"])
+        user = await db.get_twitch_user(clip["creator_id"], clip["creator_name"])
         db_clip = db.Clip(
             user_id=user.id,
             clip_id=clip["id"],
