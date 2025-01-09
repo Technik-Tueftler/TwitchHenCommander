@@ -6,6 +6,7 @@ Functions and classes for the twitch bot with all allowed commands
 import twitchio
 from twitchio.ext import commands
 import hashtag_handler as hashh
+import links
 import environment_verification as env
 from watcher import logger
 
@@ -78,6 +79,15 @@ class Bot(commands.Bot):
                         await hashh.register_new_hashtags(
                             message.author.display_name, reviewed_hashtags
                         )
+        if hashh.app_data["dc_feature_links"]:
+            if await check_if_hash_authorized(message):
+                new_links = await links.separate_links(message)
+                if len(new_links) > 0:
+                    reviewed_links = await links.review_links(
+                        new_links, message.author.display_name
+                    )
+                    if len(reviewed_links) > 0:
+                        await links.register_new_links(message.author, reviewed_links)
 
         await self.handle_commands(message)
 

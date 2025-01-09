@@ -41,6 +41,9 @@ from constants import (
     FINISH_BOT_AT_STREAMEND,
     YT_VIDEO_FETCH_TIME,
     YT_POST_TEXT,
+    DC_FEATURE_LINKS,
+    YT_API_MAX_REQUESTS_S,
+    APP_VERSION
 )
 
 
@@ -65,8 +68,7 @@ token = config.get("TW_TOKEN", None)
 nickname = config.get("TW_NICKNAME", None)
 init_channels = config.get("TW_INIT_CHANNELS", None)
 broadcaster_id = config.get("TW_BROADCASTER_ID", None)
-check_stream_interval = config.get(
-    "CHECK_STREAM_INTERVAL", CHECK_STREAM_INTERVAL)
+check_stream_interval = config.get("CHECK_STREAM_INTERVAL", CHECK_STREAM_INTERVAL)
 log_level_env = config.get("LOG_LEVEL", LOG_LEVEL)
 discord_username_hashtag = config.get("DC_USER_NAME_HASHTAG", None)
 webhook_url_hashtag = config.get("DC_WEBHOOK_URL_HASHTAG", None)
@@ -74,9 +76,15 @@ discord_username_clip = config.get("DC_USER_NAME_CLIP", None)
 webhook_url_clip = config.get("DC_WEBHOOK_URL_CLIP", None)
 dc_feature_hashtag = config.get("DC_FEATURE_HASHTAG", DC_FEATURE_HASHTAG)
 dc_feature_clips = config.get("DC_FEATURE_CLIPS", DC_FEATURE_CLIPS)
+discord_username_links = config.get(
+    "",
+)
+webhook_url_links = config.get(
+    "",
+)
+dc_feature_links = config.get("DC_FEATURE_LINKS", DC_FEATURE_LINKS)
 clip_thank_you_text = config.get("CLIP_THANK_YOU_TEXT", CLIP_THANK_YOU_TEXT)
-clips_fetch_time = config.get(
-    "CLIPS_FETCH_TIME", UPDATE_INTERVAL_PUBLISH_NEW_CLIPS)
+clips_fetch_time = config.get("CLIPS_FETCH_TIME", UPDATE_INTERVAL_PUBLISH_NEW_CLIPS)
 dc_feature_message_streamstart = config.get(
     "DC_FEATURE_MESSAGE_STREAMSTART", DC_FEATURE_MESSAGE_STREAMSTART
 )
@@ -94,8 +102,7 @@ dc_feature_message_streamstart_text = config.get(
 hashtag_max_length = config.get("HASHTAG_MAX_LENGTH", HASHTAG_MAX_LENGTH)
 hashtag_min_length = config.get("HASHTAG_MIN_LENGTH", HASHTAG_MIN_LENGTH)
 tweet_max_length = config.get("TWEET_MAX_LENGTH", TWEET_MAX_LENGTH)
-hashtag_all_lower_case = config.get(
-    "HASHTAG_ALL_LOWER_CASE", HASHTAG_ALL_LOWER_CASE)
+hashtag_all_lower_case = config.get("HASHTAG_ALL_LOWER_CASE", HASHTAG_ALL_LOWER_CASE)
 hashtag_authentication_level = config.get(
     "HASHTAG_AUTHENTICATION_LEVEL", HASHTAG_AUTHENTICATION_LEVEL
 )
@@ -105,7 +112,9 @@ hashtag_chatter_thanks_text = config.get(
 hashtag_from_stream_tags = config.get(
     "HASHTAG_FEATURE_FROM_STREAM_TAGS", HASHTAG_FEATURE_FROM_STREAM_TAGS
 )
-start_bot_at_streamstart = config.get("START_BOT_AT_STREAMSTART", START_BOT_AT_STREAMSTART)
+start_bot_at_streamstart = config.get(
+    "START_BOT_AT_STREAMSTART", START_BOT_AT_STREAMSTART
+)
 finish_bot_at_streamend = config.get("FINISH_BOT_AT_STREAMEND", FINISH_BOT_AT_STREAMEND)
 start_hashtag_bot_command = config.get(
     "BOT_HASHTAG_COMMAND_START", BOT_HASHTAG_COMMAND_START
@@ -143,6 +152,7 @@ app_settings = {
     "dc_available": False,
     "dc_feature_hashtag": False,
     "dc_feature_clips": False,
+    "dc_feature_links": False,
     "dc_feature_start_message": False,
     "check_stream_interval": CHECK_STREAM_INTERVAL,
     "clips_fetch_time": clips_fetch_time,
@@ -151,7 +161,7 @@ app_settings = {
     "finish_bot_at_streamend": finish_bot_at_streamend,
     "log_level": log_level_env,
     "yt_feature_new_video": False,
-    "yt_new_video_fetch_time": YT_VIDEO_FETCH_TIME,
+    "yt_new_video_fetch_time": yt_new_video_fetch_time,
 }
 
 bot_hashtag_commands = {
@@ -185,11 +195,12 @@ discord_settings = {
     "dc_feature_message_streamstart_time_diff": dc_feature_message_streamstart_time_diff,
     "discord_username_video": discord_username_video,
     "webhook_url_video": webhook_url_video,
-
+    "discord_username_links": discord_username_links,
+    "webhook_url_links": webhook_url_links,
 }
 
 youtube_settings = {
-    "youtube_token": youtube_token, 
+    "youtube_token": youtube_token,
     "youtube_channel_id": youtube_channel_id,
     "yt_post_text": yt_post_text,
 }
@@ -200,16 +211,36 @@ def log_settings() -> None:
     log_level = app_settings["log_level"]
     streamstart = app_settings["start_bot_at_streamstart"]
     streamend = app_settings["finish_bot_at_streamend"]
-    dc_active = app_settings["dc_available"]
     dc_hashtags = app_settings["dc_feature_hashtag"]
     dc_clips = app_settings["dc_feature_clips"]
+    dc_yt = app_settings["yt_feature_new_video"]
+    logger.info("=" *25)
+    logger.info(" Settings")
+    logger.info("=" * 25)
+    logger.info("*" * 25)
+    logger.info(" Hen Commander")
+    logger.info("*" * 25)
+    logger.info(f"Version:   {APP_VERSION}")
     logger.info(f"Log-Level: {log_level}")
-    logger.info(f"Bot-Settings / Start: {streamstart} / " f"End: {streamend}")
-    logger.info(
-        f"DC-Settings / Active: {dc_active} / "
-        f"Hashtags: {dc_hashtags} / "
-        f"Clips: {dc_clips}"
-    )
+    logger.info("*" * 25)
+    logger.info("*" * 25)
+    logger.info(" Hashtag-Feature")
+    logger.info("*" * 25)
+    logger.info(f"#-Collection active: {dc_hashtags}")
+    logger.info(f"Automatik Start:     {streamstart}")
+    logger.info(f"Automatik End:       {streamend}")
+    logger.info("*" * 25)
+    logger.info("*" * 25)
+    logger.info(" Clip-Feature")
+    logger.info("*" * 25)
+    logger.info(f"Clip-Fetch active: {dc_clips}")
+    logger.info("*" * 25)
+    logger.info("*" * 25)
+    logger.info(" Video-Feature")
+    logger.info(f"Video-Fetch active: {dc_yt}")
+    logger.info("*" * 25)
+    logger.info("*" * 25)
+    logger.info("=" * 25)
 
 
 def bot_setting_verification() -> None:
@@ -274,8 +305,7 @@ def check_tweet_settings():
         else int(HASHTAG_MIN_LENGTH)
     )
     tweet_settings["tweet_max_length"] = (
-        int(tweet_max_length) if tweet_max_length.isdecimal() else int(
-            TWEET_MAX_LENGTH)
+        int(tweet_max_length) if tweet_max_length.isdecimal() else int(TWEET_MAX_LENGTH)
     )
     tweet_settings["hashtag_all_lower_case"] = hashtag_all_lower_case.lower() in (
         OPTIONS_POSITIVE_ARG
@@ -328,8 +358,7 @@ def twitch_setting_verification() -> bool:
         app_settings["channels"] = init_channels.split(",")
         url = f"https://api.twitch.tv/helix/users?login={app_settings['nickname']}"
         headers = {"Client-ID": client_id, "Authorization": f"Bearer {token}"}
-        response = requests.get(url, headers=headers,
-                                timeout=REQUEST_TIMEOUT).json()
+        response = requests.get(url, headers=headers, timeout=REQUEST_TIMEOUT).json()
         app_settings["broadcaster_id"] = response["data"][0]["id"]
         return True
     logger.error("The login data for twitch is missing or incomplete.")
@@ -382,6 +411,14 @@ def discord_setting_verification() -> None:
         if dc_feature_message_streamstart_time_diff.isdecimal()
         else int(STREAM_START_TIME_DIFFERENCE)
     )
+    if dc_feature_links is not None and dc_feature_links.lower() in (
+        OPTIONS_POSITIVE_ARG
+    ):
+        if None not in (
+            discord_settings["discord_username_links"],
+            discord_settings["webhook_url_links"],
+        ):
+            app_settings["dc_feature_links"] = True
 
 
 def clip_collection_setting_verification() -> None:
@@ -398,12 +435,23 @@ def youtube_setting_verification() -> None:
     """
     Check if settings are available for youtube configurations
     """
-    app_settings["yt_feature_new_video"] = None not in (youtube_token, youtube_channel_id)
-    app_settings["yt_new_video_fetch_time"] = (
-        int(yt_new_video_fetch_time)
-        if yt_new_video_fetch_time.isdecimal()
-        else int(YT_VIDEO_FETCH_TIME)
+    app_settings["yt_feature_new_video"] = None not in (
+        youtube_token,
+        youtube_channel_id,
     )
+    if (
+        not yt_new_video_fetch_time.isdecimal()
+        or int(yt_new_video_fetch_time) < YT_API_MAX_REQUESTS_S
+    ):
+        app_settings["yt_new_video_fetch_time"] = int(YT_VIDEO_FETCH_TIME)
+        logger.info(
+            f"Youtube fetch time <{yt_new_video_fetch_time}> is not decimal or smaller "
+            f"than the allowed request time <{YT_API_MAX_REQUESTS_S}>. "
+            f"The time is set to the default value of {YT_VIDEO_FETCH_TIME}."
+        )
+        app_settings["yt_new_video_fetch_time"] = YT_API_MAX_REQUESTS_S
+        return
+    app_settings["yt_new_video_fetch_time"] = int(yt_new_video_fetch_time)
 
 
 def main() -> None:

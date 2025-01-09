@@ -56,6 +56,24 @@ class Clip(Base):
         return f"Clip: {self.clip_id}"
 
 
+class Link(Base):
+    """Class to be able to map the twitch user links via an ORM
+
+    Args:
+        Base (_type_): Basic class that is inherited
+    """
+
+    __tablename__ = "links"
+    id: Mapped[int] = mapped_column(primary_key=True)
+    user_id: Mapped[int] = mapped_column(ForeignKey("users.id"), nullable=False)
+    timestamp: Mapped[datetime] = mapped_column(nullable=False)
+    url: Mapped[str] = mapped_column(nullable=False)
+    user: Mapped[User] = relationship(back_populates="links")
+
+    def __repr__(self) -> str:
+        return f"Link: {self.id}"
+
+
 class Video(Base):
     """Class to be able to map the videos via an ORM
 
@@ -108,8 +126,10 @@ async def sync_db():
         await conn.run_sync(Base.metadata.create_all)
 
 
-async def get_twitch_user(user_id: str) -> User | None:
-    """Function searches in DB for twitch user ID and returns the mapped user
+async def get_twitch_user(user_id: str, user_name: str) -> User | None:
+    """
+    Function searches in DB for twitch user ID and returns the mapped user.
+    If the user does not exist, one is created.
 
     Args:
         user_id (str): Twitch ID of user
@@ -119,8 +139,13 @@ async def get_twitch_user(user_id: str) -> User | None:
     """
     async with session() as sess:
         statement = select(User).where(User.twitch_user_id == user_id)
-        result = await sess.execute(statement)
-    return result.scalar_one_or_none()
+        result_user = (await sess.execute(statement)).scalar_one_or_none()
+        if result_user is None:
+            user = User(twitch_user_id=user_id, twitch_user_name=user_name)
+            sess.add(user)
+            await sess.commit()
+            result_user = user
+        return result_user
 
 
 async def get_stream(stream_id: int) -> Stream:
@@ -205,6 +230,20 @@ async def add_data(data: Stream | Clip | Video) -> int:
         return data.id
 
 
+async def add_all_data(data: set) -> None:
+    """Add set of data to db
+
+    Args:
+        data (set): Set of data
+
+    Returns:
+        int: ID from commited object
+    """
+    async with session() as sess:
+        sess.add_all(data)
+        await sess.commit()
+
+
 async def last_streams_for_validation_stream_start() -> StreamValidation:
     """Helper function to get the last valid streams. This is for validation 
     if a new stream message is allowed.
@@ -234,8 +273,10 @@ async def last_video(portal: str) -> Video:
     """
     async with session() as sess:
         statement = select(Video).filter(Video.portal == portal).order_by(Video.timestamp.desc())
-        video = (await sess.execute(statement)).scalar_one_or_none()
-    return video
+        video = (await sess.execute(statement)).first()
+    if video is None:
+        return None
+    return video[0]
 
 
 async def async_main():

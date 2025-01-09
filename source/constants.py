@@ -2,7 +2,7 @@
 File contains all constants for easy central import and usage.
 """
 
-APP_VERSION = "v1.8.0"
+APP_VERSION = "v1.8.1"
 CONFIGURATION_FILE_PATH = "../files/config.json"
 CACHE_FILE_PATH = "../files/cache.json"
 LOG_FILE_PATH = "../files/log.txt"
@@ -25,6 +25,8 @@ PUBLISH_NEW_CLIPS = False
 UPDATE_INTERVAL_PUBLISH_NEW_CLIPS = "30"
 DC_FEATURE_HASHTAG = "off"
 DC_FEATURE_CLIPS = "off"
+DC_FEATURE_LINKS = "off"
+BOT_LINK_PATTERN = r"(?:(?:https?|ftp):\/\/)?[\w/\-?=%.]+\.[\w/\-&?=%.]+"
 BOT_COMMAND_PATTERN = r"^[A-Za-z0-9]+$"
 BOT_HASHTAG_COMMAND_START = "starthash"
 BOT_HASHTAG_COMMAND_FINISH = "finishhash"
@@ -37,7 +39,9 @@ HASHTAG_FEATURE_FROM_STREAM_TAGS = "off"
 DC_FEATURE_MESSAGE_STREAMSTART_TEXT = (
     "#broadcaster with #genre is online. It's amazing what's happen here: #link"
 )
-YT_VIDEO_FETCH_TIME = "600"
+# (hours * minutes * seconds) / (max yt api requests per day)
+YT_API_MAX_REQUESTS_S = (24*60*60)/(100)
+YT_VIDEO_FETCH_TIME = "1200"
 YT_POST_TEXT = (
     "A new video has been published on #portal. "
     "It's a great video. Take a look right now: #link "

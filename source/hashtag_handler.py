@@ -27,6 +27,7 @@ app_data = {
     "blacklist": set(),
     "start_message_done": False,
     "chatter": set(),
+    "links": set()
 }
 lock = asyncio.Lock()
 
