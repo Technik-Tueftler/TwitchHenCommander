@@ -5,11 +5,9 @@ Main function for starting app and bot
 """
 import asyncio
 import environment_verification as env
-from constants import APP_VERSION
 from twitch_bot import Bot
 from twitch_api import new_clips_handler, streaming_handler
 from youtube_api import new_yt_video_handler
-from watcher import logger
 import hashtag_handler as hashh
 
 
