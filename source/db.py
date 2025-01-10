@@ -32,6 +32,7 @@ class User(Base):
     twitch_user_id: Mapped[str] = mapped_column(nullable=False)
     twitch_user_name: Mapped[str] = mapped_column(nullable=False)
     clips: Mapped[List["Clip"]] = relationship(back_populates="user")
+    links: Mapped[List["Link"]] = relationship(back_populates="user")
 
     def __repr__(self) -> str:
         return f"User: {self.twitch_user_name}"
