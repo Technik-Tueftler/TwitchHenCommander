@@ -79,8 +79,6 @@ class Bot(commands.Bot):
                         await hashh.register_new_hashtags(
                             message.author.display_name, reviewed_hashtags
                         )
-        if hashh.app_data["dc_feature_links"]:
-            if await check_if_hash_authorized(message):
                 new_links = await links.separate_links(message)
                 if len(new_links) > 0:
                     reviewed_links = await links.review_links(
