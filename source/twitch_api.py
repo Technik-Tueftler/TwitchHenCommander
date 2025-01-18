@@ -17,9 +17,7 @@ from generic_functions import generic_http_request, MyTemplate
 from watcher import logger
 
 
-def log_ratelimit(
-    source_fct: str, response: requests.models.Response
-):
+def log_ratelimit(source_fct: str, response: requests.models.Response):
     """Log ratelimits for twitch API
 
     Args:
@@ -84,6 +82,7 @@ async def check_streamstart_message_allowed() -> bool:
         + f"{streams.curr_stream.id} and S2-ID: {streams.last_stream.id}"
     )
     if streams.no_first_stream:
+        logger.debug("There is no stream until yet. Stream start message is allowed. Good luck ;)")
         return True
     if streams.last_stream.timestamp_end is not None:
         time_diff_s = (
@@ -92,11 +91,16 @@ async def check_streamstart_message_allowed() -> bool:
     time_diff_s = (
         streams.curr_stream.timestamp_start - streams.last_stream.timestamp_start
     ).total_seconds()
-    if time_diff_s > env.discord_settings["dc_feature_message_streamstart_time_diff"]:
+    time_threshold = env.discord_settings["dc_feature_message_streamstart_time_diff"]
+    if time_diff_s > time_threshold:
+        logger.debug(
+            f"The time difference between {streams.curr_stream.id} and {streams.last_stream.id} "
+            + f"is {time_diff_s}s and is smaller than the threshold value {time_threshold}. "
+            + "Stream start message is allowed."
+        )
         return True
-    req_time_diff = env.discord_settings["dc_feature_message_streamstart_time_diff"]
     logger.info(
-        f"message is not allowed because the minimum time {req_time_diff} has "
+        f"message is not allowed because the minimum time {time_threshold} has "
         + "not been reached. Current: {time_diff_s}"
     )
     return False
@@ -156,7 +160,6 @@ async def check_stream_start(settings: dict, response: dict) -> None:
                 stream_id = await db.add_data(stream)
                 hashh.app_data["stream_id"] = stream_id
                 logger.debug(f"Current stream ID in database: {stream_id}")
-
             if env.tweet_settings["hashtag_from_stream_tags"]:
                 streamhashtags = [
                     "#" + hashtag for hashtag in response["data"][0]["tags"]
