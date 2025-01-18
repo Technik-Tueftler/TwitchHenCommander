@@ -8,6 +8,7 @@ from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship
 from sqlalchemy import ForeignKey, select
 from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker
 import environment_verification as env
+from watcher import logger
 
 engine = create_async_engine("sqlite+aiosqlite:///../files/HenCommander.db", echo=False)
 
@@ -256,6 +257,7 @@ async def last_streams_for_validation_stream_start() -> StreamValidation:
         statement = select(Stream).order_by(Stream.timestamp_start.desc())
         streams = (await sess.execute(statement)).scalars().all()
         if len(streams) < 2:
+            logger.debug("No two streams, therefore no stream validation object.")
             return StreamValidation(None, None)
         curr_stream = streams[0]
         last_stream = streams[1]
