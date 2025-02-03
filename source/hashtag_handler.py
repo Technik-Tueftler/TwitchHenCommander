@@ -85,7 +85,7 @@ async def tweet_hashtags() -> None:
     if len(reviewed_hashtags) <= 0:
         return
     if len(app_data["chatter"]) <= 0:
-        app_data["chatter"].add("all")
+        chatter = "all"
     content = MyTemplate(env.tweet_settings["hashtag_chatter_thanks_text"]).substitute(
         hashtags=", ".join(reviewed_hashtags),
         chatter=chatter,
@@ -100,9 +100,9 @@ async def tweet_hashtags() -> None:
             data=data,
             timeout=REQUEST_TIMEOUT,
         )
+    logger.debug(f'Clear chatter and hashtags lists: {app_data["tweets"]} / {app_data["chatter"]}')
     app_data["tweets"] = []
     app_data["chatter"].clear()
-    logger.debug(f'Clear chatter and hashtags lists: {app_data["tweets"]} / {app_data["chatter"]}')
 
 
 async def allow_collecting(allowance: bool) -> None:
@@ -113,6 +113,7 @@ async def allow_collecting(allowance: bool) -> None:
     :return: None
     """
     async with lock:
+        logger.debug(f"Allowance for collecting hashtag is set to {allowance}")
         app_data["allowed"] = allowance
 
 
@@ -123,6 +124,7 @@ async def set_stream_status(status: bool) -> None:
     :return: None
     """
     async with lock:
+        logger.debug(f"Stream status is set to {status}")
         app_data["online"] = status
 
 
