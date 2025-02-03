@@ -37,16 +37,20 @@ async def check_if_hash_authorized(message: twitchio.message.Message) -> bool:
     :param message: Sent message from user
     :return: Allowance as bool
     """
-    level = env.AuthenticationLevel.EVERYONE
-    if message.author.is_subscriber:
-        level = env.AuthenticationLevel.SUBSCRIBER
-    if message.author.is_vip:
-        level = env.AuthenticationLevel.VIP
-    if message.author.is_mod:
-        level = env.AuthenticationLevel.MOD
-    if message.author.is_broadcaster:
-        level = env.AuthenticationLevel.BROADCASTER
-    return level.value >= env.tweet_settings["hashtag_authentication_level"].value
+    try:
+        level = env.AuthenticationLevel.EVERYONE
+        if message.author.is_subscriber:
+            level = env.AuthenticationLevel.SUBSCRIBER
+        if message.author.is_vip:
+            level = env.AuthenticationLevel.VIP
+        if message.author.is_mod:
+            level = env.AuthenticationLevel.MOD
+        if message.author.is_broadcaster:
+            level = env.AuthenticationLevel.BROADCASTER
+        return level.value >= env.tweet_settings["hashtag_authentication_level"].value
+    except AttributeError as err:
+        logger.error(f"Authorization error: {err}")
+        return False
 
 
 class Bot(commands.Bot):
@@ -102,6 +106,7 @@ class Bot(commands.Bot):
         """
         if not await check_if_command_authorized(ctx):
             return
+        logger.debug("Command finish hashtag bot was executed.")
         if hashh.app_data["allowed"]:
             await hashh.allow_collecting(False)
             await hashh.tweet_hashtags()
@@ -116,6 +121,7 @@ class Bot(commands.Bot):
         """
         if not await check_if_command_authorized(ctx):
             return
+        logger.debug("Command stop hashtag bot was executed.")
         if hashh.app_data["allowed"]:
             await hashh.allow_collecting(False)
             await hashh.delete_hashtags()
@@ -130,6 +136,7 @@ class Bot(commands.Bot):
         """
         if not await check_if_setting_change_authorized(ctx):
             return
+        logger.debug("Command for blacklist was executed.")
         new_hashtags = await hashh.separate_hash(ctx.message)
         await hashh.add_hashtag_blacklist(new_hashtags)
         await hashh.write_blacklist()
@@ -146,6 +153,7 @@ class Bot(commands.Bot):
         """
         if not await check_if_command_authorized(ctx):
             return
+        logger.debug("Command for start hashtag bot was executed.")
         if not hashh.app_data["allowed"]:
             await hashh.allow_collecting(True)
             await ctx.send("Hashtag-Bot is running.")
@@ -159,7 +167,9 @@ class Bot(commands.Bot):
         """
         if not await check_if_command_authorized(ctx):
             return
-        if hashh.app_data["allowed"]:
+        status = hashh.app_data["allowed"]
+        logger.debug(f"Command for status hashtag bot was executed. Bot status is: {status}")
+        if status:
             await ctx.send("Hashtag-Bot is running and ready to collect hashtags.")
         else:
             await ctx.send("Hashtag-Bot is paused and waiting for start-command.")
@@ -173,6 +183,7 @@ class Bot(commands.Bot):
         """
         if not await check_if_command_authorized(ctx):
             return
+        logger.debug("Command for help was executed.")
         message = f"!{env.bot_hashtag_commands['status_hashtag_bot_command']} (get status of bot), \
             !{env.bot_hashtag_commands['start_hashtag_bot_command']} (start hashtag collecting), \
             !{env.bot_hashtag_commands['finish_hashtag_bot_command']} \

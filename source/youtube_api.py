@@ -74,12 +74,10 @@ async def new_yt_video_handler(**settings: dict) -> None:
             settings["youtube_token"], settings["youtube_channel_id"]
         )
     )[0]
-    latest_stored_video = await db.last_video("youtube")
-    if (latest_stored_video is not None) and (
-        latest_video.video_id == latest_stored_video.video_id
-    ):
+    if await db.check_video_exist("youtube", latest_video.video_id):
+        logger.debug(f"Youtube Video: {latest_video} already exists")
         return
-    logger.debug(f'New Youtube video detected: {latest_video.title}')
+    logger.info(f'New Youtube video detected: {latest_video.title}')
     _ = await db.add_data(latest_video)
     content = MyTemplate(settings["yt_post_text"]).substitute(
             portal=latest_video.portal, link=latest_video.url
