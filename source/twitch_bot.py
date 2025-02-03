@@ -37,16 +37,19 @@ async def check_if_hash_authorized(message: twitchio.message.Message) -> bool:
     :param message: Sent message from user
     :return: Allowance as bool
     """
-    level = env.AuthenticationLevel.EVERYONE
-    if message.author.is_subscriber:
-        level = env.AuthenticationLevel.SUBSCRIBER
-    if message.author.is_vip:
-        level = env.AuthenticationLevel.VIP
-    if message.author.is_mod:
-        level = env.AuthenticationLevel.MOD
-    if message.author.is_broadcaster:
-        level = env.AuthenticationLevel.BROADCASTER
-    return level.value >= env.tweet_settings["hashtag_authentication_level"].value
+    try:
+        level = env.AuthenticationLevel.EVERYONE
+        if message.author.is_subscriber:
+            level = env.AuthenticationLevel.SUBSCRIBER
+        if message.author.is_vip:
+            level = env.AuthenticationLevel.VIP
+        if message.author.is_mod:
+            level = env.AuthenticationLevel.MOD
+        if message.author.is_broadcaster:
+            level = env.AuthenticationLevel.BROADCASTER
+        return level.value >= env.tweet_settings["hashtag_authentication_level"].value
+    except AttributeError as err:
+        logger.error(f"Authorization error: {err}")
 
 
 class Bot(commands.Bot):
