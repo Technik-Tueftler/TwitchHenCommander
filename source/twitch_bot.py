@@ -50,6 +50,7 @@ async def check_if_hash_authorized(message: twitchio.message.Message) -> bool:
         return level.value >= env.tweet_settings["hashtag_authentication_level"].value
     except AttributeError as err:
         logger.error(f"Authorization error: {err}")
+        return False
 
 
 class Bot(commands.Bot):
