@@ -36,7 +36,7 @@ class User(Base):
     links: Mapped[List["Link"]] = relationship(back_populates="user")
 
     def __repr__(self) -> str:
-        return f"User: {self.twitch_user_name}"
+        return f"User<{self.twitch_user_name}>"
 
 
 class Clip(Base):
@@ -55,7 +55,7 @@ class Clip(Base):
     user: Mapped[User] = relationship(back_populates="clips")
 
     def __repr__(self) -> str:
-        return f"Clip: {self.clip_id}"
+        return f"Clip<{self.clip_id}>"
 
 
 class Link(Base):
@@ -73,7 +73,7 @@ class Link(Base):
     user: Mapped[User] = relationship(back_populates="links")
 
     def __repr__(self) -> str:
-        return f"Link: {self.id}"
+        return f"Link<{self.id}>"
 
 
 class Video(Base):
@@ -92,7 +92,7 @@ class Video(Base):
     url: Mapped[str] = mapped_column(nullable=False)
 
     def __repr__(self) -> str:
-        return f"Video: {self.video_id}"
+        return f"Video<{self.video_id}>"
 
 
 class Stream(Base):
@@ -108,6 +108,9 @@ class Stream(Base):
     timestamp_end: Mapped[datetime] = mapped_column(nullable=True)
     hashtags: Mapped[str] = mapped_column(nullable=True)
     chatter: Mapped[str] = mapped_column(nullable=True)
+
+    def __repr__(self) -> str:
+        return f"Stream<{self.timestamp_start}>"
 
 
 class StreamValidation:
@@ -229,6 +232,7 @@ async def add_data(data: Stream | Clip | Video) -> int:
     async with session() as sess:
         sess.add(data)
         await sess.commit()
+        logger.debug(f"New db entry for {data} created with id: {data.id}")
         return data.id
 
 
@@ -281,6 +285,24 @@ async def last_video(portal: str) -> Video:
         return None
     return video[0]
 
+
+async def check_video_exist(portal: str, video_id: str) -> bool:
+    """
+    Function checks if the video already exists.
+
+    Args:
+        portal (str): The portal to be searched
+        video_id (str): Video ID for checking
+
+    Returns:
+        bool: Information if video already exist
+    """
+    async with session() as sess:
+        statement = select(Video).filter((Video.portal == portal)and(Video.video_id == video_id))
+        video = (await sess.execute(statement)).first()
+    if video is None:
+        return False
+    return True
 
 async def async_main():
     """Scheduling function for regular call."""
