@@ -214,6 +214,9 @@ def log_settings() -> None:
     dc_hashtags = app_settings["dc_feature_hashtag"]
     dc_clips = app_settings["dc_feature_clips"]
     dc_yt = app_settings["yt_feature_new_video"]
+    clips_fetch_time_setting = app_settings["clips_fetch_time"]
+    yt_fetch_time_setting = app_settings["yt_new_video_fetch_time"]
+    online_check_time = app_settings["check_stream_interval"]
     logger.info("=" *25)
     logger.info(" Settings")
     logger.info("=" * 25)
@@ -229,17 +232,27 @@ def log_settings() -> None:
     logger.info(f"#-Collection active: {dc_hashtags}")
     logger.info(f"Automatik Start:     {streamstart}")
     logger.info(f"Automatik End:       {streamend}")
+    logger.debug(f"Onlinestatus time (loaded from env): {check_stream_interval}")
+    logger.info(f"Onlinestatus time: {online_check_time}")
     logger.info("*" * 25)
     logger.info("*" * 25)
     logger.info(" Clip-Feature")
     logger.info("*" * 25)
     logger.info(f"Clip-Fetch active: {dc_clips}")
+    logger.debug(f"Clip-Fetch time (loaded from env): {clips_fetch_time}")
+    logger.info(f"Clip-Fetch time: {clips_fetch_time_setting}")
     logger.info("*" * 25)
     logger.info("*" * 25)
     logger.info(" Video-Feature")
     logger.info(f"Video-Fetch active: {dc_yt}")
+    logger.debug(f"Video-Fetch time (loaded from env): {yt_new_video_fetch_time}")
+    logger.info(f"Video-Fetch time: {yt_fetch_time_setting}")
     logger.info("*" * 25)
     logger.info("*" * 25)
+    logger.debug( " Loaded text environment variables")
+    logger.debug(f"Thank you text: {hashtag_chatter_thanks_text}")
+    logger.debug(f"Stream start message: {dc_feature_message_streamstart_text}")
+    logger.debug(f"Youtube post text: {yt_post_text}")
     logger.info("=" * 25)
 
 
