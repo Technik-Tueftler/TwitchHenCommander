@@ -127,7 +127,7 @@ async def check_stream_start_message(settings: dict, response: dict) -> None:
                 hashh.app_data["start_message_done"] = True
                 logger.debug("Set Stream-Start status")
         else:
-            logger.debug(
+            logger.extdebug(
                 "Stream-start-message status is false, no stream start detected"
             )
     elif (
@@ -169,7 +169,7 @@ async def check_stream_start(settings: dict, response: dict) -> None:
                 "Automatic Stream-Start detected, collecting hashtags allowed."
             )
         else:
-            logger.debug("Stream-start status is false, no stream start detected")
+            logger.extdebug("Stream-start status is false, no stream start detected")
 
 
 async def check_stream_end(settings: dict, response: dict) -> None:
@@ -195,7 +195,7 @@ async def check_stream_end(settings: dict, response: dict) -> None:
             await hashh.set_stream_status(False)
             logger.debug("Automatic Stream-End (2) detected, hashtags puplished.")
         else:
-            logger.debug("Stream-end status is false, no stream ending detected")
+            logger.extdebug("Stream-end status is false, no stream ending detected")
 
 
 async def streaming_handler(**settings) -> None:
