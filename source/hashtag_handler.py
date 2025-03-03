@@ -47,9 +47,10 @@ async def stream_start_message(response: dict) -> None:
         broadcaster = response["data"][0]["display_name"]
         genre = response["data"][0]["game_name"]
         link = TWITCH_URL + "/" + broadcaster
+        notification = env.discord_settings["dc_message_streamstart_noti_role"]
         content = MyTemplate(
             env.discord_settings["dc_feature_message_streamstart_text"]
-        ).substitute(broadcaster=broadcaster, genre=genre, link=link)
+        ).substitute(notification=notification,broadcaster=broadcaster, genre=genre, link=link)
         data = {
             "content": content,
             "username": env.discord_settings["dc_username_message_streamstart"],

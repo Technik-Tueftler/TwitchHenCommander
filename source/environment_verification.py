@@ -43,7 +43,9 @@ from constants import (
     YT_POST_TEXT,
     DC_FEATURE_LINKS,
     YT_API_MAX_REQUESTS_S,
-    APP_VERSION
+    APP_VERSION,
+    DC_MESSAGE_STREAMSTART_NOTI_ROLE_NO_PATTERN,
+    DC_MESSAGE_STREAMSTART_NOTI_ROLE_REPLACEMENT,
 )
 
 
@@ -142,6 +144,7 @@ webhook_url_video = config.get("DC_WEBHOOK_URL_YT", None)
 yt_post_text = config.get("YT_POST_TEXT", YT_POST_TEXT)
 
 bot_command_pattern = re.compile(BOT_COMMAND_PATTERN)
+dc_noti_role_pattern = re.compile(DC_MESSAGE_STREAMSTART_NOTI_ROLE_NO_PATTERN)
 
 app_settings = {
     "ID": client_id,
@@ -197,6 +200,7 @@ discord_settings = {
     "webhook_url_video": webhook_url_video,
     "discord_username_links": discord_username_links,
     "webhook_url_links": webhook_url_links,
+    "dc_message_streamstart_noti_role": None
 }
 
 youtube_settings = {
@@ -217,7 +221,7 @@ def log_settings() -> None:
     clips_fetch_time_setting = app_settings["clips_fetch_time"]
     yt_fetch_time_setting = app_settings["yt_new_video_fetch_time"]
     online_check_time = app_settings["check_stream_interval"]
-    logger.info("=" *25)
+    logger.info("=" * 25)
     logger.info(" Settings")
     logger.info("=" * 25)
     logger.info("*" * 25)
@@ -249,7 +253,7 @@ def log_settings() -> None:
     logger.info(f"Video-Fetch time: {yt_fetch_time_setting}")
     logger.info("*" * 25)
     logger.info("*" * 25)
-    logger.debug( " Loaded text environment variables")
+    logger.debug(" Loaded text environment variables")
     logger.debug(f"Thank you text: {hashtag_chatter_thanks_text}")
     logger.debug(f"Stream start message: {dc_feature_message_streamstart_text}")
     logger.debug(f"Youtube post text: {yt_post_text}")
@@ -432,7 +436,24 @@ def discord_setting_verification() -> None:
             discord_settings["webhook_url_links"],
         ):
             app_settings["dc_feature_links"] = True
-
+    logger.extdebug(f"Loaded streamstart text: {dc_feature_message_streamstart_text}")
+    match_noti_role = re.search(
+        DC_MESSAGE_STREAMSTART_NOTI_ROLE_NO_PATTERN, dc_feature_message_streamstart_text
+    )
+    if match_noti_role:
+        discord_settings["dc_message_streamstart_noti_role"] = (
+            f"<@&{match_noti_role.group(1)}>"
+        )
+        logger.extdebug(f"Found role: {discord_settings['dc_message_streamstart_noti_role']}")
+        logger.extdebug(f"Founded group 0: {match_noti_role.group(0)}")
+        logger.extdebug(f"Input stream text : {dc_feature_message_streamstart_text}")
+        replacement_string = re.sub(
+            match_noti_role.group(0),
+            DC_MESSAGE_STREAMSTART_NOTI_ROLE_REPLACEMENT,
+            dc_feature_message_streamstart_text,
+        )
+        logger.extdebug(f"Replacement string: {replacement_string}")
+        discord_settings["dc_feature_message_streamstart_text"] = replacement_string
 
 def clip_collection_setting_verification() -> None:
     """

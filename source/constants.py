@@ -2,7 +2,7 @@
 File contains all constants for easy central import and usage.
 """
 
-APP_VERSION = "v1.8.5"
+APP_VERSION = "v1.8.6"
 CONFIGURATION_FILE_PATH = "../files/config.json"
 CACHE_FILE_PATH = "../files/cache.json"
 LOG_FILE_PATH = "../files/log.txt"
@@ -39,6 +39,8 @@ HASHTAG_FEATURE_FROM_STREAM_TAGS = "off"
 DC_FEATURE_MESSAGE_STREAMSTART_TEXT = (
     "#broadcaster with #genre is online. It's amazing what's happen here: #link"
 )
+DC_MESSAGE_STREAMSTART_NOTI_ROLE_NO_PATTERN = r'TD_(\d+)'
+DC_MESSAGE_STREAMSTART_NOTI_ROLE_REPLACEMENT = "#notification"
 # (hours * minutes * seconds) / (max yt api requests per day)
 YT_API_MAX_REQUESTS_S = (24*60*60)/(100)
 YT_VIDEO_FETCH_TIME = "1200"

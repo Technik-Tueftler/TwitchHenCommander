@@ -100,6 +100,7 @@ Es gibt bei einigen Texten die Möglichkeit Platzhalter durch eigene Variablen z
 |#broadcaster|DC_FEATURE_MESSAGE_STREAMSTART_TEXT|Name des Streamers|
 |#genre|DC_FEATURE_MESSAGE_STREAMSTART_TEXT|Genre des Streams|
 |#link|DC_FEATURE_MESSAGE_STREAMSTART_TEXT|Link zum Kanal|
+|TD_<DC role-id>|DC_FEATURE_MESSAGE_STREAMSTART_TEXT|Erwähnung einer Rolle für die Benachrichtigungen|
 |#link|CLIP_THANK_YOU_TEXT|Link zum gerade erstellten Clip|
 |#user|CLIP_THANK_YOU_TEXT|Chatter der den Clip erstellt hat|
 |#chatter_all|HASHTAG_CHATTER_THANKS_TEXT|Alle Chatter die einen Hashtag gepostet hatten|

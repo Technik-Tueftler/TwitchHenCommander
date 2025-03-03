@@ -80,7 +80,7 @@ All variables that are required to post a message at the beginning of a stream i
 | DC_FEATURE_MESSAGE_STREAMSTART | Determines whether the function should be active or not. | `active` for active or nothing for inactive |
 | DC_USER_NAME_MESSAGE_STREAMSTART | Username of WebHook in Discord to post message. | UpdateBot |
 | DC_WEBHOOK_URL_MESSAGE_STREAMSTART | WebHook-URL of WebHook in Discord to post message. | https://discord.com/api/webhooks/87364/oiehtt |
-| DC_FEATURE_MESSAGE_STREAMSTART_TEXT | Defines a start text that appears during stream start. | Siehe **Festlegen eigener Text** |
+| DC_FEATURE_MESSAGE_STREAMSTART_TEXT | Defines a start text that appears during stream start. | See **Set own text** |
 
 
 ### Befehle
@@ -103,6 +103,7 @@ For some texts, it is possible to replace placeholders with your own variables a
 |#broadcaster|DC_FEATURE_MESSAGE_STREAMSTART_TEXT| Name of streamer|
 |#genre|DC_FEATURE_MESSAGE_STREAMSTART_TEXT|Genre of game|
 |#link|DC_FEATURE_MESSAGE_STREAMSTART_TEXT|Link to streamer channel|
+|TD_<DC role-id>|DC_FEATURE_MESSAGE_STREAMSTART_TEXT|mention of a role for the notifications|
 |#link|CLIP_THANK_YOU_TEXT|Link to the clip you just created|
 |#user|CLIP_THANK_YOU_TEXT|Chatter who created the clip|
 |#chatter_all|HASHTAG_CHATTER_THANKS_TEXT|All chatters who had posted a hashtag|
