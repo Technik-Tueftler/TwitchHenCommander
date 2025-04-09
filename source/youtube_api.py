@@ -1,5 +1,5 @@
-"""All functions and features that work with the help of the youtube api
-"""
+"""All functions and features that work with the help of the youtube api"""
+
 import asyncio
 from datetime import datetime
 import requests
@@ -26,36 +26,40 @@ async def get_latest_yt_videos(
     Returns:
         list[Video]: List of videos
     """
-    youtube = build("youtube", "v3", developerKey=api_key)
+    try:
+        youtube = build("youtube", "v3", developerKey=api_key)
 
-    response = (
-        youtube.search() # pylint: disable=no-member
-        .list(
-            part="snippet",
-            channelId=channel_id,
-            maxResults=max_results,
-            order="date",
-            type="video",  # No playlists or livestreams
-            fields="items(id,snippet(title,publishedAt))"
+        response = (
+            youtube.search()  # pylint: disable=no-member
+            .list(
+                part="snippet",
+                channelId=channel_id,
+                maxResults=max_results,
+                order="date",
+                type="video",  # No playlists or livestreams
+                fields="items(id,snippet(title,publishedAt))",
+            )
+            .execute()
         )
-        .execute()
-    )
 
-    videos = []
-    for item in response["items"]:
-        title = item["snippet"]["title"]
-        video_id = item["id"]["videoId"]
-        published_at = item["snippet"]["publishedAt"]
-        url = f'https://www.youtube.com/watch?v={item["id"]["videoId"]}'
-        video = db.Video(
-            video_id=video_id,
-            portal="youtube",
-            timestamp=datetime.strptime(published_at, "%Y-%m-%dT%H:%M:%SZ"),
-            title=title,
-            url=url,
-        )
-        videos.append(video)
-    return videos
+        videos = []
+        for item in response["items"]:
+            title = item["snippet"]["title"]
+            video_id = item["id"]["videoId"]
+            published_at = item["snippet"]["publishedAt"]
+            url = f'https://www.youtube.com/watch?v={item["id"]["videoId"]}'
+            video = db.Video(
+                video_id=video_id,
+                portal="youtube",
+                timestamp=datetime.strptime(published_at, "%Y-%m-%dT%H:%M:%SZ"),
+                title=title,
+                url=url,
+            )
+            videos.append(video)
+        return videos
+    except OSError as err:
+        logger.error(f"Youtube API Error: {err}")
+        return []
 
 
 async def new_yt_video_handler(**settings: dict) -> None:
@@ -69,19 +73,20 @@ async def new_yt_video_handler(**settings: dict) -> None:
     if not settings["database_synchronized"]:
         await db.sync_db()
         settings["database_synchronized"] = True
-    latest_video = (
-        await get_latest_yt_videos(
-            settings["youtube_token"], settings["youtube_channel_id"]
-        )
-    )[0]
+    videos = await get_latest_yt_videos(
+        settings["youtube_token"], settings["youtube_channel_id"]
+    )
+    if not videos:
+        return
+    latest_video = videos[0]
     if await db.check_video_exist("youtube", latest_video.video_id):
         logger.extdebug(f"Youtube Video: {latest_video} already exists")
         return
-    logger.info(f'New Youtube video detected: {latest_video.title}')
+    logger.info(f"New Youtube video detected: {latest_video.title}")
     _ = await db.add_data(latest_video)
     content = MyTemplate(settings["yt_post_text"]).substitute(
-            portal=latest_video.portal, link=latest_video.url
-        )
+        portal=latest_video.portal, link=latest_video.url
+    )
     await post_video(settings, content)
     # await asyncio.sleep(CLIP_WAIT_TIME)
 

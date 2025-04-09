@@ -1,7 +1,6 @@
-"""All functions and features that work with the help of the twitch api
-"""
+"""All functions and features that work with the help of the twitch api"""
 
-from datetime import datetime, timedelta, UTC
+from datetime import datetime, timedelta, UTC, timezone
 
 import asyncio
 import requests
@@ -76,32 +75,27 @@ async def check_streamstart_message_allowed() -> bool:
     Returns:
         bool: New stream message is allowed
     """
-    streams = await db.last_streams_for_validation_stream_start()
-    logger.debug(
-        "Last two streams for stream start message logic. S1-ID: "
-        + f"{streams.curr_stream.id} and S2-ID: {streams.last_stream.id}"
-    )
-    if streams.no_first_stream:
-        logger.debug("There is no stream until yet. Stream start message is allowed. Good luck ;)")
-        return True
-    if streams.last_stream.timestamp_end is not None:
-        time_diff_s = (
-            streams.curr_stream.timestamp_start - streams.last_stream.timestamp_end
-        ).total_seconds()
-    time_diff_s = (
-        streams.curr_stream.timestamp_start - streams.last_stream.timestamp_start
-    ).total_seconds()
-    time_threshold = env.discord_settings["dc_feature_message_streamstart_time_diff"]
-    if time_diff_s > time_threshold:
+    stream = await db.last_streams_for_validation_stream_start()
+    if stream is None:
         logger.debug(
-            f"The time difference between {streams.curr_stream.id} and {streams.last_stream.id} "
-            + f"is {time_diff_s}s and is smaller than the threshold value {time_threshold}. "
-            + "Stream start message is allowed."
+            "There is no stream until yet. Stream start message is allowed. Good luck ;)"
         )
         return True
-    logger.info(
-        f"message is not allowed because the minimum time {time_threshold} has "
-        + "not been reached. Current: {time_diff_s}"
+    timestamp_now = datetime.now(UTC)
+    time_diff_s = timestamp_now - stream.timestamp_start.replace(tzinfo=timezone.utc)
+    time_threshold = env.discord_settings["dc_feature_message_streamstart_time_diff"]
+    if time_diff_s.total_seconds() > time_threshold:
+        time_formated = timestamp_now.strftime("%Y-%m-%d %H:%M:%S")
+        logger.debug(
+            "Stream start message is allowed. - "
+            + f"The difference between now: {time_formated} and the last stream (id: {stream.id})"
+            + f"is {time_diff_s}s and is greater than the threshold value {time_threshold}."
+        )
+        return True
+    logger.debug(
+        "Stream start message is not allowed. - "
+        + f"The difference between now: {time_formated} and the last stream (id: {stream.id})"
+        + f"is {time_diff_s}s and is smaller than the threshold value {time_threshold}."
     )
     return False
 
