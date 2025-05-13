@@ -84,8 +84,8 @@ async def check_streamstart_message_allowed() -> bool:
     timestamp_now = datetime.now(UTC)
     time_diff_s = timestamp_now - stream.timestamp_start.replace(tzinfo=timezone.utc)
     time_threshold = env.discord_settings["dc_feature_message_streamstart_time_diff"]
+    time_formated = timestamp_now.strftime("%Y-%m-%d %H:%M:%S")
     if time_diff_s.total_seconds() > time_threshold:
-        time_formated = timestamp_now.strftime("%Y-%m-%d %H:%M:%S")
         logger.debug(
             "Stream start message is allowed. - "
             + f"The difference between now: {time_formated} and the last stream (id: {stream.id})"
