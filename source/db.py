@@ -250,7 +250,7 @@ async def add_all_data(data: set) -> None:
         await sess.commit()
 
 
-async def last_streams_for_validation_stream_start() -> Stream | None:
+async def last_streams_for_validation_stream_start() -> List[Stream] | None:
     """Helper function to get the last valid stream. This is for validation 
     if a new stream message is allowed.
 
@@ -258,12 +258,12 @@ async def last_streams_for_validation_stream_start() -> Stream | None:
         Stream | None: Last stream object or None if no stream is found
     """
     async with session() as sess:
-        statement = select(Stream).order_by(Stream.timestamp_start.desc())
+        statement = select(Stream).order_by(Stream.timestamp_start.desc()).limit(2)
         streams = (await sess.execute(statement)).scalars().all()
-        if not streams:
+        if not streams or len(streams) < 2:
             logger.debug("No streams, therefore no stream validation object.")
             return None
-        return streams[0]
+        return streams
 
 
 async def last_video(portal: str) -> Video:

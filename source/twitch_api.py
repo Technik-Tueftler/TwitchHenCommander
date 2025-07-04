@@ -81,20 +81,23 @@ async def check_streamstart_message_allowed() -> bool:
             "There is no stream until yet. Stream start message is allowed. Good luck ;)"
         )
         return True
+    last_stream = stream[1]
     timestamp_now = datetime.now(UTC)
-    time_diff_s = timestamp_now - stream.timestamp_start.replace(tzinfo=timezone.utc)
+    time_diff_s = timestamp_now - last_stream.timestamp_start.replace(
+        tzinfo=timezone.utc
+    )
     time_threshold = env.discord_settings["dc_feature_message_streamstart_time_diff"]
     time_formated = timestamp_now.strftime("%Y-%m-%d %H:%M:%S")
     if time_diff_s.total_seconds() > time_threshold:
         logger.debug(
-            "Stream start message is allowed. - "
-            + f"The difference between now: {time_formated} and the last stream (id: {stream.id})"
+            "Stream start message is allowed. - The "
+            + f"difference between now: {time_formated} and the last stream (id: {last_stream.id})"
             + f"is {time_diff_s}s and is greater than the threshold value {time_threshold}."
         )
         return True
     logger.debug(
         "Stream start message is not allowed. - "
-        + f"The difference between now: {time_formated} and the last stream (id: {stream.id})"
+        + f"The difference between now: {time_formated} and the last stream (id: {last_stream.id})"
         + f"is {time_diff_s}s and is smaller than the threshold value {time_threshold}."
     )
     return False
@@ -223,8 +226,8 @@ async def streaming_handler(**settings) -> None:
         return
     log_ratelimit("streaming_handler", response_temp)
     response = response_temp.json()
-    await check_stream_start_message(settings, response)
     await check_stream_start(settings, response)
+    await check_stream_start_message(settings, response)
     await check_stream_end(settings, response)
 
 
