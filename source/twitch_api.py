@@ -26,7 +26,7 @@ def log_ratelimit(source_fct: str, response: requests.models.Response):
     limit = response.headers.get("Ratelimit-Limit", "NA")
     remaining = response.headers.get("Ratelimit-Remaining")
     reset_time = response.headers.get("Ratelimit-Reset")
-    logger.extdebug(
+    logger.trace(
         f"{source_fct}: / "
         f"Get online status with: Limit: {limit} / "
         f"Remaining: {remaining} / "
@@ -124,7 +124,7 @@ async def check_stream_start_message(settings: dict, response: dict) -> None:
                 hashh.app_data["start_message_done"] = True
                 logger.debug("Set Stream-Start status")
         else:
-            logger.extdebug(
+            logger.debug(
                 "Stream-start-message status is false, no stream start detected"
             )
     elif (
@@ -162,11 +162,11 @@ async def check_stream_start(settings: dict, response: dict) -> None:
                     "#" + hashtag for hashtag in response["data"][0]["tags"]
                 ]
                 await hashh.register_new_hashtags(None, set(streamhashtags))
-            logger.debug(
+            logger.info(
                 "Automatic Stream-Start detected, collecting hashtags allowed."
             )
         else:
-            logger.extdebug("Stream-start status is false, no stream start detected")
+            logger.debug("Stream-start status is false, no stream start detected")
 
 
 async def check_stream_end(settings: dict, response: dict) -> None:
@@ -192,7 +192,7 @@ async def check_stream_end(settings: dict, response: dict) -> None:
             await hashh.set_stream_status(False)
             logger.debug("Automatic Stream-End (2) detected, hashtags puplished.")
         else:
-            logger.extdebug("Stream-end status is false, no stream ending detected")
+            logger.debug("Stream-end status is false, no stream ending detected")
 
 
 async def streaming_handler(**settings) -> None:

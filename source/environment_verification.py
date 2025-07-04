@@ -436,7 +436,7 @@ def discord_setting_verification() -> None:
             discord_settings["webhook_url_links"],
         ):
             app_settings["dc_feature_links"] = True
-    logger.extdebug(f"Loaded streamstart text: {dc_feature_message_streamstart_text}")
+    logger.debug(f"Loaded streamstart text: {dc_feature_message_streamstart_text}")
     match_noti_role = re.search(
         DC_MESSAGE_STREAMSTART_NOTI_ROLE_NO_PATTERN, dc_feature_message_streamstart_text
     )
@@ -444,15 +444,15 @@ def discord_setting_verification() -> None:
         discord_settings["dc_message_streamstart_noti_role"] = (
             f"<@&{match_noti_role.group(1)}>"
         )
-        logger.extdebug(f"Found role: {discord_settings['dc_message_streamstart_noti_role']}")
-        logger.extdebug(f"Founded group 0: {match_noti_role.group(0)}")
-        logger.extdebug(f"Input stream text : {dc_feature_message_streamstart_text}")
+        logger.trace(f"Found role: {discord_settings['dc_message_streamstart_noti_role']}")
+        logger.trace(f"Founded group 0: {match_noti_role.group(0)}")
+        logger.trace(f"Input stream text : {dc_feature_message_streamstart_text}")
         replacement_string = re.sub(
             match_noti_role.group(0),
             DC_MESSAGE_STREAMSTART_NOTI_ROLE_REPLACEMENT,
             dc_feature_message_streamstart_text,
         )
-        logger.extdebug(f"Replacement string: {replacement_string}")
+        logger.trace(f"Replacement string: {replacement_string}")
         discord_settings["dc_feature_message_streamstart_text"] = replacement_string
 
 def clip_collection_setting_verification() -> None:
