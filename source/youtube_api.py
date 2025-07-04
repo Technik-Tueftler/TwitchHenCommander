@@ -69,7 +69,7 @@ async def new_yt_video_handler(**settings: dict) -> None:
     Args:
         settings (dict): App settings
     """
-    logger.extdebug("Check if new youtube video is available.")
+    logger.debug("Check if new youtube video is available.")
     if not settings["database_synchronized"]:
         await db.sync_db()
         settings["database_synchronized"] = True
@@ -80,7 +80,7 @@ async def new_yt_video_handler(**settings: dict) -> None:
         return
     latest_video = videos[0]
     if await db.check_video_exist("youtube", latest_video.video_id):
-        logger.extdebug(f"Youtube Video: {latest_video} already exists")
+        logger.debug(f"Youtube Video: {latest_video} already exists")
         return
     logger.info(f"New Youtube video detected: {latest_video.title}")
     _ = await db.add_data(latest_video)

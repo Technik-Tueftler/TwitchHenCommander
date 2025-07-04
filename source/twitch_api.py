@@ -26,7 +26,7 @@ def log_ratelimit(source_fct: str, response: requests.models.Response):
     limit = response.headers.get("Ratelimit-Limit", "NA")
     remaining = response.headers.get("Ratelimit-Remaining")
     reset_time = response.headers.get("Ratelimit-Reset")
-    logger.extdebug(
+    logger.trace(
         f"{source_fct}: / "
         f"Get online status with: Limit: {limit} / "
         f"Remaining: {remaining} / "
@@ -81,20 +81,23 @@ async def check_streamstart_message_allowed() -> bool:
             "There is no stream until yet. Stream start message is allowed. Good luck ;)"
         )
         return True
+    last_stream = stream[1]
     timestamp_now = datetime.now(UTC)
-    time_diff_s = timestamp_now - stream.timestamp_start.replace(tzinfo=timezone.utc)
+    time_diff_s = timestamp_now - last_stream.timestamp_start.replace(
+        tzinfo=timezone.utc
+    )
     time_threshold = env.discord_settings["dc_feature_message_streamstart_time_diff"]
     time_formated = timestamp_now.strftime("%Y-%m-%d %H:%M:%S")
     if time_diff_s.total_seconds() > time_threshold:
         logger.debug(
-            "Stream start message is allowed. - "
-            + f"The difference between now: {time_formated} and the last stream (id: {stream.id})"
+            "Stream start message is allowed. - The "
+            + f"difference between now: {time_formated} and the last stream (id: {last_stream.id})"
             + f"is {time_diff_s}s and is greater than the threshold value {time_threshold}."
         )
         return True
     logger.debug(
         "Stream start message is not allowed. - "
-        + f"The difference between now: {time_formated} and the last stream (id: {stream.id})"
+        + f"The difference between now: {time_formated} and the last stream (id: {last_stream.id})"
         + f"is {time_diff_s}s and is smaller than the threshold value {time_threshold}."
     )
     return False
@@ -121,7 +124,7 @@ async def check_stream_start_message(settings: dict, response: dict) -> None:
                 hashh.app_data["start_message_done"] = True
                 logger.debug("Set Stream-Start status")
         else:
-            logger.extdebug(
+            logger.debug(
                 "Stream-start-message status is false, no stream start detected"
             )
     elif (
@@ -159,11 +162,11 @@ async def check_stream_start(settings: dict, response: dict) -> None:
                     "#" + hashtag for hashtag in response["data"][0]["tags"]
                 ]
                 await hashh.register_new_hashtags(None, set(streamhashtags))
-            logger.debug(
+            logger.info(
                 "Automatic Stream-Start detected, collecting hashtags allowed."
             )
         else:
-            logger.extdebug("Stream-start status is false, no stream start detected")
+            logger.debug("Stream-start status is false, no stream start detected")
 
 
 async def check_stream_end(settings: dict, response: dict) -> None:
@@ -189,7 +192,7 @@ async def check_stream_end(settings: dict, response: dict) -> None:
             await hashh.set_stream_status(False)
             logger.debug("Automatic Stream-End (2) detected, hashtags puplished.")
         else:
-            logger.extdebug("Stream-end status is false, no stream ending detected")
+            logger.debug("Stream-end status is false, no stream ending detected")
 
 
 async def streaming_handler(**settings) -> None:
@@ -223,8 +226,8 @@ async def streaming_handler(**settings) -> None:
         return
     log_ratelimit("streaming_handler", response_temp)
     response = response_temp.json()
-    await check_stream_start_message(settings, response)
     await check_stream_start(settings, response)
+    await check_stream_start_message(settings, response)
     await check_stream_end(settings, response)
 
 
