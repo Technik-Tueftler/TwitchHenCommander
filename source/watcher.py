@@ -13,3 +13,4 @@ def init_logging(log_level: str) -> None:
     logger.remove()
     logger.add("../files/henCommander.log", rotation="500 MB", level=log_level)
     logger.add(sys.stdout, colorize=True, level=log_level)
+    logger.debug(f"Logging initialized with level: {log_level}")
