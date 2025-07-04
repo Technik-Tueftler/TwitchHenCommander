@@ -1,7 +1,6 @@
 """All functions and features for logging the app
 """
 import sys
-from functools import partialmethod
 from loguru import logger
 
 
