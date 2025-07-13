@@ -3,6 +3,7 @@ File contains all constants for easy central import and usage.
 """
 
 APP_VERSION = "v1.8.9"
+MODE_DEVELOP = False
 CONFIGURATION_FILE_PATH = "../files/config.json"
 CACHE_FILE_PATH = "../files/cache.json"
 LOG_FILE_PATH = "../files/log.txt"
