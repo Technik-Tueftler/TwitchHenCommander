@@ -23,3 +23,11 @@ jobs:
     - name: Analysing the code with pylint
       run: |
         pylint $(git ls-files '*.py')
+    - name: Check constants
+      run: |
+          if grep -E '^MODE_DEVELOP\s*=\s*True' files/constants.py; then
+            echo "MODE_DEVELOP is active, merge is not allowed."
+            exit 1
+          else
+            echo "MODE_DEVELOP is not active, merge is allowed."
+          fi
