@@ -23,11 +23,38 @@ jobs:
     - name: Analysing the code with pylint
       run: |
         pylint $(git ls-files '*.py')
-    - name: Check constants
+    - name: Read MODE_DEVELOP and APP_VERSION from constants.py
+      id: vars
       run: |
-          if grep -E '^MODE_DEVELOP\s*=\s*True' files/constants.py; then
-            echo "MODE_DEVELOP is active, merge is not allowed."
-            exit 1
+          MODE_DEVELOP=$(grep -E "^MODE_DEVELOP\s*=\s*True" files/constants.py || true)
+          if [ -n "$MODE_DEVELOP" ]; then
+            echo "MODE_DEVELOP_TRUE=true" >> $GITHUB_ENV
           else
-            echo "MODE_DEVELOP is not active, merge is allowed."
+            echo "MODE_DEVELOP_TRUE=false" >> $GITHUB_ENV
           fi
+          APP_VERSION=$(grep -E "^APP_VERSION\s*=" files/constants.py | sed -E "s/APP_VERSION\s*=\s*[\"']?([^\"']+)[\"']?/\1/")
+          echo "APP_VERSION=$APP_VERSION" >> $GITHUB_ENV
+
+    - name: Check, if APP_VERSION already exists as a release
+      id: version_check
+      run: |
+          # Get all existing release tags
+          RELEASES=$(gh release list --limit 1000 --json tagName --jq '.[].tagName')
+          if echo "$RELEASES" | grep -Fxq "$APP_VERSION"; then
+            echo "VERSION_EXISTS=true" >> $GITHUB_ENV
+          else
+            echo "VERSION_EXISTS=false" >> $GITHUB_ENV
+          fi
+      env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+    - name: Merge blocked if MODE_DEVELOP is True or APP_VERSION already exists as a release
+      if: ${{ env.MODE_DEVELOP_TRUE == 'true' || env.VERSION_EXISTS == 'true' }}
+      run: |
+          if [ "$MODE_DEVELOP_TRUE" = "true" ]; then
+            echo "MODE_DEVELOP is True, merge blocked."
+          fi
+          if [ "$VERSION_EXISTS" = "true" ]; then
+            echo "APP_VERSION $APP_VERSION is already a release, merge is blocked."
+          fi
+          exit 1
