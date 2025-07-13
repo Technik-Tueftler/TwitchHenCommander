@@ -26,13 +26,13 @@ jobs:
     - name: Read MODE_DEVELOP and APP_VERSION from constants.py
       id: vars
       run: |
-          MODE_DEVELOP=$(grep -E "^MODE_DEVELOP\s*=\s*True" files/constants.py || true)
+          MODE_DEVELOP=$(grep -E "^MODE_DEVELOP\s*=\s*True" source/constants.py || true)
           if [ -n "$MODE_DEVELOP" ]; then
             echo "MODE_DEVELOP_TRUE=true" >> $GITHUB_ENV
           else
             echo "MODE_DEVELOP_TRUE=false" >> $GITHUB_ENV
           fi
-          APP_VERSION=$(grep -E "^APP_VERSION\s*=" files/constants.py | sed -E "s/APP_VERSION\s*=\s*[\"']?([^\"']+)[\"']?/\1/")
+          APP_VERSION=$(grep -E "^APP_VERSION\s*=" source/constants.py | sed -E "s/APP_VERSION\s*=\s*[\"']?([^\"']+)[\"']?/\1/")
           echo "APP_VERSION=$APP_VERSION" >> $GITHUB_ENV
 
     - name: Check, if APP_VERSION already exists as a release
