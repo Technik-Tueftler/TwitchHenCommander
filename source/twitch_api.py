@@ -7,11 +7,7 @@ import requests
 import db
 import hashtag_handler as hashh
 import environment_verification as env
-from constants import (
-    REQUEST_TIMEOUT,
-    CLIP_WAIT_TIME,
-    TIMESTAMP_PATTERN,
-)
+from constants import REQUEST_TIMEOUT, CLIP_WAIT_TIME, TIMESTAMP_PATTERN, MODE_DEVELOP
 from generic_functions import generic_http_request, MyTemplate
 from watcher import logger
 
@@ -114,7 +110,7 @@ async def check_stream_start_message(settings: dict, response: dict) -> None:
         settings["dc_feature_start_message"]
         and not hashh.app_data["start_message_done"]
     ):
-        if (
+        if MODE_DEVELOP or (
             response["data"]
             and response["data"][0]["is_live"]
             and await check_streamstart_message_allowed()
@@ -146,9 +142,13 @@ async def check_stream_start(settings: dict, response: dict) -> None:
     """
     if settings["start_bot_at_streamstart"]:
         if (
-            response["data"]
+            MODE_DEVELOP
             and not hashh.app_data["online"]
-            and response["data"][0]["is_live"]
+            or (
+                response["data"]
+                and not hashh.app_data["online"]
+                and response["data"][0]["is_live"]
+            )
         ):
             await hashh.allow_collecting(True)
             await hashh.set_stream_status(True)
@@ -158,13 +158,14 @@ async def check_stream_start(settings: dict, response: dict) -> None:
                 hashh.app_data["stream_id"] = stream_id
                 logger.debug(f"Current stream ID in database: {stream_id}")
             if env.tweet_settings["hashtag_from_stream_tags"]:
-                streamhashtags = [
-                    "#" + hashtag for hashtag in response["data"][0]["tags"]
-                ]
+                if MODE_DEVELOP:
+                    streamhashtags = ["testMode", "#develop"]
+                else:
+                    streamhashtags = [
+                        "#" + hashtag for hashtag in response["data"][0]["tags"]
+                    ]
                 await hashh.register_new_hashtags(None, set(streamhashtags))
-            logger.info(
-                "Automatic Stream-Start detected, collecting hashtags allowed."
-            )
+            logger.info("Automatic Stream-Start detected, collecting hashtags allowed.")
         else:
             logger.debug("Stream-start status is false, no stream start detected")
 
@@ -177,6 +178,8 @@ async def check_stream_end(settings: dict, response: dict) -> None:
         response (dict): Response from API request
     """
     if settings["finish_bot_at_streamend"]:
+        if MODE_DEVELOP:
+            return
         if not response["data"] and hashh.app_data["online"]:
             await hashh.allow_collecting(False)
             await hashh.tweet_hashtags()

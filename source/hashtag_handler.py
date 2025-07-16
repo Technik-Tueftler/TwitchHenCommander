@@ -17,6 +17,7 @@ from constants import (
     REQUEST_TIMEOUT,
     HASHTAG_BLACKLIST_FILE_PATH,
     TWITCH_URL,
+    MODE_DEVELOP
 )
 
 app_data = {
@@ -44,9 +45,14 @@ async def delete_hashtags() -> None:
 async def stream_start_message(response: dict) -> None:
     """Send a Stream-Start information in DC"""
     try:
-        broadcaster = response["data"][0]["display_name"]
-        genre = response["data"][0]["game_name"]
-        link = TWITCH_URL + "/" + broadcaster
+        if MODE_DEVELOP:
+            broadcaster = "TestUser"
+            genre = "TestGenre"
+            link = TWITCH_URL + "/" + broadcaster
+        else:
+            broadcaster = response["data"][0]["display_name"]
+            genre = response["data"][0]["game_name"]
+            link = TWITCH_URL + "/" + broadcaster
         notification = env.discord_settings["dc_message_streamstart_noti_role"]
         content = MyTemplate(
             env.discord_settings["dc_feature_message_streamstart_text"]
