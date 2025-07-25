@@ -296,8 +296,9 @@ async def check_video_exist(portal: str, video_id: str) -> bool:
         bool: Information if video already exist
     """
     async with session() as sess:
-        statement = select(Video).filter((Video.portal == portal)and(Video.video_id == video_id))
-        video = (await sess.execute(statement)).first()
+        statement = select(Video).filter((Video.portal == portal)&(Video.video_id == video_id))
+        video = (await sess.execute(statement)).scalars().first()
+    logger.trace(f"Check if video {video_id} exists in portal {portal}. Output: {video}")
     if video is None:
         return False
     return True
