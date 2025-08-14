@@ -11,6 +11,8 @@ from constants import (
     REQUEST_TIMEOUT,
     CLIP_WAIT_TIME,
     TIMESTAMP_PATTERN,
+    MODE_DEVELOP,
+    DEVELOP_API_RESPONSE,
 )
 from generic_functions import generic_http_request, MyTemplate
 from watcher import logger
@@ -83,21 +85,20 @@ async def check_streamstart_message_allowed() -> bool:
         return True
     last_stream = stream[1]
     timestamp_now = datetime.now(UTC)
-    time_diff_s = timestamp_now - last_stream.timestamp_start.replace(
-        tzinfo=timezone.utc
-    )
+    time_diff = timestamp_now - last_stream.timestamp_start.replace(tzinfo=timezone.utc)
     time_threshold = env.discord_settings["dc_feature_message_streamstart_time_diff"]
     time_formated = timestamp_now.strftime("%Y-%m-%d %H:%M:%S")
-    if time_diff_s.total_seconds() > time_threshold:
+    time_diff_s = time_diff.total_seconds()
+    if time_diff_s > time_threshold:
         logger.debug(
             "Stream start message is allowed. - The "
-            + f"difference between now: {time_formated} and the last stream (id: {last_stream.id})"
+            + f"difference between now: {time_formated} and the last stream (id: {last_stream.id}) "
             + f"is {time_diff_s}s and is greater than the threshold value {time_threshold}."
         )
         return True
     logger.debug(
         "Stream start message is not allowed. - "
-        + f"The difference between now: {time_formated} and the last stream (id: {last_stream.id})"
+        + f"The difference between now: {time_formated} and the last stream (id: {last_stream.id}) "
         + f"is {time_diff_s}s and is smaller than the threshold value {time_threshold}."
     )
     return False
@@ -113,28 +114,20 @@ async def check_stream_start_message(settings: dict, response: dict) -> None:
     if (
         settings["dc_feature_start_message"]
         and not hashh.app_data["start_message_done"]
-    ):
-        if (
-            response["data"]
-            and response["data"][0]["is_live"]
-            and await check_streamstart_message_allowed()
-        ):
-            await hashh.stream_start_message(response)
-            async with hashh.lock:
-                hashh.app_data["start_message_done"] = True
-                logger.debug("Set Stream-Start status")
-        else:
-            logger.debug(
-                "Stream-start-message status is false, no stream start detected"
-            )
-    elif (
-        settings["dc_feature_start_message"]
-        and hashh.app_data["start_message_done"]
-        and not hashh.app_data["online"]
+        and hashh.app_data["online"]
     ):
         async with hashh.lock:
+            hashh.app_data["start_message_done"] = True
+            logger.debug("Stream-Start-Message-Check is done")
+        if await check_streamstart_message_allowed():
+            await hashh.stream_start_message(response)
+            logger.debug("Stream-Start-Message is allowed and sent.")
+        else:
+            logger.debug("Stream-Start-Message is not allowed and sent.")
+    elif settings["dc_feature_start_message"] and not hashh.app_data["online"]:
+        async with hashh.lock:
             hashh.app_data["start_message_done"] = False
-            logger.debug("Reset Stream-Start status")
+            logger.debug("Stream-Start-Message-Check has been reset.")
 
 
 async def check_stream_start(settings: dict, response: dict) -> None:
@@ -162,9 +155,7 @@ async def check_stream_start(settings: dict, response: dict) -> None:
                     "#" + hashtag for hashtag in response["data"][0]["tags"]
                 ]
                 await hashh.register_new_hashtags(None, set(streamhashtags))
-            logger.info(
-                "Automatic Stream-Start detected, collecting hashtags allowed."
-            )
+            logger.info("Automatic Stream-Start detected, collecting hashtags allowed.")
         else:
             logger.debug("Stream-start status is false, no stream start detected")
 
@@ -214,18 +205,22 @@ async def streaming_handler(**settings) -> None:
     # {data": [ {"display_name": "Technik_Tueftler", "game_id": "509658",
     # "game_name": "Just Chatting", "is_live": true,
     # "tags": ["KeinBackseatGaming","Deutsch"], "title": "Reaction",
-    # "started_at": "2024-04-02T12:45:22Z"} ],"pagination": {}
+    # "started_at": "2024-04-02T12:45:22Z"} ],"pagination": {}}
 
     # {'data': [{'display_name': 'Technik_Tueftler', 'game_id': '766571430',
     # 'game_name': 'HELLDIVERS 2', 'id': '206130928', 'is_live': False,
     # 'tags': ['visuellesASMR', 'Deutsch', 'KeineBackseatgaming'],
     # 'title': '🐔 Noch 2 Achievements #34 🐔',
     # 'started_at': ''}], 'pagination': {}}
-    response_temp = await generic_http_request(is_live_url, headers, logger=logger)
-    if response_temp is None:
-        return
-    log_ratelimit("streaming_handler", response_temp)
-    response = response_temp.json()
+    if MODE_DEVELOP:
+        response_temp = DEVELOP_API_RESPONSE
+        response = response_temp
+    else:
+        response_temp = await generic_http_request(is_live_url, headers, logger=logger)
+        if response_temp is None:
+            return
+        log_ratelimit("streaming_handler", response_temp)
+        response = response_temp.json()
     await check_stream_start(settings, response)
     await check_stream_start_message(settings, response)
     await check_stream_end(settings, response)

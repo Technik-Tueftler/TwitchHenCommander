@@ -2,8 +2,22 @@
 File contains all constants for easy central import and usage.
 """
 
-APP_VERSION = "v1.8.10"
+APP_VERSION = "v1.8.11"
 MODE_DEVELOP = False
+DEVELOP_API_RESPONSE = {
+                "data": [
+                    {
+                        "display_name": "Technik_Tueftler",
+                        "game_id": "509658",
+                        "game_name": "Just Chatting",
+                        "is_live": True,
+                        "tags": ["test", "developMode"],
+                        "title": "test stream",
+                        "started_at": "2024-04-02T12:45:22Z",
+                    }
+                ],
+                "pagination": {},
+            }
 CONFIGURATION_FILE_PATH = "../files/config.json"
 CACHE_FILE_PATH = "../files/cache.json"
 LOG_FILE_PATH = "../files/log.txt"
@@ -62,4 +76,4 @@ CHECK_STREAM_INTERVAL = "60"
 # TRACE, DEBUG, INFO, SUCCESS, WARNING, ERROR, CRITICAL
 OPTIONS_LOG_LEVEL = ("TRACE", "DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL")
 LOG_LEVEL = "INFO"
-STREAM_START_TIME_DIFFERENCE = "720"
+STREAM_START_TIME_DIFFERENCE = "43200"
