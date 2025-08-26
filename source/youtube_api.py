@@ -8,12 +8,12 @@ import db
 from generic_functions import MyTemplate
 from watcher import logger
 from constants import (
-    REQUEST_TIMEOUT,
+    REQUEST_TIMEOUT
 )
 
 
 async def get_latest_yt_videos(
-    api_key: str, channel_id: str, max_results: int = 1
+    api_key: str, channel_id: str, max_results: int
 ) -> list[db.Video]:
     """
     Function fetches the latest videos from youtube and sorts them by the most new.
@@ -74,20 +74,22 @@ async def new_yt_video_handler(**settings: dict) -> None:
         await db.sync_db()
         settings["database_synchronized"] = True
     videos = await get_latest_yt_videos(
-        settings["youtube_token"], settings["youtube_channel_id"]
+        settings["youtube_token"],
+        settings["youtube_channel_id"],
+        settings["yt_max_fetched_videos"],
     )
     if not videos:
         return
-    latest_video = videos[0]
-    if await db.check_video_exist("youtube", latest_video.video_id):
-        logger.debug(f"Youtube Video: {latest_video} already exists")
-        return
-    logger.info(f"New Youtube video detected: {latest_video.title}")
-    _ = await db.add_data(latest_video)
-    content = MyTemplate(settings["yt_post_text"]).substitute(
-        portal=latest_video.portal, link=latest_video.url
-    )
-    await post_video(settings, content)
+    for video in videos:
+        if await db.check_video_exist("youtube", video.video_id):
+            logger.debug(f"Youtube Video: {video} already exists")
+            continue
+        logger.info(f"New Youtube video detected: {video.title}")
+        _ = await db.add_data(video)
+        content = MyTemplate(settings["yt_post_text"]).substitute(
+            portal=video.portal, link=video.url
+        )
+        await post_video(settings, content)
     # await asyncio.sleep(CLIP_WAIT_TIME)
 
 
