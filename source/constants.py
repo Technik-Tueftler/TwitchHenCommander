@@ -2,7 +2,7 @@
 File contains all constants for easy central import and usage.
 """
 
-APP_VERSION = "v1.8.11"
+APP_VERSION = "v1.8.12"
 MODE_DEVELOP = False
 DEVELOP_API_RESPONSE = {
                 "data": [
