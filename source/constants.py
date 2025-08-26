@@ -2,7 +2,7 @@
 File contains all constants for easy central import and usage.
 """
 
-APP_VERSION = "v1.8.11"
+APP_VERSION = "v1.8.12"
 MODE_DEVELOP = False
 DEVELOP_API_RESPONSE = {
                 "data": [
@@ -58,6 +58,7 @@ DC_MESSAGE_STREAMSTART_NOTI_ROLE_NO_PATTERN = r'TD_(\d+)'
 DC_MESSAGE_STREAMSTART_NOTI_ROLE_REPLACEMENT = "#notification"
 # (hours * minutes * seconds) / (max yt api requests per day)
 YT_API_MAX_REQUESTS_S = (24*60*60)/(100)
+YT_MAX_FETCHED_VIDEOS = 3
 YT_VIDEO_FETCH_TIME = "1200"
 YT_POST_TEXT = (
     "A new video has been published on #portal. "

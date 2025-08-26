@@ -46,6 +46,7 @@ from constants import (
     APP_VERSION,
     DC_MESSAGE_STREAMSTART_NOTI_ROLE_NO_PATTERN,
     DC_MESSAGE_STREAMSTART_NOTI_ROLE_REPLACEMENT,
+    YT_MAX_FETCHED_VIDEOS,
 )
 
 
@@ -139,6 +140,7 @@ blacklist_hashtag_bot_command = config.get(
 youtube_token = config.get("YT_TOKEN", None)
 youtube_channel_id = config.get("YT_CHANNEL_ID", None)
 yt_new_video_fetch_time = config.get("YT_VIDEO_FETCH_TIME", YT_VIDEO_FETCH_TIME)
+yt_max_fetched_videos = config.get("YT_MAX_FETCHED_VIDEOS", YT_MAX_FETCHED_VIDEOS)
 discord_username_video = config.get("DC_USER_NAME_YT", None)
 webhook_url_video = config.get("DC_WEBHOOK_URL_YT", None)
 yt_post_text = config.get("YT_POST_TEXT", YT_POST_TEXT)
@@ -165,6 +167,7 @@ app_settings = {
     "log_level": log_level_env,
     "yt_feature_new_video": False,
     "yt_new_video_fetch_time": yt_new_video_fetch_time,
+    "yt_max_fetched_videos": yt_max_fetched_videos
 }
 
 bot_hashtag_commands = {
@@ -220,6 +223,7 @@ def log_settings() -> None:
     dc_yt = app_settings["yt_feature_new_video"]
     clips_fetch_time_setting = app_settings["clips_fetch_time"]
     yt_fetch_time_setting = app_settings["yt_new_video_fetch_time"]
+    yt_max_fetched_new_videos = app_settings["yt_max_fetched_videos"]
     online_check_time = app_settings["check_stream_interval"]
     logger.info("=" * 25)
     logger.info(" Settings")
@@ -251,6 +255,7 @@ def log_settings() -> None:
     logger.info(f"Video-Fetch active: {dc_yt}")
     logger.debug(f"Video-Fetch time (loaded from env): {yt_new_video_fetch_time}")
     logger.info(f"Video-Fetch time: {yt_fetch_time_setting}")
+    logger.info(f"Max fetched videos: {yt_max_fetched_new_videos}")
     logger.info("*" * 25)
     logger.info("*" * 25)
     logger.debug(" Loaded text environment variables")
