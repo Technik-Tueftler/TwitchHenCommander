@@ -47,6 +47,8 @@ from constants import (
     DC_MESSAGE_STREAMSTART_NOTI_ROLE_NO_PATTERN,
     DC_MESSAGE_STREAMSTART_NOTI_ROLE_REPLACEMENT,
     YT_MAX_FETCHED_VIDEOS,
+    CHAT_LINK_PATTERN,
+    DB_CONNECTION_STRING
 )
 
 
@@ -65,12 +67,12 @@ class AuthenticationLevel(Enum):
     SUBSCRIBER = 1
     EVERYONE = 0
 
-
 client_id = config.get("TW_CLIENT_ID", None)
 token = config.get("TW_TOKEN", None)
 nickname = config.get("TW_NICKNAME", None)
 init_channels = config.get("TW_INIT_CHANNELS", None)
 broadcaster_id = config.get("TW_BROADCASTER_ID", None)
+db_connection_string = config.get("DB_CONNECTION_STRING", DB_CONNECTION_STRING)
 check_stream_interval = config.get("CHECK_STREAM_INTERVAL", CHECK_STREAM_INTERVAL)
 log_level_env = config.get("LOG_LEVEL", LOG_LEVEL)
 discord_username_hashtag = config.get("DC_USER_NAME_HASHTAG", None)
@@ -148,11 +150,15 @@ yt_post_text = config.get("YT_POST_TEXT", YT_POST_TEXT)
 bot_command_pattern = re.compile(BOT_COMMAND_PATTERN)
 dc_noti_role_pattern = re.compile(DC_MESSAGE_STREAMSTART_NOTI_ROLE_NO_PATTERN)
 
+link_pattern = config.get("CHAT_LINK_PATTERN", CHAT_LINK_PATTERN)
+
+
 app_settings = {
     "ID": client_id,
     "token": token,
     "nickname": nickname,
     "broadcaster_id": broadcaster_id,
+    "db_con_str": db_connection_string,
     "channels": None,
     "dc_available": False,
     "dc_feature_hashtag": False,
@@ -212,8 +218,12 @@ youtube_settings = {
     "yt_post_text": yt_post_text,
 }
 
+link_settings = {
+    "link_pattern": re.compile(link_pattern, re.IGNORECASE)
+}
 
-def log_settings() -> None:
+
+def log_settings() -> None: # pylint: disable=too-many-statements
     """Log all settings for user information"""
     log_level = app_settings["log_level"]
     streamstart = app_settings["start_bot_at_streamstart"]
@@ -225,6 +235,7 @@ def log_settings() -> None:
     yt_fetch_time_setting = app_settings["yt_new_video_fetch_time"]
     yt_max_fetched_new_videos = app_settings["yt_max_fetched_videos"]
     online_check_time = app_settings["check_stream_interval"]
+    link_pattern_info = link_settings["link_pattern"]
     logger.info("=" * 25)
     logger.info(" Settings")
     logger.info("=" * 25)
@@ -262,6 +273,10 @@ def log_settings() -> None:
     logger.debug(f"Thank you text: {hashtag_chatter_thanks_text}")
     logger.debug(f"Stream start message: {dc_feature_message_streamstart_text}")
     logger.debug(f"Youtube post text: {yt_post_text}")
+    logger.info("*" * 25)
+    logger.info("*" * 25)
+    logger.debug(" Loaded link variables")
+    logger.debug(f"Link pattern: {link_pattern_info}")
     logger.info("=" * 25)
 
 

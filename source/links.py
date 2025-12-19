@@ -2,17 +2,11 @@
 All functions to collect the links and send the collected to the configured platforms
 """
 
-import re
 from datetime import datetime, UTC
 import twitchio
 import db
 import hashtag_handler as hashh
-from constants import (
-    BOT_LINK_PATTERN,
-)
-
-bot_link_pattern = re.compile(BOT_LINK_PATTERN)
-
+import environment_verification as env
 
 async def separate_links(message: twitchio.message.Message) -> set:
     """
@@ -20,7 +14,7 @@ async def separate_links(message: twitchio.message.Message) -> set:
     :param message:
     :return: Set of links
     """
-    return re.findall(BOT_LINK_PATTERN, message.content)
+    return env.link_settings["link_pattern"].findall(message.content)
 
 
 async def review_links(links: set, _: str) -> set:
