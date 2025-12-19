@@ -4,6 +4,7 @@ import asyncio
 from datetime import datetime
 import requests
 from googleapiclient.discovery import build
+import googleapiclient.errors
 import db
 from generic_functions import MyTemplate
 from watcher import logger
@@ -61,8 +62,14 @@ async def get_latest_yt_videos(
             )
             videos.append(video)
         return videos
+    except googleapiclient.errors.HttpError as http_err:
+        logger.error(f"YouTube HTTP Error {http_err.resp.status}: {http_err.content}")
+        return []
     except OSError as err:
         logger.error(f"Youtube API Error: {err}")
+        return []
+    except (ValueError, KeyError) as err:
+        logger.error(f"API Parameter Error: {err}")
         return []
 
 
