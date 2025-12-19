@@ -127,7 +127,7 @@ async def check_stream_start_message(settings: dict, response: dict) -> None:
     elif settings["dc_feature_start_message"] and not hashh.app_data["online"]:
         async with hashh.lock:
             hashh.app_data["start_message_done"] = False
-            logger.debug("Stream-Start-Message-Check has been reset.")
+            logger.trace("Stream-Start-Message-Check has been reset.")
 
 
 async def check_stream_start(settings: dict, response: dict) -> None:
@@ -157,7 +157,7 @@ async def check_stream_start(settings: dict, response: dict) -> None:
                 await hashh.register_new_hashtags(None, set(streamhashtags))
             logger.info("Automatic Stream-Start detected, collecting hashtags allowed.")
         else:
-            logger.debug("Stream-start status is false, no stream start detected")
+            logger.trace("Stream-start status is false, no stream start detected")
 
 
 async def check_stream_end(settings: dict, response: dict) -> None:
@@ -172,7 +172,7 @@ async def check_stream_end(settings: dict, response: dict) -> None:
             await hashh.allow_collecting(False)
             await hashh.tweet_hashtags()
             await hashh.set_stream_status(False)
-            logger.debug("Automatic Stream-End (1) detected, hashtags puplished.")
+            logger.info("Automatic Stream-End (1) detected, hashtags puplished.")
         elif (
             response["data"]
             and hashh.app_data["online"]
@@ -181,9 +181,9 @@ async def check_stream_end(settings: dict, response: dict) -> None:
             await hashh.allow_collecting(False)
             await hashh.tweet_hashtags()
             await hashh.set_stream_status(False)
-            logger.debug("Automatic Stream-End (2) detected, hashtags puplished.")
+            logger.info("Automatic Stream-End (2) detected, hashtags puplished.")
         else:
-            logger.debug("Stream-end status is false, no stream ending detected")
+            logger.trace("Stream-end status is false, no stream ending detected")
 
 
 async def streaming_handler(**settings) -> None:

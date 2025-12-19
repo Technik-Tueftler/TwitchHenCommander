@@ -4,6 +4,7 @@ import asyncio
 from datetime import datetime
 import requests
 from googleapiclient.discovery import build
+import googleapiclient.errors
 import db
 from generic_functions import MyTemplate
 from watcher import logger
@@ -28,6 +29,7 @@ async def get_latest_yt_videos(
     """
     try:
         youtube = build("youtube", "v3", developerKey=api_key)
+        videos: list[db.Video] = []
 
         response = (
             youtube.search()  # pylint: disable=no-member
@@ -37,13 +39,17 @@ async def get_latest_yt_videos(
                 maxResults=max_results,
                 order="date",
                 type="video",  # No playlists or livestreams
-                fields="items(id,snippet(title,publishedAt))",
+                fields="items(id,snippet(title,publishedAt,channelId))",
             )
             .execute()
         )
 
-        videos = []
         for item in response["items"]:
+            if item["snippet"].get("channelId") != channel_id:
+                url = f'https://www.youtube.com/watch?v={item["id"]["videoId"]}'
+                channel_id_found = item["snippet"].get("channelId")
+                logger.debug(f"Wrong channel id ({channel_id_found}) found with video: {url}")
+                continue
             title = item["snippet"]["title"]
             video_id = item["id"]["videoId"]
             published_at = item["snippet"]["publishedAt"]
@@ -57,8 +63,14 @@ async def get_latest_yt_videos(
             )
             videos.append(video)
         return videos
+    except googleapiclient.errors.HttpError as http_err:
+        logger.error(f"YouTube HTTP Error {http_err.resp.status}: {http_err.content}")
+        return []
     except OSError as err:
         logger.error(f"Youtube API Error: {err}")
+        return []
+    except (ValueError, KeyError) as err:
+        logger.error(f"API Parameter Error: {err}")
         return []
 
 
