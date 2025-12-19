@@ -47,7 +47,8 @@ async def get_latest_yt_videos(
         for item in response["items"]:
             if item["snippet"].get("channelId") != channel_id:
                 url = f'https://www.youtube.com/watch?v={item["id"]["videoId"]}'
-                logger.debug(f"Wrong channel id found with video: {url}")
+                channel_id_found = item["snippet"].get("channelId")
+                logger.debug(f"Wrong channel id ({channel_id_found}) found with video: {url}")
                 continue
             title = item["snippet"]["title"]
             video_id = item["id"]["videoId"]
