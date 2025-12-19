@@ -28,6 +28,7 @@ async def get_latest_yt_videos(
     """
     try:
         youtube = build("youtube", "v3", developerKey=api_key)
+        videos: list[db.Video] = []
 
         response = (
             youtube.search()  # pylint: disable=no-member
@@ -37,13 +38,16 @@ async def get_latest_yt_videos(
                 maxResults=max_results,
                 order="date",
                 type="video",  # No playlists or livestreams
-                fields="items(id,snippet(title,publishedAt))",
+                fields="items(id,snippet(title,publishedAt,channelId))",
             )
             .execute()
         )
 
-        videos = []
         for item in response["items"]:
+            if item["snippet"].get("channelId") != channel_id:
+                url = f'https://www.youtube.com/watch?v={item["id"]["videoId"]}'
+                logger.debug(f"Wrong channel id found with video: {url}")
+                continue
             title = item["snippet"]["title"]
             video_id = item["id"]["videoId"]
             published_at = item["snippet"]["publishedAt"]
