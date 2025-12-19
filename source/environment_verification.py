@@ -223,7 +223,7 @@ link_settings = {
 }
 
 
-def log_settings() -> None:
+def log_settings() -> None: # pylint: disable=too-many-statements
     """Log all settings for user information"""
     log_level = app_settings["log_level"]
     streamstart = app_settings["start_bot_at_streamstart"]
