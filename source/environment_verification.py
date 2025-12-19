@@ -47,7 +47,8 @@ from constants import (
     DC_MESSAGE_STREAMSTART_NOTI_ROLE_NO_PATTERN,
     DC_MESSAGE_STREAMSTART_NOTI_ROLE_REPLACEMENT,
     YT_MAX_FETCHED_VIDEOS,
-    CHAT_LINK_PATTERN
+    CHAT_LINK_PATTERN,
+    DB_CONNECTION_STRING
 )
 
 
@@ -66,12 +67,12 @@ class AuthenticationLevel(Enum):
     SUBSCRIBER = 1
     EVERYONE = 0
 
-
 client_id = config.get("TW_CLIENT_ID", None)
 token = config.get("TW_TOKEN", None)
 nickname = config.get("TW_NICKNAME", None)
 init_channels = config.get("TW_INIT_CHANNELS", None)
 broadcaster_id = config.get("TW_BROADCASTER_ID", None)
+db_connection_string = config.get("DB_CONNECTION_STRING", DB_CONNECTION_STRING)
 check_stream_interval = config.get("CHECK_STREAM_INTERVAL", CHECK_STREAM_INTERVAL)
 log_level_env = config.get("LOG_LEVEL", LOG_LEVEL)
 discord_username_hashtag = config.get("DC_USER_NAME_HASHTAG", None)
@@ -157,6 +158,7 @@ app_settings = {
     "token": token,
     "nickname": nickname,
     "broadcaster_id": broadcaster_id,
+    "db_con_str": db_connection_string,
     "channels": None,
     "dc_available": False,
     "dc_feature_hashtag": False,

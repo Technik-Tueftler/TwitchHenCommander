@@ -21,6 +21,7 @@ DEVELOP_API_RESPONSE = {
 CONFIGURATION_FILE_PATH = "../files/config.json"
 CACHE_FILE_PATH = "../files/cache.json"
 LOG_FILE_PATH = "../files/log.txt"
+DB_CONNECTION_STRING = "sqlite+aiosqlite:///../files/HenCommander.db"
 HASHTAG_BLACKLIST_FILE_PATH = "../files/blacklist.txt"
 HASHTAG_MAX_LENGTH = "10"
 HASHTAG_MIN_LENGTH = "3"

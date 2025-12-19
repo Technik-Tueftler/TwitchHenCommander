@@ -5,12 +5,12 @@ import asyncio
 from datetime import datetime, timedelta, UTC
 from typing import List
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship
-from sqlalchemy import ForeignKey, select
+from sqlalchemy import ForeignKey, TEXT, String, select
 from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker
 import environment_verification as env
 from watcher import logger
 
-engine = create_async_engine("sqlite+aiosqlite:///../files/HenCommander.db", echo=False)
+engine = create_async_engine(env.app_settings["db_con_str"], echo=False)
 
 
 class Base(DeclarativeBase):
@@ -30,8 +30,8 @@ class User(Base):
 
     __tablename__ = "users"
     id: Mapped[int] = mapped_column(primary_key=True)
-    twitch_user_id: Mapped[str] = mapped_column(nullable=False)
-    twitch_user_name: Mapped[str] = mapped_column(nullable=False)
+    twitch_user_id: Mapped[str] = mapped_column(TEXT, nullable=False)
+    twitch_user_name: Mapped[str] = mapped_column(TEXT, nullable=False)
     clips: Mapped[List["Clip"]] = relationship(back_populates="user")
     links: Mapped[List["Link"]] = relationship(back_populates="user")
 
@@ -48,10 +48,10 @@ class Clip(Base):
 
     __tablename__ = "clips"
     id: Mapped[int] = mapped_column(primary_key=True)
-    clip_id: Mapped[str] = mapped_column(nullable=False)
+    clip_id: Mapped[str] = mapped_column(TEXT, nullable=False)
     user_id: Mapped[int] = mapped_column(ForeignKey("users.id"), nullable=False)
     timestamp: Mapped[datetime] = mapped_column(nullable=False)
-    title: Mapped[str] = mapped_column(nullable=False)
+    title: Mapped[str] = mapped_column(TEXT, nullable=False)
     user: Mapped[User] = relationship(back_populates="clips")
 
     def __repr__(self) -> str:
@@ -69,7 +69,7 @@ class Link(Base):
     id: Mapped[int] = mapped_column(primary_key=True)
     user_id: Mapped[int] = mapped_column(ForeignKey("users.id"), nullable=False)
     timestamp: Mapped[datetime] = mapped_column(nullable=False)
-    url: Mapped[str] = mapped_column(nullable=False)
+    url: Mapped[str] = mapped_column(TEXT, nullable=False)
     user: Mapped[User] = relationship(back_populates="links")
 
     def __repr__(self) -> str:
@@ -85,11 +85,11 @@ class Video(Base):
 
     __tablename__ = "videos"
     id: Mapped[int] = mapped_column(primary_key=True)
-    video_id: Mapped[str] = mapped_column(nullable=False)
-    portal: Mapped[str] = mapped_column(nullable=False)
+    video_id: Mapped[str] = mapped_column(TEXT, nullable=False)
+    portal: Mapped[str] = mapped_column(String(100), nullable=False)
     timestamp: Mapped[datetime] = mapped_column(nullable=False)
-    title: Mapped[str] = mapped_column(nullable=False)
-    url: Mapped[str] = mapped_column(nullable=False)
+    title: Mapped[str] = mapped_column(TEXT, nullable=False)
+    url: Mapped[str] = mapped_column(TEXT, nullable=False)
 
     def __repr__(self) -> str:
         return f"Video<{self.video_id}>"
@@ -106,8 +106,8 @@ class Stream(Base):
     id: Mapped[int] = mapped_column(primary_key=True)
     timestamp_start: Mapped[datetime] = mapped_column(nullable=False)
     timestamp_end: Mapped[datetime] = mapped_column(nullable=True)
-    hashtags: Mapped[str] = mapped_column(nullable=True)
-    chatter: Mapped[str] = mapped_column(nullable=True)
+    hashtags: Mapped[str] = mapped_column(TEXT, nullable=True)
+    chatter: Mapped[str] = mapped_column(TEXT, nullable=True)
 
     def __repr__(self) -> str:
         return f"Stream<{self.timestamp_start}>"

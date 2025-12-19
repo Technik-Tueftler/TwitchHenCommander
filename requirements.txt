@@ -9,3 +9,4 @@ typing-extensions==4.10.0
 loguru==0.7.2
 twitchio==2.7.0
 google-api-python-client==2.154.0
+aiomysql==0.3.2
