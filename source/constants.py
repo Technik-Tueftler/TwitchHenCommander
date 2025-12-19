@@ -41,7 +41,7 @@ UPDATE_INTERVAL_PUBLISH_NEW_CLIPS = "30"
 DC_FEATURE_HASHTAG = "off"
 DC_FEATURE_CLIPS = "off"
 DC_FEATURE_LINKS = "off"
-BOT_LINK_PATTERN = r"(?:(?:https?|ftp):\/\/)?[\w/\-?=%.]+\.[\w/\-&?=%.]+"
+CHAT_LINK_PATTERN = r'(?:https?://|ftp://|www\.)[^\s<>"]{2,}(?=\s|$)'
 BOT_COMMAND_PATTERN = r"^[A-Za-z0-9]+$"
 BOT_HASHTAG_COMMAND_START = "starthash"
 BOT_HASHTAG_COMMAND_FINISH = "finishhash"
