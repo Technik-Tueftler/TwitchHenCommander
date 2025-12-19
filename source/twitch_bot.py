@@ -93,7 +93,7 @@ class Bot(commands.Bot):
 
         await self.handle_commands(message)
 
-    async def event_command_error(self, context: commands.Context, error: Exception):
+    async def event_command_error(self, _: commands.Context, error: Exception):
         if isinstance(error, commands.CommandNotFound):
             return
 
