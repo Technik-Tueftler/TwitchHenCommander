@@ -8,14 +8,20 @@ import db
 import hashtag_handler as hashh
 import environment_verification as env
 
-async def separate_links(message: twitchio.message.Message) -> set:
+async def separate_links(message: twitchio.message.Message) -> list[str]:
     """
     Separate all links from a twitch message
-    :param message:
-    :return: Set of links
-    """
-    return env.link_settings["link_pattern"].findall(message.content)
 
+    Args:
+        message (twitchio.message.Message): Chat message from twitch
+
+    Returns:
+        list[str]: List of separated links
+    """
+    links = env.link_settings["link_pattern"].findall(message.content)
+    if links is None:
+        return []
+    return links
 
 async def review_links(links: set, _: str) -> set:
     """
