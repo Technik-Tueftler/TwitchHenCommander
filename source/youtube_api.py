@@ -94,7 +94,7 @@ async def new_yt_video_handler(**settings: dict) -> None:
         return
     for video in videos:
         if await db.check_video_exist("youtube", video.video_id):
-            logger.debug(f"Youtube Video: {video} already exists")
+            logger.trace(f"Youtube Video: {video} already exists")
             continue
         logger.info(f"New Youtube video detected: {video.title}")
         _ = await db.add_data(video)
