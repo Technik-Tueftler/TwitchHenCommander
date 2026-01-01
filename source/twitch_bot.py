@@ -83,13 +83,14 @@ class Bot(commands.Bot):
                         await hashh.register_new_hashtags(
                             message.author.display_name, reviewed_hashtags
                         )
-                new_links = await links.separate_links(message)
-                if len(new_links) > 0:
-                    reviewed_links = await links.review_links(
-                        new_links, message.author.display_name
-                    )
-                    if len(reviewed_links) > 0:
-                        await links.register_new_links(message.author, reviewed_links)
+        if hashh.app_data["allowed"] and hashh.app_data["online"]:
+            new_links = await links.separate_links(message)
+            if len(new_links) > 0:
+                reviewed_links = await links.review_links(
+                    new_links, message.author.display_name
+                )
+                if len(reviewed_links) > 0:
+                    await links.register_new_links(message.author, reviewed_links)
 
         await self.handle_commands(message)
 
