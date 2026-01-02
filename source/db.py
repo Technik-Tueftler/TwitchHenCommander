@@ -58,6 +58,25 @@ class Clip(Base):
         return f"Clip<{self.clip_id}>"
 
 
+class Stream(Base):
+    """Class to collect all stream related information
+
+    Args:
+        Base (_type_): Basic class that is inherited
+    """
+
+    __tablename__ = "streams"
+    id: Mapped[int] = mapped_column(primary_key=True)
+    timestamp_start: Mapped[datetime] = mapped_column(nullable=False)
+    timestamp_end: Mapped[datetime] = mapped_column(nullable=True)
+    hashtags: Mapped[str] = mapped_column(TEXT, nullable=True)
+    chatter: Mapped[str] = mapped_column(TEXT, nullable=True)
+    links: Mapped[List["Link"]] = relationship(back_populates="stream")
+
+    def __repr__(self) -> str:
+        return f"Stream<{self.timestamp_start}>"
+
+
 class Link(Base):
     """Class to be able to map the twitch user links via an ORM
 
@@ -68,9 +87,11 @@ class Link(Base):
     __tablename__ = "links"
     id: Mapped[int] = mapped_column(primary_key=True)
     user_id: Mapped[int] = mapped_column(ForeignKey("users.id"), nullable=False)
+    stream_id: Mapped[int] = mapped_column(ForeignKey("streams.id"), nullable=False)
     timestamp: Mapped[datetime] = mapped_column(nullable=False)
     url: Mapped[str] = mapped_column(TEXT, nullable=False)
     user: Mapped[User] = relationship(back_populates="links")
+    stream: Mapped[Stream] = relationship(back_populates="links")
 
     def __repr__(self) -> str:
         return f"Link<{self.id}>"
@@ -93,24 +114,6 @@ class Video(Base):
 
     def __repr__(self) -> str:
         return f"Video<{self.video_id}>"
-
-
-class Stream(Base):
-    """Class to collect all stream related information
-
-    Args:
-        Base (_type_): Basic class that is inherited
-    """
-
-    __tablename__ = "streams"
-    id: Mapped[int] = mapped_column(primary_key=True)
-    timestamp_start: Mapped[datetime] = mapped_column(nullable=False)
-    timestamp_end: Mapped[datetime] = mapped_column(nullable=True)
-    hashtags: Mapped[str] = mapped_column(TEXT, nullable=True)
-    chatter: Mapped[str] = mapped_column(TEXT, nullable=True)
-
-    def __repr__(self) -> str:
-        return f"Stream<{self.timestamp_start}>"
 
 
 class StreamValidation:

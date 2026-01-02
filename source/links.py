@@ -7,15 +7,22 @@ import twitchio
 import db
 import hashtag_handler as hashh
 import environment_verification as env
+from watcher import logger
 
-async def separate_links(message: twitchio.message.Message) -> set:
+async def separate_links(message: twitchio.message.Message) -> list[str]:
     """
     Separate all links from a twitch message
-    :param message:
-    :return: Set of links
-    """
-    return env.link_settings["link_pattern"].findall(message.content)
 
+    Args:
+        message (twitchio.message.Message): Chat message from twitch
+
+    Returns:
+        list[str]: List of separated links
+    """
+    links = env.link_settings["link_pattern"].findall(message.content)
+    if links is None:
+        return []
+    return links
 
 async def review_links(links: set, _: str) -> set:
     """
@@ -31,7 +38,7 @@ async def review_links(links: set, _: str) -> set:
     return links
 
 
-async def register_new_links(author: twitchio.message.Message, new_links: set) -> None:
+async def register_new_links(author: twitchio.message.Message, new_links: list) -> None:
     """
     Prevents duplications and add all new links to app_data.
     :display_name: Displayname of chatter
@@ -39,14 +46,17 @@ async def register_new_links(author: twitchio.message.Message, new_links: set) -
     :return: None
     """
     async with hashh.lock:
-        merged_links = set(hashh.app_data["links"]).union(set(new_links))
+        unique_links = [link for link in new_links if link not in hashh.app_data["links"]]
+        merged_links = set(hashh.app_data["links"]).union(set(unique_links))
         hashh.app_data["links"] = list(merged_links)
         db_links = set()
-        for link in merged_links:
+        for link in unique_links:
+            logger.debug(f"Register new link: {link} from {author.display_name}")
             user = await db.get_twitch_user(author.id, author.display_name)
             db_links.add(
                 db.Link(
                     user_id=user.id,
+                    stream_id=hashh.app_data["stream_id"],
                     timestamp=datetime.now(UTC),
                     url=link,
                 )
